@@ -1,4 +1,4 @@
-package controller;
+package com.derecho.oauth2login.controller;
 
 import java.util.Map;
 
