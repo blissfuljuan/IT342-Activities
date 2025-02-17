@@ -1,4 +1,4 @@
-package com.malagapo.OAuth2Login.controller;
+package com.pangalay.OAuth2Login.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

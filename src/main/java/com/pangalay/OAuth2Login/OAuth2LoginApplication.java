@@ -1,4 +1,4 @@
-package com.malagapo.OAuth2Login;
+package com.pangalay.OAuth2Login;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

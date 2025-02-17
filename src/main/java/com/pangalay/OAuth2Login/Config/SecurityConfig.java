@@ -1,4 +1,4 @@
-package com.malagapo.OAuth2Login.Config;
+package com.pangalay.OAuth2Login.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
