@@ -1,4 +1,4 @@
-package com.example.Sugimoto;
+package com.example.sugimoto;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
