@@ -8,6 +8,7 @@ public class OAuth2LoginApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(OAuth2LoginApplication.class, args);
+		System.out.println("Running!!!");
 	}
 
 }
