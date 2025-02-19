@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-OAuth2LoginApplication<OAuth2demo>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "duterte.com.example.OAuth2demo.OAuth2LoginApplication",
+            "projectName": "OAuth2demo",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

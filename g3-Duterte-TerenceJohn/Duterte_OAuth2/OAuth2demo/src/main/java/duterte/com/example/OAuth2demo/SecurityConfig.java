@@ -1,4 +1,4 @@
-package com.maquiling.dymur.hello;
+package duterte.com.example.OAuth2demo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
