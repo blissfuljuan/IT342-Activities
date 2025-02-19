@@ -1,4 +1,4 @@
-package com.sevenial.oauth2login;
+package com.sevenial.oauth2login.controller;
 
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,4 +21,8 @@ public class UserController {
         return oAuth2User.getAttributes();
     }
 
+    @GetMapping("/secured")
+    public String securedEndpoint(){
+        return "<h1> This is a secured Enpoint. </h1>";
+    }
 }
