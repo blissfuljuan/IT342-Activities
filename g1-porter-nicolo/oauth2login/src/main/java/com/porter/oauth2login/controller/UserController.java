@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     @GetMapping()
-    public String Index() {
+    public String index() {
         return "AAAAAAAAAA";
     }
 
@@ -19,4 +19,5 @@ public class UserController {
     public Map<String, Object> getUser(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return oAuth2User.getAttributes();
     }
+
 }
