@@ -8,6 +8,7 @@ public class OAuth2loginApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(OAuth2loginApplication.class, args);
+		System.out.println("Andre Bacusmo so Gwapo");
 	}
 
 }
