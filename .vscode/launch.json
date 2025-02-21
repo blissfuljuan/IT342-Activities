@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-OAuth2LoginApplication<oauth2login>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.lacanglacang.oauth2login.OAuth2LoginApplication",
+            "projectName": "oauth2login",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
