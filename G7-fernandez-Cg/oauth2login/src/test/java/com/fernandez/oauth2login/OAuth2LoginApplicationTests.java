@@ -1,4 +1,4 @@
-package com.fernandez.aouth2login;
+package com.fernandez.oauth2login;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

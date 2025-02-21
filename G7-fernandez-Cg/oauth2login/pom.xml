@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.fernandez</groupId>
-	<artifactId>aouth2login</artifactId>
+	<artifactId>oauth2login</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>OAuth2Login</name>
 	<description>Spring Boot Integration with OAuth2</description>

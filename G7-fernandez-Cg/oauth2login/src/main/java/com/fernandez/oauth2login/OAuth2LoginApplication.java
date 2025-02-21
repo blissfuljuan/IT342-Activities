@@ -1,4 +1,4 @@
-package com.fernandez.aouth2login;
+package com.fernandez.oauth2login;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
