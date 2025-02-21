@@ -10,4 +10,6 @@ public class Oauth2loginApplication {
 		SpringApplication.run(Oauth2loginApplication.class, args);
 	}
 
+
 }
+ 
