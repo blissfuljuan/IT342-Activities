@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        pre {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>User Information (JSON Format)</h2>
+    <pre id="json-output">Loading...</pre>
+</div>
+
+<script>
+        async function fetchUserInfo() {
+            try {
+                const response = await fetch('/user-info');
+                const data = await response.json();
+
+                // Format the JSON output
+                document.getElementById('json-output').textContent = JSON.stringify(data, null, 4);
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+                document.getElementById('json-output').textContent = "Failed to load user info.";
+            }
+        }
+
+        fetchUserInfo();
+    </script>
+
+</body>
+</html>
