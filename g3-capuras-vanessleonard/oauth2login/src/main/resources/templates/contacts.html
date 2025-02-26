@@ -272,57 +272,61 @@
 
   // Save edited contact
   function saveContact(contactId, index) {
-    const name = document.getElementById('edit-name-' + index).value;
-    const phone = document.getElementById('edit-phone-' + index).value;
+    const name = document.getElementById('edit-name-' + index).value.trim();
+    const phone = document.getElementById('edit-phone-' + index).value.trim();
 
-    // Validate inputs
     if (!name || !phone) {
-      alert('Name and phone number are required');
+      showToast('Name and phone number are required', 'error');
       return;
     }
 
-    // Make API call to update contact
-    fetch('/api/contacts/' + contactId, {
-      method: 'PUT',
+    // Clean up the contact ID
+    const cleanId = contactId.replace('people/', '');
+
+    fetch(`/api/contacts/${encodeURIComponent(cleanId)}`, {
+      method: 'PUT',  // Changed from PATCH to PUT
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         name: name,
         phoneNumber: phone
-      }),
+      })
     })
-            .then(response => {
-              if (response.ok) {
-                return response.json();
+            .then(async response => {
+              const text = await response.text();
+              console.log('Response:', text);
+
+              if (!response.ok) {
+                throw new Error(text || `HTTP error! status: ${response.status}`);
               }
-              throw new Error('Failed to update contact');
+
+              try {
+                return text ? JSON.parse(text) : {};
+              } catch (e) {
+                console.error('Error parsing JSON:', e);
+                return {};
+              }
             })
             .then(data => {
-              // Find the card containing this contact
-              const contactCards = document.querySelectorAll('.contact-card');
-              const card = contactCards[index];
-
-              // Update the contact display
+              const card = document.querySelectorAll('.contact-card')[index];
               card.querySelector('.contact-name').textContent = name;
               card.querySelector('.contact-phone').textContent = phone;
-
-              // Hide edit form
               cancelEdit(index);
-
-              // Show success message
-              alert('Contact updated successfully!');
+              showToast('Contact updated successfully!', 'success');
             })
             .catch(error => {
               console.error('Error:', error);
-              alert('Error updating contact: ' + error.message);
+              showToast('Failed to update contact: ' + error.message, 'error');
             });
   }
 
   // Show delete confirmation
   function confirmDelete(contactId, name) {
+    console.log('Confirming delete for:', contactId, name);
     currentContactId = contactId;
-    document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete "' + name + '"?';
+    document.getElementById('deleteMessage').textContent = `Are you sure you want to delete "${name}"?`;
     document.getElementById('confirmDeleteBtn').onclick = function() {
       deleteContact(contactId);
     };
@@ -336,18 +340,43 @@
 
   // Delete contact
   function deleteContact(contactId) {
-    // Make API call to delete contact
-    fetch('/api/contacts/' + contactId, {
+    // Extract just the ID from the resourceId if it contains a path
+    const id = contactId.includes('/') ? contactId.split('/').pop() : contactId;
+    console.log('Attempting to delete contact:', id);
+
+    fetch(`/api/contacts/${id}`, {
       method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
     })
             .then(response => {
-              if (response.ok) {
-                // Find and remove the contact element
+              console.log('Delete response status:', response.status);
+
+              if (response.status >= 200 && response.status < 300) {  // Check for any successful status code
+                // Remove the contact card from the UI
                 const contactCards = document.querySelectorAll('.contact-card');
                 for (let i = 0; i < contactCards.length; i++) {
                   const deleteBtn = contactCards[i].querySelector('.delete-contact-btn');
                   if (deleteBtn.getAttribute('data-resource-id') === contactId) {
-                    contactCards[i].remove();
+                    // Fade out animation
+                    const card = contactCards[i];
+                    card.style.transition = 'opacity 0.5s ease';
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                      card.remove();
+                      // Check if there are no more contacts
+                      if (document.querySelectorAll('.contact-card').length === 0) {
+                        // Show "No contacts" message
+                        const contactsList = document.getElementById('contactsList');
+                        const emptyMessage = document.createElement('div');
+                        emptyMessage.className = 'empty-contacts';
+                        emptyMessage.innerHTML = '<p>No contacts found with phone numbers.</p>';
+                        contactsList.parentNode.replaceChild(emptyMessage, contactsList);
+                      }
+                    }, 500);
                     break;
                   }
                 }
@@ -356,14 +385,61 @@
                 cancelDelete();
 
                 // Show success message
-                alert('Contact deleted successfully!');
+                const successMessage = document.createElement('div');
+                successMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #4CAF50;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 4px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+                successMessage.textContent = 'Contact deleted successfully!';
+                document.body.appendChild(successMessage);
+
+                // Show and hide the success message
+                setTimeout(() => {
+                  successMessage.style.opacity = '1';
+                  setTimeout(() => {
+                    successMessage.style.opacity = '0';
+                    setTimeout(() => {
+                      successMessage.remove();
+                    }, 300);
+                  }, 2000);
+                }, 100);
+
               } else {
-                throw new Error('Failed to delete contact');
+                throw new Error(`Failed to delete contact. Status: ${response.status}`);
               }
             })
             .catch(error => {
               console.error('Error:', error);
-              alert('Error deleting contact: ' + error.message);
+
+              // Show error message in a toast-like notification
+              const errorMessage = document.createElement('div');
+              errorMessage.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f44336;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        `;
+              errorMessage.textContent = `Error: ${error.message}`;
+              document.body.appendChild(errorMessage);
+
+              setTimeout(() => {
+                errorMessage.remove();
+              }, 3000);
+
               cancelDelete();
             });
   }

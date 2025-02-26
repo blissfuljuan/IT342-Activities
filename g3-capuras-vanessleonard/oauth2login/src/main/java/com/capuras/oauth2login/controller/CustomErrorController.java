@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Controller
@@ -64,8 +66,8 @@ public class CustomErrorController implements ErrorController {
             requestPath = path.toString();
         }
 
-        // Get current time
-        LocalDateTime now = LocalDateTime.now();
+        // Get current time with timezone
+        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z yyyy");
         String currentTime = now.format(formatter);
 

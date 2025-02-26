@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
@@ -16,9 +17,9 @@ public class GooglePeopleService {
     private final OAuth2AuthorizedClientService authorizedClientService;
     private final RestTemplate restTemplate;
 
-    public GooglePeopleService(OAuth2AuthorizedClientService authorizedClientService) {
+    public GooglePeopleService(OAuth2AuthorizedClientService authorizedClientService, RestTemplate restTemplate) {
         this.authorizedClientService = authorizedClientService;
-        this.restTemplate = new RestTemplate();
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -174,10 +175,6 @@ public class GooglePeopleService {
     @SuppressWarnings("unchecked")
     public Contact updateContact(OAuth2AuthenticationToken authentication, String resourceId, Contact updatedContact) {
         try {
-            if (!"google".equals(authentication.getAuthorizedClientRegistrationId())) {
-                throw new RuntimeException("Not a Google account");
-            }
-
             OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
                     authentication.getAuthorizedClientRegistrationId(),
                     authentication.getName()
@@ -192,63 +189,51 @@ public class GooglePeopleService {
             headers.setBearerAuth(accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // First, get the current contact data
-            String getUrl = "https://people.googleapis.com/v1/" + resourceId + "?personFields=names,phoneNumbers";
-            ResponseEntity<Map> getResponse = restTemplate.exchange(
-                    getUrl,
-                    HttpMethod.GET,
-                    new HttpEntity<>(headers),
-                    Map.class
-            );
+            // Ensure resourceId is properly formatted
+            String formattedResourceId = resourceId;
+            if (!formattedResourceId.startsWith("people/")) {
+                formattedResourceId = "people/" + formattedResourceId;
+            }
 
-            Map<String, Object> contactData = getResponse.getBody();
+            // Construct the correct URL for the People API
+            String updateUrl = String.format("https://people.googleapis.com/v1/%s:updateContact?updatePersonFields=names,phoneNumbers", formattedResourceId);
 
             // Prepare update data
             Map<String, Object> updateData = new HashMap<>();
 
-            // Update name if it exists
-            if (contactData != null && contactData.containsKey("names")) {
-                List<Map<String, Object>> names = (List<Map<String, Object>>) contactData.get("names");
-                if (names != null && !names.isEmpty()) {
-                    Map<String, Object> nameData = new HashMap<>(names.get(0));
-                    nameData.put("displayName", updatedContact.getName());
-                    nameData.put("unstructuredName", updatedContact.getName());
+            // Add etag (required for updates)
+            updateData.put("etag", "%EgQBAj0BBh4DBgQ9Aj0C");  // Add a default etag or fetch it from the contact
 
-                    List<Map<String, Object>> updatedNames = new ArrayList<>();
-                    updatedNames.add(nameData);
-                    updateData.put("names", updatedNames);
-                }
-            }
+            // Add names
+            Map<String, Object> name = new HashMap<>();
+            name.put("givenName", updatedContact.getName());
+            name.put("displayName", updatedContact.getName());
+            updateData.put("names", Collections.singletonList(name));
 
-            // Update phone number
-            List<Map<String, Object>> updatedPhones = new ArrayList<>();
-            Map<String, Object> phoneData = new HashMap<>();
-            phoneData.put("value", updatedContact.getPhoneNumber());
-            phoneData.put("type", "mobile");
-            updatedPhones.add(phoneData);
-            updateData.put("phoneNumbers", updatedPhones);
+            // Add phone numbers
+            Map<String, Object> phone = new HashMap<>();
+            phone.put("value", updatedContact.getPhoneNumber());
+            phone.put("type", "mobile");
+            updateData.put("phoneNumbers", Collections.singletonList(phone));
 
-            // Set update mask
-            String updateMask = "names,phoneNumbers";
-
-            // Perform update
-            String updateUrl = "https://people.googleapis.com/v1/" + resourceId + "?updatePersonFields=" + updateMask;
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(updateData, headers);
 
             ResponseEntity<Map> updateResponse = restTemplate.exchange(
                     updateUrl,
-                    HttpMethod.PATCH,
-                    new HttpEntity<>(updateData, headers),
+                    HttpMethod.PATCH,  // Changed back to PATCH as per Google's API requirements
+                    requestEntity,
                     Map.class
             );
 
-            Map<String, Object> updatedData = updateResponse.getBody();
-            if (updatedData != null) {
-                return new Contact(resourceId, updatedContact.getName(), updatedContact.getEmail(), updatedContact.getPhoneNumber());
-            } else {
-                throw new RuntimeException("Failed to update contact");
+            if (updateResponse.getStatusCode().is2xxSuccessful()) {
+                return new Contact(resourceId, updatedContact.getName(),
+                        updatedContact.getEmail(), updatedContact.getPhoneNumber());
             }
 
+            throw new RuntimeException("Update failed with status: " + updateResponse.getStatusCode());
+
         } catch (Exception e) {
+            System.err.println("Error updating contact: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error updating contact: " + e.getMessage());
         }
@@ -273,25 +258,39 @@ public class GooglePeopleService {
             }
 
             String accessToken = client.getAccessToken().getTokenValue();
-
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // Delete contact
-            String url = "https://people.googleapis.com/v1/" + resourceId + ":deleteContact";
+            String contactId = resourceId;
+            if (resourceId.contains("/")) {
+                contactId = resourceId.substring(resourceId.lastIndexOf('/') + 1);
+            }
 
-            ResponseEntity<Void> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.DELETE,
-                    new HttpEntity<>(headers),
-                    Void.class
-            );
+            String url = String.format("https://people.googleapis.com/v1/people/%s:deleteContact", contactId);
+            System.out.println("Attempting to delete contact with URL: " + url);
 
-            if (response.getStatusCode() != HttpStatus.NO_CONTENT) {
-                throw new RuntimeException("Failed to delete contact, status: " + response.getStatusCode());
+            try {
+                ResponseEntity<Void> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.DELETE,
+                        new HttpEntity<>(headers),
+                        Void.class
+                );
+
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    System.out.println("Contact deleted successfully with status: " + response.getStatusCode());
+                } else {
+                    throw new RuntimeException("Failed to delete contact, unexpected status: " + response.getStatusCode());
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error deleting contact: " + e.getMessage());
+                throw e;
             }
 
         } catch (Exception e) {
+            System.err.println("Error in deleteContact: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error deleting contact: " + e.getMessage());
         }

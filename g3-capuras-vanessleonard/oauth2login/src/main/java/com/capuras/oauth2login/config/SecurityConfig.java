@@ -15,12 +15,14 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error").permitAll() // Allow access to error page without authentication
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/**").authenticated() // Allow access to error page without authentication
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth.defaultSuccessUrl("/googleuser", true))
                 .formLogin(form -> form.defaultSuccessUrl("/secured", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.disable())
                 .build();
     }
 }
