@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Information</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .user-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<h2>Google User Information</h2>
+
+<table>
+    <tr>
+        <th>Profile Picture</th>
+        <td>
+            <img th:if="${picture}" th:src="${picture}" class="user-picture" alt="Profile Picture"/>
+        </td>
+    </tr>
+    <tr>
+        <th>Name</th>
+        <td th:text="${name}">-</td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td th:text="${email}">-</td>
+    </tr>
+    <tr>
+        <th>Phone</th>
+        <td th:text="${phone}">-</td>
+    </tr>
+</table>
+
+<div th:if="${#authentication != null}">
+    <h3>All Available Attributes:</h3>
+    <table>
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+        <tr th:each="attr : ${#authentication.principal.attributes}">
+            <td th:text="${attr.key}">Key</td>
+            <td th:text="${attr.value}">Value</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Add Contact Form and Contacts List -->
+<div style="margin: 20px auto; max-width: 600px;">
+    <h3>Add New Contact</h3>
+    <form id="addContactForm" style="margin-bottom: 20px;">
+        <div style="margin-bottom: 10px;">
+            <input type="text" id="contactName" placeholder="Name" required style="padding: 5px; margin-right: 10px;">
+            <input type="email" id="contactEmail" placeholder="Email" required style="padding: 5px; margin-right: 10px;">
+            <input type="tel" id="contactPhone" placeholder="Phone" required style="padding: 5px; margin-right: 10px;">
+            <button type="submit" style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Add Contact</button>
+        </div>
+    </form>
+
+    <h3>Your Contacts</h3>
+    <div id="contactsList">
+        <!-- Contacts will be loaded here -->
+    </div>
+</div>
+
+<!-- Add this after the existing user info table -->
+<div style="margin: 20px auto; max-width: 600px;">
+    <h3>Additional Profile Information</h3>
+    <form id="profileForm" style="margin-bottom: 20px;">
+        <div style="margin-bottom: 10px;">
+            <label for="localPhoneNumber">Local Phone Number:</label>
+            <input type="tel" id="localPhoneNumber" name="localPhoneNumber" style="padding: 5px; margin: 5px;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label for="alternativeEmail">Alternative Email:</label>
+            <input type="email" id="alternativeEmail" name="alternativeEmail" style="padding: 5px; margin: 5px;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" style="padding: 5px; margin: 5px;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label for="notes">Notes:</label>
+            <textarea id="notes" name="notes" style="padding: 5px; margin: 5px;"></textarea>
+        </div>
+        <button type="submit" style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">
+            Save Additional Info
+        </button>
+    </form>
+    <p style="color: #666; font-size: 0.9em;">
+        Note: This information is stored locally in our application and is not connected to your Google account.
+        To update your Google profile information, please visit 
+        <a href="https://myaccount.google.com/" target="_blank">Google Account Settings</a>.
+    </p>
+</div>
+
+<!-- Add this script section at the bottom of the body -->
+<script>
+    // Function to load and display contacts
+    function loadContacts() {
+        fetch('/contacts')
+            .then(response => response.json())
+            .then(contacts => {
+                const contactsList = document.getElementById('contactsList');
+                contactsList.innerHTML = '';
+                
+                contacts.forEach(contact => {
+                    const contactDiv = document.createElement('div');
+                    contactDiv.style.margin = '10px 0';
+                    contactDiv.style.padding = '10px';
+                    contactDiv.style.border = '1px solid #ddd';
+                    contactDiv.style.borderRadius = '4px';
+                    
+                    contactDiv.innerHTML = `
+                        <strong>${contact.name}</strong><br>
+                        Email: ${contact.email}<br>
+                        Phone: ${contact.phone}
+                        <button onclick="deleteContact(${contact.id})" 
+                                style="float: right; padding: 5px 10px; background-color: #f44336; 
+                                color: white; border: none; cursor: pointer;">
+                            Delete
+                        </button>
+                    `;
+                    
+                    contactsList.appendChild(contactDiv);
+                });
+            })
+            .catch(error => console.error('Error loading contacts:', error));
+    }
+
+    // Function to add a new contact
+    document.getElementById('addContactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const contactData = {
+            name: document.getElementById('contactName').value,
+            email: document.getElementById('contactEmail').value,
+            phone: document.getElementById('contactPhone').value
+        };
+
+        fetch('/contacts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(contactData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Clear the form
+            document.getElementById('addContactForm').reset();
+            // Reload the contacts list
+            loadContacts();
+        })
+        .catch(error => console.error('Error adding contact:', error));
+    });
+
+    // Function to delete a contact
+    function deleteContact(id) {
+        if (confirm('Are you sure you want to delete this contact?')) {
+            fetch(`/contacts/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the contacts list
+                    loadContacts();
+                } else {
+                    console.error('Failed to delete contact');
+                }
+            })
+            .catch(error => console.error('Error deleting contact:', error));
+        }
+    }
+
+    // Load contacts when the page loads
+    document.addEventListener('DOMContentLoaded', loadContacts);
+
+    // Add this to your existing JavaScript
+    function loadProfile() {
+        fetch('/user-profile')
+            .then(response => response.json())
+            .then(profile => {
+                document.getElementById('localPhoneNumber').value = profile.localPhoneNumber || '';
+                document.getElementById('alternativeEmail').value = profile.alternativeEmail || '';
+                document.getElementById('address').value = profile.address || '';
+                document.getElementById('notes').value = profile.notes || '';
+            })
+            .catch(error => console.error('Error loading profile:', error));
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const profileData = {
+            localPhoneNumber: document.getElementById('localPhoneNumber').value,
+            alternativeEmail: document.getElementById('alternativeEmail').value,
+            address: document.getElementById('address').value,
+            notes: document.getElementById('notes').value
+        };
+
+        fetch('/user-profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(profileData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Profile updated successfully!');
+        })
+        .catch(error => console.error('Error updating profile:', error));
+    });
+
+    // Load profile when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProfile();
+        loadContacts(); // Your existing function
+    });
+</script>
+</body>
+</html>
