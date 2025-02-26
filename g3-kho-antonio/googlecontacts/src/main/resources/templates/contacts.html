@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts</title>
+</head>
+<body>
+<h1>Your Contacts</h1>
+<ul>
+    <th:block th:each="contact : ${contacts}">
+        <li>
+            <p>Name: <span th:text="${contact.name}"></span></p>
+            <p>Emails: <span th:text="${contact.emails}"></span></p>
+            <p>Phones: <span th:text="${contact.phones}"></span></p>
+            <form action="/contacts/modify" method="POST">
+                <input type="hidden" name="contactId" th:value="${contact.id}"/>
+                <button type="submit">Modify</button>
+            </form>
+            <form action="/contacts/remove" method="POST">
+                <input type="hidden" name="contactId" th:value="${contact.id}"/>
+                <button type="submit">Remove</button>
+            </form>
+        </li>
+    </th:block>
+</ul>
+<form action="/contacts/add" method="POST">
+    <label for="name">Name: </label><input type="text" name="name" required/>
+    <label for="email">Email: </label><input type="email" name="email" required/>
+    <label for="phone">Phone: </label><input type="tel" name="phone"/>
+    <button type="submit">Add Contact</button>
+</form>
+</body>
+</html>
