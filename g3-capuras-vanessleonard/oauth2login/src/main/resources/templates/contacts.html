@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Google Contacts Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h2 {
+      color: #333;
+      text-align: center;
+    }
+    .contacts-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .contact-card {
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .contact-info {
+      flex-grow: 1;
+    }
+    .contact-name {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    .contact-phone {
+      color: #666;
+    }
+    .contact-email {
+      color: #888;
+      font-style: italic;
+      font-size: 14px;
+    }
+    .contact-actions {
+      display: flex;
+      gap: 5px;
+    }
+    .edit-form {
+      display: none;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .edit-form input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .btn-edit {
+      background-color: #4CAF50;
+    }
+    .btn-edit:hover {
+      background-color: #45a049;
+    }
+    .btn-delete {
+      background-color: #f44336;
+    }
+    .btn-delete:hover {
+      background-color: #d32f2f;
+    }
+    .btn-save {
+      background-color: #2196F3;
+    }
+    .btn-save:hover {
+      background-color: #0b7dda;
+    }
+    .btn-cancel {
+      background-color: #607d8b;
+    }
+    .btn-cancel:hover {
+      background-color: #546e7a;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .nav-buttons {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .nav-btn {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #5bc0de;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin: 0 5px;
+    }
+    .nav-btn:hover {
+      background-color: #46b8da;
+    }
+    .empty-contacts {
+      text-align: center;
+      padding: 30px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+<div class="nav-buttons">
+  <a href="/googleuser" class="nav-btn">Back to Profile</a>
+</div>
+
+<div class="contacts-container">
+  <h2>Google Contacts Manager</h2>
+
+  <div th:if="${contactsMap == null or contactsMap.isEmpty()}" class="empty-contacts">
+    <p>No contacts found with phone numbers.</p>
+  </div>
+
+  <div th:if="${contactsMap != null and not contactsMap.isEmpty()}">
+    <div id="contactsList">
+      <div th:each="contact, contactStat : ${contactsMap}" class="contact-card">
+        <div class="contact-info">
+          <div class="contact-name" th:text="${contact.value.name}">Contact Name</div>
+          <div class="contact-phone" th:text="${contact.value.phoneNumber}">Phone Number</div>
+          <div th:if="${contact.value.email != null and contact.value.email != ''}" class="contact-email" th:text="${contact.value.email}">Email</div>
+        </div>
+        <div class="contact-actions">
+          <button class="btn btn-edit" th:onclick="'editContact(\'' + ${contact.key} + '\', \'' + ${contact.value.name} + '\', \'' + ${contact.value.phoneNumber} + '\', ' + ${contactStat.index} + ')'">Edit</button>
+          <button class="btn btn-delete" th:onclick="'confirmDelete(\'' + ${contact.key} + '\', \'' + ${contact.value.name} + '\')'">Delete</button>
+        </div>
+        <div class="edit-form" th:id="'edit-form-' + ${contactStat.index}">
+          <input type="text" th:id="'edit-name-' + ${contactStat.index}" th:value="${contact.value.name}" placeholder="Name" />
+          <input type="text" th:id="'edit-phone-' + ${contactStat.index}" th:value="${contact.value.phoneNumber}" placeholder="Phone" />
+          <div class="contact-actions">
+            <button type="button" class="btn btn-save" th:onclick="'saveContact(\'' + ${contact.key} + '\', ' + ${contactStat.index} + ')'">Save</button>
+            <button type="button" class="btn btn-cancel" th:onclick="'cancelEdit(' + ${contactStat.index} + ')'">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <p id="deleteMessage">Are you sure you want to delete this contact?</p>
+    <div class="modal-buttons">
+      <button id="confirmDeleteBtn" class="btn btn-delete">Delete</button>
+      <button onclick="cancelDelete()" class="btn btn-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global variables
+  let currentContactId = null;
+
+  // Edit contact
+  function editContact(contactId, name, phone, index) {
+    // Find the card containing this contact
+    const contactCards = document.querySelectorAll('.contact-card');
+    const card = contactCards[index];
+
+    // Show the edit form
+    card.querySelector('.edit-form').style.display = 'block';
+  }
+
+  // Cancel edit
+  function cancelEdit(index) {
+    // Find the card containing this contact
+    const contactCards = document.querySelectorAll('.contact-card');
+    const card = contactCards[index];
+
+    // Hide the edit form
+    card.querySelector('.edit-form').style.display = 'none';
+  }
+
+  // Save edited contact
+  function saveContact(contactId, index) {
+    const name = document.getElementById('edit-name-' + index).value;
+    const phone = document.getElementById('edit-phone-' + index).value;
+
+    // Validate inputs
+    if (!name || !phone) {
+      alert('Name and phone number are required');
+      return;
+    }
+
+    // Make API call to update contact
+    fetch('/api/contacts/' + contactId, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: name,
+        phoneNumber: phone
+      }),
+    })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              }
+              throw new Error('Failed to update contact');
+            })
+            .then(data => {
+              // Find the card containing this contact
+              const contactCards = document.querySelectorAll('.contact-card');
+              const card = contactCards[index];
+
+              // Update the contact display
+              card.querySelector('.contact-name').textContent = name;
+              card.querySelector('.contact-phone').textContent = phone;
+
+              // Hide edit form
+              cancelEdit(index);
+
+              // Show success message
+              alert('Contact updated successfully!');
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Error updating contact: ' + error.message);
+            });
+  }
+
+  // Show delete confirmation
+  function confirmDelete(contactId, name) {
+    currentContactId = contactId;
+    document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete "' + name + '"?';
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+      deleteContact(contactId);
+    };
+    document.getElementById('deleteModal').style.display = 'block';
+  }
+
+  // Cancel delete
+  function cancelDelete() {
+    document.getElementById('deleteModal').style.display = 'none';
+  }
+
+  // Delete contact
+  function deleteContact(contactId) {
+    // Make API call to delete contact
+    fetch('/api/contacts/' + contactId, {
+      method: 'DELETE',
+    })
+            .then(response => {
+              if (response.ok) {
+                // Find and remove the contact element
+                const contactCards = document.querySelectorAll('.contact-card');
+                for (let i = 0; i < contactCards.length; i++) {
+                  if (contactCards[i].querySelector('.btn-delete').onclick.toString().includes(contactId)) {
+                    contactCards[i].remove();
+                    break;
+                  }
+                }
+
+                // Close modal
+                cancelDelete();
+
+                // Show success message
+                alert('Contact deleted successfully!');
+              } else {
+                throw new Error('Failed to delete contact');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Error deleting contact: ' + error.message);
+              cancelDelete();
+            });
+  }
+</script>
+</body>
+</html>
