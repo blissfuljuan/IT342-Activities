@@ -51,4 +51,14 @@ public class UserController {
         googleContactsService.getContacts(principal, name, email);
         return "redirect:/contacts";
     }*/
+
+    @GetMapping("/contacts")
+    public String getContacts(@AuthenticationPrincipal OAuth2User principal, Model model) {
+        if (principal != null) {
+            List<Contacts> contacts = googleContactsService.getContacts(principal);
+            model.addAttribute("contact", contacts);
+        }
+        return "contacts"; // This should match your Thymeleaf template file name
+    }
+
 }
