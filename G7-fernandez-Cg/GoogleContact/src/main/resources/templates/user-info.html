@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+</head>
+<body>
+<h1>Welcome, <span th:text="${user.name}"></span>!</h1>
+<p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+<p><strong>First Name:</strong> <span th:text="${user.givenName}"></span></p>
+<p><strong>Last Name:</strong> <span th:text="${user.familyName}"></span></p>
+<p><strong>User ID:</strong> <span th:text="${user.id}"></span></p>
+<img th:src="${user.picture}" alt="Profile Picture" width="100"/>
+<br>
+
+<!-- Link to Contacts Page -->
+<a href="/contacts">View Contacts</a>
+
+<br>
+<a href="/logout">Logout</a>
+</body>
+</html>
