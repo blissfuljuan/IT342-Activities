@@ -1,13 +1,13 @@
-package com.Lacaba.GoogleIntegration;
+package com.Lacaba.GoogleContacts;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GoogleIntegrationApplication {
+public class GoogleContactsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GoogleIntegrationApplication.class, args);
+		SpringApplication.run(GoogleContactsApplication.class, args);
 	}
 
 }

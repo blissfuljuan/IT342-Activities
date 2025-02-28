@@ -1,10 +1,10 @@
-package com.Lacaba.GoogleIntegration;
+package com.Lacaba.GoogleContacts;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GoogleIntegrationApplicationTests {
+class GoogleContactsApplicationTests {
 
 	@Test
 	void contextLoads() {
