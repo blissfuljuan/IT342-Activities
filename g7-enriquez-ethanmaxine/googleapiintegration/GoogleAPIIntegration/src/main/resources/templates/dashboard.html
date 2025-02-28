@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Google Contacts</title>
+</head>
+<body>
+<h1>Your Google Contacts</h1>
+<table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Phone Number</th>
+  </tr>
+  <tr th:each="contact : ${contacts}">
+    <td th:text="${contact.names != null and contact.names[0] != null ? contact.names[0].displayName : 'No Name'}"></td>
+    <td th:text="${contact != null and contact.emailAddresses != null and not #lists.isEmpty(contact.emailAddresses) ? contact.emailAddresses[0].value : 'No Email'}"></td>
+    <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers[0] != null ? contact.phoneNumbers[0].value : 'No Phone'}"></td>
+  </tr>
+</table>
+</body>
+</html>
