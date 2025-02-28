@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .profile-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+<div class="profile-container">
+    <h2>User Profile</h2>
+    <img th:src="${picture}" alt="Profile Picture" class="profile-pic">
+    <p><strong>Name:</strong> <span th:text="${name}"></span></p>
+    <p><strong>Family Name:</strong> <span th:text="${family_name}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+
+    <br><br>
+    <div>
+        <a href="/contacts">Contacts</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+</body>
+</html>
