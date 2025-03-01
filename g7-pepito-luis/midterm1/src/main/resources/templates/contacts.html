@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Contacts</h1>
+
+    <a href="/user-info">Back</a>
+    
+    <button onclick="showAddPopup()">Add Contact</button>
+
+    <br>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="contact : ${contacts}">
+                <td th:text="${contact.name}">Name</td>
+                <td th:text="${contact.email}">Email</td>
+                <td th:text="${contact.phone}">Phone</td>
+                <td>
+                    <button onclick="showEditPopup('${contact.resourceName}', '${contact.name}', '${contact.email}', '${contact.phone}')">Edit</button>
+                    <button onclick="deleteContact('${contact.resourceName}')">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${error}" th:text="${error}"></p>
+
+    <!-- Add Contact Popup -->
+    <div id="addPopup" style="display:none;">
+        <h2>Add Contact</h2>
+        <form id="addForm">
+            <label>Name: <input type="text" id="addName" required></label><br>
+            <label>Email: <input type="email" id="addEmail" required></label><br>
+            <label>Phone: <input type="text" id="addPhone" required></label><br>
+            <button type="submit">Add</button>
+            <button type="button" onclick="closeAddPopup()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Edit Contact Popup -->
+    <div id="editPopup" style="display:none;">
+        <h2>Edit Contact</h2>
+        <form id="editForm">
+            <input type="hidden" id="editResourceName">
+            <label>Name: <input type="text" id="editName" required></label><br>
+            <label>Email: <input type="email" id="editEmail" required></label><br>
+            <label>Phone: <input type="text" id="editPhone" required></label><br>
+            <button type="submit">Save</button>
+            <button type="button" onclick="closeEditPopup()">Cancel</button>
+        </form>
+    </div>
+
+    <script>
+        function showAddPopup() {
+            $('#addPopup').show();
+        }
+
+        function closeAddPopup() {
+            $('#addPopup').hide();
+        }
+
+        $('#addForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/contacts/add',
+                type: 'POST',
+                data: {
+                    name: $('#addName').val(),
+                    email: $('#addEmail').val(),
+                    phone: $('#addPhone').val()
+                },
+                success: function() { location.reload(); },
+                error: function(err) {
+                    alert(err.responseJSON ? err.responseJSON.message : 'Failed to add contact.');
+                    console.error(err);
+                }
+            });
+        });
+
+        function showEditPopup(resourceName, name, email, phone) {
+            $('#editResourceName').val(resourceName);
+            $('#editName').val(name);
+            $('#editEmail').val(email);
+            $('#editPhone').val(phone);
+            $('#editPopup').show();
+        }
+
+        function closeEditPopup() {
+            $('#editPopup').hide();
+        }
+
+        $('#editForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: '/contacts/edit',
+                type: 'POST',
+                data: {
+                    resourceName: $('#editResourceName').val(),
+                    name: $('#editName').val(),
+                    email: $('#editEmail').val(),
+                    phone: $('#editPhone').val()
+                },
+                success: function() { location.reload(); },
+                error: function(err) {
+                    alert(err.responseJSON ? err.responseJSON.message : 'Failed to update contact.');
+                    console.error(err);
+                }
+            });
+        });
+
+        function deleteContact(resourceName) {
+            $.ajax({
+                url: '/contacts/delete',
+                type: 'POST',
+                data: { resourceName: resourceName },
+                success: function() { location.reload(); },
+                error: function(err) {
+                    alert(err.responseJSON ? err.responseJSON.message : 'Failed to delete contact.');
+                    console.error(err);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
