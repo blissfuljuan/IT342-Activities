@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .profile-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transition: 0.3s;
+        }
+
+        .profile-container:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Profile Image */
+        .profile-img {
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            border: 4px solid #007bff;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        /* User Details */
+        .profile-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .profile-id {
+            font-size: 14px;
+            font-style: italic;
+            font-weight: 300;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .profile-info {
+            color: #555;
+            font-size: 16px;
+            margin: 8px 0;
+        }
+
+        .profile-info strong {
+            color: #222;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: white;
+            background: #007bff;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="profile-container" th:if="${user}">
+        <img th:src="${user.picture}" alt="Profile Picture" class="profile-img">
+        <h2 class="profile-name" th:text="${user.name}">Loading...</h2>
+        <p class="profile-id" th:text="${user.sub}"></p>
+
+        <p class="profile-info"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <p class="profile-info"><strong>First Name:</strong> <span th:text="${user.given_name}"></span></p>
+        <p class="profile-info"><strong>Last Name:</strong> <span th:text="${user.family_name}"></span></p>
+
+        <a href="/contacts-page" class="btn">View Contacts</a>
+    </div>
+
+    <p th:if="${error}" style="color: red;" th:text="${error}"></p>
+
+</body>
+
+</html>

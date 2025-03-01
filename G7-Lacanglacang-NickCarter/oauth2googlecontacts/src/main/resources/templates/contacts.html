@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Contacts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .table {
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #e9ecef;
+            cursor: pointer;
+        }
+
+        .modal-dialog {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .profile-pic {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 5px solid white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .btn-edit {
+            border: 2px solid yellow;
+            color: yellow;
+            background-color: transparent;
+        }
+
+        .btn-delete {
+            border: 2px solid red;
+            color: red;
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>GOOGLE CONTACTS</h2>
+            <input type="text" id="searchInput" class="form-control w-25" placeholder="Search by name or number">
+        </div>
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="contactsTable" class="text-center"></tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body" id="contactModalBody">
+                    <img id="contactPhoto" class="profile-pic mb-3" src="" alt="Contact Photo">
+                    <h3 id="contactName"></h3>
+                    <p><strong>Phone Number:</strong> <span id="contactPhone"></span></p>
+                    <p><strong>Email:</strong> <span id="contactEmail"></span></p>
+                    <div class="modal-buttons">
+                        <button class="btn btn-edit" id="editButton">Edit</button>
+                        <button class="btn btn-delete" id="deleteButton">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/contacts')
+                .then(response => response.json())
+                .then(data => {
+                    let contacts = data.connections || [];
+                    contacts.sort((a, b) => (a.names?.[0]?.displayName || "").localeCompare(b.names?.[0]?.displayName || ""));
+                    renderContacts(contacts);
+
+                    document.getElementById("searchInput").addEventListener("input", function () {
+                        const query = this.value.toLowerCase();
+                        const filteredContacts = contacts.filter(contact => {
+                            const name = contact.names ? contact.names[0].displayName.toLowerCase() : "";
+                            const phone = contact.phoneNumbers ? contact.phoneNumbers[0].value.toLowerCase() : "";
+                            return name.includes(query) || phone.includes(query);
+                        });
+                        renderContacts(filteredContacts);
+                    });
+                })
+                .catch(error => console.error("Error fetching contacts:", error));
+        });
+
+        function renderContacts(contacts) {
+            const contactsTable = document.getElementById("contactsTable");
+            contactsTable.innerHTML = "";
+            contacts.forEach(contact => {
+                const name = contact.names ? contact.names[0].displayName : "Unknown";
+                const phone = contact.phoneNumbers ? contact.phoneNumbers[0].value : "No Phone";
+                const email = contact.emailAddresses ? contact.emailAddresses[0].value : "No Email";
+                const photo = contact.photos ? contact.photos[0].url : "https://via.placeholder.com/100";
+
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><img src="${photo}" class="rounded-circle" width="50" height="50"></td>
+                    <td>${name}</td>
+                    <td>${phone}</td>
+                    <td>${email}</td>
+                `;
+
+                row.onclick = function () {
+                    document.getElementById("contactName").textContent = name;
+                    document.getElementById("contactPhone").textContent = phone;
+                    document.getElementById("contactEmail").textContent = email;
+                    document.getElementById("contactPhoto").src = photo;
+                    new bootstrap.Modal(document.getElementById('contactModal')).show();
+                };
+
+                contactsTable.appendChild(row);
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
