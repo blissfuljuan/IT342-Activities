@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Profile</title>
+</head>
+<body>
+<h1>My Profile</h1>
+
+<!-- Display user profile details -->
+<img th:src="${picture}" alt="User Picture">
+<p><strong>Display Name:</strong> <span th:text="${displayName}"></span></p>
+<p><strong>First Name:</strong> <span th:text="${firstName}"></span></p>
+<p><strong>Last Name:</strong> <span th:text="${lastName}"></span></p>
+<p><strong>Email:</strong> <span th:text="${email}"></span></p>
+
+<!-- Navigation links -->
+<button>
+    <a href="/contacts">Contacts</a> |
+</button>
+
+<button>
+    <a href="/logout">Logout</a>
+</button>
+
+</body>
+</html>
