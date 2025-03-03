@@ -1,4 +1,4 @@
-package com.example.canete_oauth2;
+package test.java.com.example.canete_oauth2;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.example.canete_oauth2;
+package main.java.com.example.canete_oauth2;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
