@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+</head>
+<body>
+<div th:replace="~{layouts/main :: body(content=~{::section})}">
+    <section>
+        <h1>Error</h1>
+        <div class="alert alert-danger" th:text="${error}">An error occurred</div>
+        <a href="/" class="btn btn-primary">Back to Home</a>
+    </section>
+</div>
+</body>
+</html>

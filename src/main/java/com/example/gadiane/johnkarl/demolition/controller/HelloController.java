@@ -1,18 +1,18 @@
 package com.example.gadiane.johnkarl.demolition.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class HelloController {
 
     @GetMapping("/")
-    public String hello() {
-        return "Hello, John!";
+    public String home() {
+        return "home";
     }
 
-    @GetMapping("/Secured")
+    @GetMapping("/secured")
     public String secured() {
-        return "Hello, Secured";
+        return "secured";
     }
 }

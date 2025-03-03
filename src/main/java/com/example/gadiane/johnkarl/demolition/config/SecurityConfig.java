@@ -14,10 +14,14 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/user-info", true))
+                        authorizeRequests
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/api/contacts/**").authenticated()
+                                .requestMatchers("/contacts/**").authenticated()
+                                .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/contacts", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
-                .formLogin(form -> form.defaultSuccessUrl("/secured", true))
+                .formLogin(form -> form.defaultSuccessUrl("/contacts", true))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
