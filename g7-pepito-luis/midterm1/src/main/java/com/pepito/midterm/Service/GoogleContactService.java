@@ -32,18 +32,21 @@ public class GoogleContactService {
         if (client == null) {
             throw new IllegalStateException("No authorized client found for Google");
         }
-
+    
         String accessToken = client.getAccessToken().getTokenValue();
         String url = "https://people.googleapis.com/v1/people/me/connections"
                 + "?personFields=names,emailAddresses,phoneNumbers";
-
+    
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
+    
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
-
+    
+        // Log the entire response
+        System.out.println("Contacts API Response: " + response.getBody());
+    
         return response.getBody();
     }
 
@@ -75,7 +78,34 @@ public class GoogleContactService {
         return "N/A";
     }
 
+    private String getContactEtag(OAuth2User oAuth2User, String resourceName) {
+        String accessToken = getAccessToken(oAuth2User);
+        String url = "https://people.googleapis.com/v1/" + resourceName + "?personFields=names,emailAddresses,phoneNumbers";
+    
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+    
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+        Map<String, Object> body = response.getBody();
+    
+        System.out.println("Full contact response: " + body);
+    
+        // Google includes 'etag' at the top level of the response
+        if (body != null && body.containsKey("etag")) {
+            System.out.println("Fetched etag: " + body.get("etag"));
+            return (String) body.get("etag");
+        } else {
+            throw new IllegalStateException("No etag found for contact.");
+        }
+    }
+    
+
     public void addContact(OAuth2User oAuth2User, String name, String email, String phone) {
+        if (oAuth2User == null) {
+            throw new IllegalStateException("User is not authenticated");
+        }
         String accessToken = getAccessToken(oAuth2User);
         String url = "https://people.googleapis.com/v1/people:createContact";
 
@@ -94,32 +124,41 @@ public class GoogleContactService {
     }
 
     public void updateContact(OAuth2User oAuth2User, String resourceName, String name, String email, String phone) {
+        System.out.println("Updating contact with resourceName: " + resourceName);
         String accessToken = getAccessToken(oAuth2User);
         String url = "https://people.googleapis.com/v1/" + resourceName + "?updatePersonFields=names,emailAddresses,phoneNumbers";
-
+    
+        String etag = getContactEtag(oAuth2User, resourceName); // Get the latest etag
+    
         Map<String, Object> body = Map.of(
+            "etag", etag,
             "names", List.of(Map.of("givenName", name)),
             "emailAddresses", List.of(Map.of("value", email)),
             "phoneNumbers", List.of(Map.of("value", phone))
         );
-
+    
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-
-        new RestTemplate().put(url, entity);
+    
+        try {
+            ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.PATCH, entity, String.class);
+            System.out.println("Update response: " + response.getBody());
+        } catch (Exception e) {
+            System.err.println("Failed to update contact: " + e.getMessage());
+        }
     }
 
     public void deleteContact(OAuth2User oAuth2User, String resourceName) {
-        String accessToken = getAccessToken(oAuth2User);
-        String url = "https://people.googleapis.com/v1/" + resourceName;
+    String accessToken = getAccessToken(oAuth2User);
+    String url = "https://people.googleapis.com/v1/" + resourceName + ":deleteContact";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Bearer " + accessToken);
+    HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        new RestTemplate().exchange(url, HttpMethod.DELETE, entity, String.class);
-    }
+    new RestTemplate().exchange(url, HttpMethod.DELETE, entity, String.class);
+}
     
 }

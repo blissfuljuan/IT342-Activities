@@ -11,10 +11,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/", "/user-info", "/contacts").authenticated()
+                        .requestMatchers("/contacts/add", "/contacts/edit", "/contacts/delete").authenticated()
+                        .anyRequest().authenticated()
+                )
                 .oauth2Login(oauth -> oauth.defaultSuccessUrl("/user-info", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
-                .formLogin(formLogin -> formLogin.defaultSuccessUrl("/user-info", true))
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/contacts/add", "/contacts/edit", "/contacts/delete")
+                )
                 .build();
     }
 }
