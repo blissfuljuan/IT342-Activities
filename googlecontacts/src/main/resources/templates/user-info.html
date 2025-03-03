@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info</title>
+</head>
+<body>
+<h1>Other Contacts</h1>
+<ul>
+    <li th:each="contact : ${otherContacts}">
+        <span th:text="${contact.names[0].displayName}"></span> -
+        <span th:text="${contact.emailAddresses[0].value}"></span>
+    </li>
+</ul>
+</body>
+</html>
