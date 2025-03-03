@@ -27,7 +27,7 @@ public class GoogleContactsService {
     public List<Person> listContacts(Credential credential) throws GeneralSecurityException, IOException {
         PeopleService peopleService = getPeopleService(credential);
         return peopleService.people().connections().list("people/me")
-                .setPersonFields("names,emailAddresses")
+                .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute()
                 .getConnections();
     }
@@ -35,7 +35,7 @@ public class GoogleContactsService {
     public Person getContact(Credential credential, String resourceName) throws GeneralSecurityException, IOException {
         PeopleService peopleService = getPeopleService(credential);
         return peopleService.people().get(resourceName)
-                .setPersonFields("names,emailAddresses")
+                .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
     }
 
