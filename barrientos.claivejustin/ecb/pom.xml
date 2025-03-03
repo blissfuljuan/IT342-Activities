@@ -53,7 +53,38 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		 <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-client</artifactId>
+    </dependency>
+
+    <!-- Google API Client -->
+    <dependency>
+        <groupId>com.google.api-client</groupId>
+        <artifactId>google-api-client</artifactId>
+        <version>2.2.0</version>
+    </dependency>
+
+    <!-- Google OAuth Client -->
+    <dependency>
+        <groupId>com.google.oauth-client</groupId>
+        <artifactId>google-oauth-client-jetty</artifactId>
+        <version>1.34.1</version>
+    </dependency>
+   
+	
+
+
 	</dependencies>
+	
+<repositories>
+    <repository>
+        <id>google</id>
+        <url>https://maven.google.com/</url>
+        <layout>default</layout>
+    </repository>
+</repositories>
 
 	<build>
 		<plugins>
