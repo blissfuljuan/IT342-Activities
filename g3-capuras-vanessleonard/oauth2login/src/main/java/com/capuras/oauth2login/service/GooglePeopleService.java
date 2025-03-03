@@ -46,7 +46,6 @@ public class GooglePeopleService {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
 
-            // Try with expanded fields
             String url = "https://people.googleapis.com/v1/people/me?personFields=phoneNumbers";
 
             ResponseEntity<Map> response = restTemplate.exchange(
@@ -79,9 +78,6 @@ public class GooglePeopleService {
         }
     }
 
-    /**
-     * Get contacts with their phone numbers as a map with resourceId as key
-     */
     @SuppressWarnings("unchecked")
     public Map<String, Contact> getContactsMap(OAuth2AuthenticationToken authentication) {
         Map<String, Contact> contactsMap = new HashMap<>();
@@ -101,12 +97,21 @@ public class GooglePeopleService {
             }
 
             String accessToken = client.getAccessToken().getTokenValue();
-
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
 
-            // Get contacts with phone numbers
-            String url = "https://people.googleapis.com/v1/people/me/connections?personFields=names,phoneNumbers,emailAddresses&pageSize=20";
+
+            headers.setCacheControl("no-cache, no-store, must-revalidate");
+            headers.setPragma("no-cache");
+            headers.setExpires(0);
+
+
+            String url = UriComponentsBuilder.fromHttpUrl("https://people.googleapis.com/v1/people/me/connections")
+                    .queryParam("personFields", "names,phoneNumbers,emailAddresses,metadata")
+                    .queryParam("sortOrder", "LAST_MODIFIED_DESCENDING")
+                    .queryParam("pageSize", "1000") // Increase page size to get more contacts
+                    .build()
+                    .toUriString();
 
             ResponseEntity<Map> response = restTemplate.exchange(
                     url,
@@ -125,8 +130,9 @@ public class GooglePeopleService {
                         String name = "Unknown";
                         String email = "";
                         String phone = "No phone";
+                        String etag = (String) connection.get("etag");
 
-                        // Get name
+
                         if (connection.containsKey("names")) {
                             List<LinkedHashMap<String, Object>> names =
                                     (List<LinkedHashMap<String, Object>>) connection.get("names");
@@ -135,7 +141,7 @@ public class GooglePeopleService {
                             }
                         }
 
-                        // Get email
+
                         if (connection.containsKey("emailAddresses")) {
                             List<LinkedHashMap<String, Object>> emails =
                                     (List<LinkedHashMap<String, Object>>) connection.get("emailAddresses");
@@ -156,6 +162,17 @@ public class GooglePeopleService {
                             }
                         }
 
+                        // Get metadata for last updated time
+                        Map<String, Object> metadata = (Map<String, Object>) connection.get("metadata");
+                        if (metadata != null && metadata.containsKey("sources")) {
+                            List<Map<String, Object>> sources = (List<Map<String, Object>>) metadata.get("sources");
+                            if (sources != null && !sources.isEmpty()) {
+                                // Use the most recent update time
+                                String updateTime = (String) metadata.get("updateTime");
+                                System.out.println("Contact " + name + " was last updated at: " + updateTime);
+                            }
+                        }
+
                         Contact contact = new Contact(resourceId, name, email, phone);
                         contactsMap.put(resourceId, contact);
                     }
@@ -169,9 +186,6 @@ public class GooglePeopleService {
         }
     }
 
-    /**
-     * Update a contact in Google Contacts
-     */
     @SuppressWarnings("unchecked")
     public Contact updateContact(OAuth2AuthenticationToken authentication, String resourceId, Contact updatedContact) {
         try {
@@ -189,45 +203,78 @@ public class GooglePeopleService {
             headers.setBearerAuth(accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // Ensure resourceId is properly formatted
-            String formattedResourceId = resourceId;
-            if (!formattedResourceId.startsWith("people/")) {
-                formattedResourceId = "people/" + formattedResourceId;
-            }
+            final String formattedResourceId = !resourceId.startsWith("people/") ? "people/" + resourceId : resourceId;
 
-            // Construct the correct URL for the People API
-            String updateUrl = String.format("https://people.googleapis.com/v1/%s:updateContact?updatePersonFields=names,phoneNumbers", formattedResourceId);
+            String getUrl = String.format("https://people.googleapis.com/v1/%s?personFields=names,phoneNumbers,emailAddresses", formattedResourceId);
+            ResponseEntity<Map> getResponse = restTemplate.exchange(
+                    getUrl,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Map.class
+            );
 
-            // Prepare update data
-            Map<String, Object> updateData = new HashMap<>();
+            Map<String, Object> existingContact = getResponse.getBody();
+            String etag = (String) existingContact.get("etag");
 
-            // Add etag (required for updates)
-            updateData.put("etag", "%EgQBAj0BBh4DBgQ9Aj0C");  // Add a default etag or fetch it from the contact
+            String updateUrl = String.format("https://people.googleapis.com/v1/%s:updateContact", formattedResourceId);
+            updateUrl = UriComponentsBuilder.fromUriString(updateUrl)
+                    .queryParam("updatePersonFields", "names,phoneNumbers,emailAddresses")
+                    .build()
+                    .toUriString();
 
-            // Add names
+            Map<String, Object> updateBody = new HashMap<>();
+
+            updateBody.put("etag", etag);
+            updateBody.put("resourceName", formattedResourceId);
+
+            List<Map<String, Object>> names = new ArrayList<>();
             Map<String, Object> name = new HashMap<>();
             name.put("givenName", updatedContact.getName());
             name.put("displayName", updatedContact.getName());
-            updateData.put("names", Collections.singletonList(name));
+            name.put("unstructuredName", updatedContact.getName());
+            names.add(name);
+            updateBody.put("names", names);
 
-            // Add phone numbers
+            List<Map<String, Object>> phoneNumbers = new ArrayList<>();
             Map<String, Object> phone = new HashMap<>();
             phone.put("value", updatedContact.getPhoneNumber());
             phone.put("type", "mobile");
-            updateData.put("phoneNumbers", Collections.singletonList(phone));
+            phoneNumbers.add(phone);
+            updateBody.put("phoneNumbers", phoneNumbers);
 
-            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(updateData, headers);
+
+            List<Map<String, Object>> emailAddresses = new ArrayList<>();
+            Map<String, Object> email = new HashMap<>();
+            email.put("value", updatedContact.getEmail());
+            email.put("type", "home");
+            emailAddresses.add(email);
+            updateBody.put("emailAddresses", emailAddresses);
+
+
+            System.out.println("Update Request Body: " + updateBody);
+
+
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(updateBody, headers);
+
 
             ResponseEntity<Map> updateResponse = restTemplate.exchange(
                     updateUrl,
-                    HttpMethod.PATCH,  // Changed back to PATCH as per Google's API requirements
+                    HttpMethod.PATCH,
                     requestEntity,
                     Map.class
             );
 
             if (updateResponse.getStatusCode().is2xxSuccessful()) {
-                return new Contact(resourceId, updatedContact.getName(),
-                        updatedContact.getEmail(), updatedContact.getPhoneNumber());
+                Map<String, Object> updatedBody = updateResponse.getBody();
+                System.out.println("Update Response Body: " + updatedBody);
+
+
+                return new Contact(
+                        formattedResourceId,
+                        updatedContact.getName(),
+                        updatedContact.getEmail(),
+                        updatedContact.getPhoneNumber()
+                );
             }
 
             throw new RuntimeException("Update failed with status: " + updateResponse.getStatusCode());
@@ -239,9 +286,47 @@ public class GooglePeopleService {
         }
     }
 
-    /**
-     * Delete a contact from Google Contacts
-     */
+
+    @SuppressWarnings("unchecked")
+    private String extractName(Map<String, Object> body) {
+        if (body != null && body.containsKey("names")) {
+            List<Map<String, Object>> names = (List<Map<String, Object>>) body.get("names");
+            if (names != null && !names.isEmpty()) {
+                Map<String, Object> name = names.get(0);
+                String displayName = (String) name.get("displayName");
+                return displayName != null ? displayName : "";
+            }
+        }
+        return "";
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractPhone(Map<String, Object> body) {
+        if (body != null && body.containsKey("phoneNumbers")) {
+            List<Map<String, Object>> phones = (List<Map<String, Object>>) body.get("phoneNumbers");
+            if (phones != null && !phones.isEmpty()) {
+                Map<String, Object> phone = phones.get(0);
+                String value = (String) phone.get("value");
+                return value != null ? value : "";
+            }
+        }
+        return "";
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractEmail(Map<String, Object> body) {
+        if (body != null && body.containsKey("emailAddresses")) {
+            List<Map<String, Object>> emails = (List<Map<String, Object>>) body.get("emailAddresses");
+            if (emails != null && !emails.isEmpty()) {
+                Map<String, Object> email = emails.get(0);
+                String value = (String) email.get("value");
+                return value != null ? value : "";
+            }
+        }
+        return "";
+    }
+
+
     public void deleteContact(OAuth2AuthenticationToken authentication, String resourceId) {
         try {
             if (!"google".equals(authentication.getAuthorizedClientRegistrationId())) {
@@ -293,6 +378,86 @@ public class GooglePeopleService {
             System.err.println("Error in deleteContact: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error deleting contact: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Contact createContact(OAuth2AuthenticationToken authentication, Contact newContact) {
+        try {
+            OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
+                    authentication.getAuthorizedClientRegistrationId(),
+                    authentication.getName()
+            );
+
+            if (client == null) {
+                throw new RuntimeException("No authorized client found");
+            }
+
+            String accessToken = client.getAccessToken().getTokenValue();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+
+            Map<String, Object> createBody = new HashMap<>();
+
+
+            List<Map<String, Object>> names = new ArrayList<>();
+            Map<String, Object> name = new HashMap<>();
+            name.put("givenName", newContact.getName());
+            name.put("displayName", newContact.getName());
+            name.put("unstructuredName", newContact.getName());
+            names.add(name);
+            createBody.put("names", names);
+
+
+            if (newContact.getPhoneNumber() != null && !newContact.getPhoneNumber().isEmpty()) {
+                List<Map<String, Object>> phoneNumbers = new ArrayList<>();
+                Map<String, Object> phone = new HashMap<>();
+                phone.put("value", newContact.getPhoneNumber());
+                phone.put("type", "mobile");
+                phoneNumbers.add(phone);
+                createBody.put("phoneNumbers", phoneNumbers);
+            }
+
+
+            if (newContact.getEmail() != null && !newContact.getEmail().isEmpty()) {
+                List<Map<String, Object>> emailAddresses = new ArrayList<>();
+                Map<String, Object> email = new HashMap<>();
+                email.put("value", newContact.getEmail());
+                email.put("type", "home");
+                emailAddresses.add(email);
+                createBody.put("emailAddresses", emailAddresses);
+            }
+
+
+            String createUrl = "https://people.googleapis.com/v1/people:createContact";
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(createBody, headers);
+
+            ResponseEntity<Map> createResponse = restTemplate.exchange(
+                    createUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    Map.class
+            );
+
+            if (createResponse.getStatusCode().is2xxSuccessful() && createResponse.getBody() != null) {
+                Map<String, Object> responseBody = createResponse.getBody();
+                String resourceId = (String) responseBody.get("resourceName");
+
+                return new Contact(
+                        resourceId,
+                        newContact.getName(),
+                        newContact.getEmail(),
+                        newContact.getPhoneNumber()
+                );
+            }
+
+            throw new RuntimeException("Failed to create contact");
+        } catch (Exception e) {
+            System.err.println("Error creating contact: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error creating contact: " + e.getMessage());
         }
     }
 }

@@ -16,7 +16,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/**").authenticated() // Allow access to error page without authentication
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth.defaultSuccessUrl("/googleuser", true))
                 .formLogin(form -> form.defaultSuccessUrl("/secured", true))

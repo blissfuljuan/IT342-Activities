@@ -34,17 +34,14 @@ public class UserController {
 
     @GetMapping("/googleuser")
     public String getUserInfo(Model model, OAuth2AuthenticationToken authentication) {
-        // Basic user info from OAuth
         OAuth2User user = authentication.getPrincipal();
         model.addAttribute("name", user.getAttribute("name"));
         model.addAttribute("email", user.getAttribute("email"));
         model.addAttribute("picture", user.getAttribute("picture"));
 
-        // Get the user's own phone number
         String phoneNumber = googlePeopleService.getPhoneNumber(authentication);
         model.addAttribute("phone", phoneNumber);
 
-        // Get user's contacts with phone numbers
         Map<String, Contact> contactsMap = googlePeopleService.getContactsMap(authentication);
         model.addAttribute("contactsMap", contactsMap);
 
