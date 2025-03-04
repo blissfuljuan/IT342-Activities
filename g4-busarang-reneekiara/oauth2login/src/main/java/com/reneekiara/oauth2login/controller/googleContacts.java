@@ -53,14 +53,38 @@ public class googleContacts {
 
         serv.newContact(person,principal.getName());
 
-        model.addAttribute("contacts", serv.getContacts(principal.getName()));
-        return "contacts";
+        return "redirect:contacts";
     }
 
-    @DeleteMapping(value="/deleteContact")
-    public String deleteContact(@PathVariable String resourceName, @AuthenticationPrincipal OAuth2User principal) throws IOException, GeneralSecurityException {
+    @PostMapping("/deleteContact")
+    public String deleteContact(@RequestParam("resourceName") String resourceName, @AuthenticationPrincipal OAuth2User principal) throws IOException, GeneralSecurityException {
 
         serv.deleteContact(resourceName,principal.getName());
+
+        return "redirect:contacts";
+    }
+
+    @PostMapping("/updateContact")
+    public String updateContact(@RequestParam("givenName") String givenName,
+                             @RequestParam("familyName") String familyName,
+                             @RequestParam("email") String email,
+                             @RequestParam("phoneNumber") String phoneNumber, @RequestParam("resourceName") String resourceName,
+                             @AuthenticationPrincipal OAuth2User principal, Model model) throws IOException, GeneralSecurityException {
+        Person person = new Person();
+
+        List<Name> names = new ArrayList<>();
+        names.add(new Name().setGivenName(givenName).setFamilyName(familyName));
+        person.setNames(names);
+
+        List<EmailAddress> emails = new ArrayList<>();
+        emails.add(new EmailAddress().setValue(email));
+        person.setEmailAddresses(emails);
+
+        List<PhoneNumber> phones = new ArrayList<>();
+        phones.add(new PhoneNumber().setValue(phoneNumber));
+        person.setPhoneNumbers(phones);
+
+        serv.updateContact(person,resourceName,principal.getName());
 
         return "redirect:contacts";
     }

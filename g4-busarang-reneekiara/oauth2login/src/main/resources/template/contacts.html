@@ -15,8 +15,8 @@
         }
 
         button {
-            background-color: #1a73e8;
-            color: white;
+
+            color: black;
             padding: 10px 15px;
             border: none;
             border-radius: 4px;
@@ -42,23 +42,23 @@
             text-align: left;
         }
          .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 60%; /* Could be more or less, depending on screen size */
+            width: 60%;
         }
 
         .close {
@@ -110,7 +110,39 @@
         <td th:text="${contact.names[0].displayName}"></td>
         <td th:text="${contact.emailAddresses[0].value}"></td>
         <td th:text="${contact.phoneNumbers[0].value}"></td>
-        <td><button>Edit</button><button onclick="deleteContact('${contact.resourceName}')">Delete</button></td>
+        <td>
+            <button th:data-resource-name="${contact.resourceName}"
+                    th:data-given-name="${contact.names[0].givenName}"
+                    th:data-family-name="${contact.names[0].familyName}"
+                    th:data-email="${contact.emailAddresses[0].value}"
+                    th:data-phone="${contact.phoneNumbers[0].value}"
+                    onclick="openUpdateModal(this)">
+                Edit
+            </button>
+
+            <div id="updateModal" class="modal">
+                <div class="modal-content">
+                    <span class="close update-close">x</span>
+                    <h2>Update Contact</h2>
+                    <form id="updateForm" th:action="@{/updateContact}" method="post">
+                        <input type="hidden" id="updateResourceName" name="resourceName">
+                        <label for="updateGivenName">Given Name:</label><br>
+                        <input type="text" id="updateGivenName" name="givenName"><br>
+                        <label for="updateFamilyName">Family Name:</label><br>
+                        <input type="text" id="updateFamilyName" name="familyName"><br>
+                        <label for="updateEmail">Email:</label><br>
+                        <input type="email" id="updateEmail" name="email"><br>
+                        <label for="updatePhoneNumber">Phone Number:</label><br>
+                        <input type="tel" id="updatePhoneNumber" name="phoneNumber"><br><br>
+                        <button type="submit">Update Contact</button>
+                    </form>
+                </div>
+            </div>
+
+            <form th:action="@{/deleteContact}" method="post" style="display:inline;">
+                <input type="hidden" name="resourceName" th:value="${contact.getResourceName()}">
+                <button type="submit">Delete</button>
+            </form></td>
     </tr>
     </tbody>
 </table>
@@ -118,10 +150,35 @@
 <script>
 
         var modal = document.getElementById("contactModal");
-
         var btn = document.getElementById("createContactBtn");
-
         var span = document.getElementsByClassName("close")[0];
+        var updateModal = document.getElementById("updateModal");
+        var updateSpan = document.getElementsByClassName("update-close")[0];
+
+        function openUpdateModal(button) {
+            var resourceName = button.getAttribute("data-resource-name");
+            var givenName = button.getAttribute("data-given-name");
+            var familyName = button.getAttribute("data-family-name");
+            var email = button.getAttribute("data-email");
+            var phone = button.getAttribute("data-phone");
+
+
+
+            console.log("updateModal"+resourceName, givenName, familyName, email, phone);
+            if (updateModal) {
+
+                document.getElementById("updateResourceName").value = resourceName;
+                document.getElementById("updateGivenName").value = givenName;
+                document.getElementById("updateFamilyName").value = familyName;
+                document.getElementById("updateEmail").value = email;
+                document.getElementById("updatePhoneNumber").value = phone;
+
+
+                updateModal.style.display = "block";
+            } else {
+                console.error("Modal not found! Check the ID: updateModal" + resourceName);
+            }
+        }
 
         btn.onclick = function() {
             modal.style.display = "block";
@@ -137,11 +194,6 @@
             }
         }
 
-        function deleteContact(resourceName) {
-            if (confirm("Are you sure you want to delete this contact?")) {
-               await =
-            }
-        }
     </script>
 
 </body>

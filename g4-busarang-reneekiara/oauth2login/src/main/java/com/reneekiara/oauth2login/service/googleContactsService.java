@@ -25,14 +25,15 @@ public class googleContactsService {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     private final OAuth2AuthorizedClientService authorizedClientService;
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
     PeopleService peopleService;
 
-    public googleContactsService(OAuth2AuthorizedClientService authorizedClientService){
+    public googleContactsService(OAuth2AuthorizedClientService authorizedClientService) throws GeneralSecurityException, IOException {
         this.authorizedClientService = authorizedClientService;
     }
     public List getContacts(String principalName) throws IOException, GeneralSecurityException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
 
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient("google",principalName);
 
@@ -56,7 +57,6 @@ public class googleContactsService {
     }
 
     public void newContact (Person person, String principalName) throws IOException, GeneralSecurityException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient("google",principalName);
 
@@ -69,19 +69,16 @@ public class googleContactsService {
                         .build();
 
         Person contactToCreate = new Person();
-        List<Name> names = new ArrayList<>();
-        names.add(new Name().setGivenName("John").setFamilyName("Doe"));
         contactToCreate.setNames(person.getNames());
         contactToCreate.setEmailAddresses(person.getEmailAddresses());
         contactToCreate.setPhoneNumbers(person.getPhoneNumbers());
 
-        Person createdContact = service.people().createContact(contactToCreate).execute();
+        service.people().createContact(contactToCreate).execute();
 
 
     }
 
     public void deleteContact (String name, String principalName) throws IOException, GeneralSecurityException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient("google",principalName);
 
@@ -94,6 +91,32 @@ public class googleContactsService {
                         .build();
 
         service.people().deleteContact(name).execute();
+    }
+
+    public void updateContact (Person person, String name, String principalName) throws IOException, GeneralSecurityException {
+
+        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient("google",principalName);
+
+        OAuth2AccessToken accessToken = client.getAccessToken();
+        GoogleCredential credentials = new GoogleCredential().setAccessToken(accessToken.getTokenValue());
+
+        PeopleService service =
+                new PeopleService.Builder(HTTP_TRANSPORT, JSON_FACTORY, credentials)
+                        .setApplicationName("Google Contacts")
+                        .build();
+
+        Person contactToUpdate = service.people().get(name).setPersonFields("names,emailAddresses,phoneNumbers").execute();
+
+        contactToUpdate.setNames(person.getNames());
+        contactToUpdate.setEmailAddresses(person.getEmailAddresses());
+        contactToUpdate.setPhoneNumbers(person.getPhoneNumbers());
+
+        service.people()
+                .updateContact(contactToUpdate.getResourceName(), contactToUpdate)
+                .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
+                .execute();
+
+
     }
 
 }
