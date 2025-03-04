@@ -100,11 +100,9 @@ public class GooglePeopleService {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
 
-
             headers.setCacheControl("no-cache, no-store, must-revalidate");
             headers.setPragma("no-cache");
             headers.setExpires(0);
-
 
             String url = UriComponentsBuilder.fromHttpUrl("https://people.googleapis.com/v1/people/me/connections")
                     .queryParam("personFields", "names,phoneNumbers,emailAddresses,metadata")
@@ -132,7 +130,6 @@ public class GooglePeopleService {
                         String phone = "No phone";
                         String etag = (String) connection.get("etag");
 
-
                         if (connection.containsKey("names")) {
                             List<LinkedHashMap<String, Object>> names =
                                     (List<LinkedHashMap<String, Object>>) connection.get("names");
@@ -140,7 +137,6 @@ public class GooglePeopleService {
                                 name = (String) names.get(0).get("displayName");
                             }
                         }
-
 
                         if (connection.containsKey("emailAddresses")) {
                             List<LinkedHashMap<String, Object>> emails =
@@ -242,7 +238,6 @@ public class GooglePeopleService {
             phoneNumbers.add(phone);
             updateBody.put("phoneNumbers", phoneNumbers);
 
-
             List<Map<String, Object>> emailAddresses = new ArrayList<>();
             Map<String, Object> email = new HashMap<>();
             email.put("value", updatedContact.getEmail());
@@ -250,12 +245,9 @@ public class GooglePeopleService {
             emailAddresses.add(email);
             updateBody.put("emailAddresses", emailAddresses);
 
-
             System.out.println("Update Request Body: " + updateBody);
 
-
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(updateBody, headers);
-
 
             ResponseEntity<Map> updateResponse = restTemplate.exchange(
                     updateUrl,
@@ -267,7 +259,6 @@ public class GooglePeopleService {
             if (updateResponse.getStatusCode().is2xxSuccessful()) {
                 Map<String, Object> updatedBody = updateResponse.getBody();
                 System.out.println("Update Response Body: " + updatedBody);
-
 
                 return new Contact(
                         formattedResourceId,
@@ -285,7 +276,6 @@ public class GooglePeopleService {
             throw new RuntimeException("Error updating contact: " + e.getMessage());
         }
     }
-
 
     @SuppressWarnings("unchecked")
     private String extractName(Map<String, Object> body) {
@@ -325,7 +315,6 @@ public class GooglePeopleService {
         }
         return "";
     }
-
 
     public void deleteContact(OAuth2AuthenticationToken authentication, String resourceId) {
         try {
@@ -398,9 +387,7 @@ public class GooglePeopleService {
             headers.setBearerAuth(accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-
             Map<String, Object> createBody = new HashMap<>();
-
 
             List<Map<String, Object>> names = new ArrayList<>();
             Map<String, Object> name = new HashMap<>();
@@ -409,7 +396,6 @@ public class GooglePeopleService {
             name.put("unstructuredName", newContact.getName());
             names.add(name);
             createBody.put("names", names);
-
 
             if (newContact.getPhoneNumber() != null && !newContact.getPhoneNumber().isEmpty()) {
                 List<Map<String, Object>> phoneNumbers = new ArrayList<>();
@@ -420,7 +406,6 @@ public class GooglePeopleService {
                 createBody.put("phoneNumbers", phoneNumbers);
             }
 
-
             if (newContact.getEmail() != null && !newContact.getEmail().isEmpty()) {
                 List<Map<String, Object>> emailAddresses = new ArrayList<>();
                 Map<String, Object> email = new HashMap<>();
@@ -429,7 +414,6 @@ public class GooglePeopleService {
                 emailAddresses.add(email);
                 createBody.put("emailAddresses", emailAddresses);
             }
-
 
             String createUrl = "https://people.googleapis.com/v1/people:createContact";
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(createBody, headers);
@@ -458,6 +442,62 @@ public class GooglePeopleService {
             System.err.println("Error creating contact: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error creating contact: " + e.getMessage());
+        }
+    }
+
+    public String getBirthday(OAuth2AuthenticationToken authentication) {
+        try {
+            if (!"google".equals(authentication.getAuthorizedClientRegistrationId())) {
+                return "Not a Google account";
+            }
+
+            OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
+                    authentication.getAuthorizedClientRegistrationId(),
+                    authentication.getName()
+            );
+
+            if (client == null) {
+                return "No authorized client found";
+            }
+
+            String accessToken = client.getAccessToken().getTokenValue();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            headers.setCacheControl("no-cache, no-store, must-revalidate");
+            headers.setPragma("no-cache");
+            headers.setExpires(0);
+
+            String url = "https://people.googleapis.com/v1/people/me?personFields=birthdays";
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Map.class
+            );
+
+            Map<String, Object> body = response.getBody();
+
+            if (body != null && body.containsKey("birthdays")) {
+                List<LinkedHashMap<String, Object>> birthdays = (List<LinkedHashMap<String, Object>>) body.get("birthdays");
+
+                if (birthdays != null && !birthdays.isEmpty()) {
+                    LinkedHashMap<String, Object> birthdayEntry = birthdays.get(0);
+                    if (birthdayEntry.containsKey("date")) {
+                        Map<String, Object> date = (Map<String, Object>) birthdayEntry.get("date");
+                        Integer year = (Integer) date.get("year");
+                        Integer month = (Integer) date.get("month");
+                        Integer day = (Integer) date.get("day");
+
+                        return String.format("%04d-%02d-%02d", year, month, day);
+                    }
+                }
+            }
+
+            return "No birthday found in your Google profile.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error retrieving birthday: " + e.getMessage();
         }
     }
 }

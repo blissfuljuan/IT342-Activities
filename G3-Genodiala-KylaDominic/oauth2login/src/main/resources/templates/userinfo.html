@@ -35,39 +35,20 @@
             height: 100px;
             border-radius: 50%;
         }
-        .contacts-list {
-            max-width: 600px;
-            margin: 20px auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 15px;
-        }
-        .contacts-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        .contacts-list h3 {
-            margin: 0;
-        }
-        .contacts-list li {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        .manage-contacts-btn {
-            padding: 8px 15px;
-            background-color: #4CAF50;
+        .view-contacts-btn, .logout-btn {
+            display: inline-block;
+            width: 100px;
+            margin: 10px 5px;
+            padding: 10px 20px;
+            background-color: #808080;
             color: white;
+            text-align: center;
             text-decoration: none;
             border-radius: 4px;
             font-weight: bold;
         }
-        .manage-contacts-btn:hover {
-            background-color: #45a049;
+        .view-contacts-btn:hover, .logout-btn:hover {
+            background-color: #696969;
         }
         .attributes-container {
             max-width: 600px;
@@ -98,25 +79,21 @@
         <td th:text="${email}">-</td>
     </tr>
     <tr>
+        <th>Birthday</th>
+        <td th:text="${birthday}">-</td>
+    </tr>
+    <tr>
         <th>Phone</th>
         <td th:text="${phone}">-</td>
     </tr>
+    <tr>
+        <th>Actions</th>
+        <td>
+            <a href="/api/contacts/view" class="view-contacts-btn">View Contacts</a>
+            <a href="/login" class="logout-btn">Logout</a>
+        </td>
+    </tr>
 </table>
-
-<div th:if="${contactsMap != null}" class="contacts-list">
-    <div class="contacts-header">
-        <h3>Your Contacts</h3>
-        <a href="/api/contacts/view" class="manage-contacts-btn">Manage Contacts</a>
-    </div>
-
-    <div th:if="${contactsMap.isEmpty()}">
-        <p>No contacts found with phone numbers.</p>
-    </div>
-
-    <ul th:if="${not contactsMap.isEmpty()}">
-        <li th:each="contact : ${contactsMap}" th:text="${contact.value.name + ': ' + contact.value.phoneNumber}">Contact info</li>
-    </ul>
-</div>
 
 <div th:if="${#authentication != null}" class="attributes-container">
     <h3>All Available Attributes:</h3>
