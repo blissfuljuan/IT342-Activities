@@ -1,13 +1,13 @@
-package com.canal.GoogleContact;
+package com.canal.googlecontact;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GoogleContactApplication {
+public class GooglecontactApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GoogleContactApplication.class, args);
+		SpringApplication.run(GooglecontactApplication.class, args);
 	}
 
 }
