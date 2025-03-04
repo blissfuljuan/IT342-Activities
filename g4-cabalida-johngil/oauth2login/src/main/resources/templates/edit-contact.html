@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Contact</title>
+</head>
+<body>
+<h1>Edit Contact</h1>
+<form th:action="@{/update-contact}" method="post">
+    <input type="hidden" name="id" th:value="${contact.resourceName}">
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" th:value="${contact.names[0].displayName}" required><br><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" th:value="${contact.emailAddresses[0].value}"><br><br>
+
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" name="phone" th:value="${contact.phoneNumbers[0].value}"><br><br>
+
+    <button type="submit">Save Changes</button>
+</form>
+<a th:href="@{/contacts}"><button type="button">Cancel</button></a>
+</body>
+</html>

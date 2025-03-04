@@ -4,8 +4,8 @@
     <title>Add Contact</title>
 </head>
 <body>
-<h1>Add a New Contact</h1>
-<form th:action="@{/contacts/add}" method="post">
+<h1>Add New Contact</h1>
+<form th:action="@{/new-contact}" method="post">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" required><br><br>
 
@@ -15,7 +15,11 @@
     <label for="phone">Phone Number:</label>
     <input type="text" id="phone" name="phone"><br><br>
 
+    <!-- Hidden field for Access Token -->
+    <input type="hidden" name="accessToken" th:value="${accessToken}" />
+
     <button type="submit">Add Contact</button>
+    <button type="button" onclick="window.location.href='/contacts'">Back</button>
 </form>
 </body>
 </html>
