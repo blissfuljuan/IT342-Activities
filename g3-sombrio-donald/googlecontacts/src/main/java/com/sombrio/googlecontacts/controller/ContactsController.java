@@ -1,32 +1,28 @@
+
 package com.sombrio.googlecontacts.controller;
 
-import com.sombrio.googlecontacts.model.Contact;
+import com.google.api.services.people.v1.model.Person;
 import com.sombrio.googlecontacts.service.GoogleContactsService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.List;
 
-import static org.apache.tomcat.util.net.openssl.OpenSSLStatus.getName;
-
-@Controller
-@RequestMapping("/contacts")
+@RestController
+@RequestMapping("/api/contacts")
 public class ContactsController {
 
-    private final GoogleContactsService contactsService;
+    private final GoogleContactsService googleContactsService;
 
-    public ContactsController(GoogleContactsService contactsService){
-        this.contactsService = contactsService;
+    public ContactsController(GoogleContactsService googleContactsService){
+        this.googleContactsService = googleContactsService;
     }
 
     @GetMapping
-    public String getContacts(@AuthenticationPrincipal OAuth2User principal, Model model ){
-        List<Contact> contacts = contactsService.getContact(principal.getName());
-        model.addAttribute("contacts", contacts);
-        return "contacts";
+    public List<Person> getContacts() throws IOException {
+        List<Person> contacts = googleContactsService.getContacts();
+        System.out.println("Fetched Contacts: " + contacts);
+        return contacts;
     }
 }
