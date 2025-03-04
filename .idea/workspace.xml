@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="0a3aea30-ea21-4fbb-8549-f3d8d3da858c" name="Changes" comment="" />
+    <list default="true" id="0a3aea30-ea21-4fbb-8549-f3d8d3da858c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/add-contact.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/GoogleContactApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/GoogleContactApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/model/Contact.java" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/java/com/fernandez/GoogleContact/model/Contact.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/addContact.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/contacts.html" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/contacts.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/user-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/G7-fernandez-Cg/GoogleContact/src/main/resources/templates/user-info.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +29,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
   <component name="ProjectId" id="2tLchP6A0hfIYiB45Vr8PCBVtAP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,9 +41,27 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "Z:/L14X20W08/IT342-Activities-Fernandez/G7-fernandez-Cg/oauth2login"
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/allen/IT342-Activities-Fernandez/G7-fernandez-Cg/GoogleContact",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.25659.39" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.25659.39" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -33,7 +70,11 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1740134913838</updated>
+      <workItem from="1740975867698" duration="473000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
