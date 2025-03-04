@@ -1,27 +1,69 @@
 package com.reneekiara.oauth2login.controller;
 
-import com.google.api.services.people.v1.model.ListConnectionsResponse;
+import com.google.api.services.people.v1.model.EmailAddress;
+import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
+import com.google.api.services.people.v1.model.PhoneNumber;
 import com.reneekiara.oauth2login.service.googleContactsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@RestController
+@Controller
 public class googleContacts {
 
     @Autowired
     googleContactsService serv;
 
+
     @GetMapping("/contacts")
-    public List<Person> getContacts(@AuthenticationPrincipal OAuth2User principal) throws IOException {
-        return serv.getContacts(principal.getName());
+    public String getContacts(@AuthenticationPrincipal OAuth2User principal, Model model) throws IOException, GeneralSecurityException {
+
+        model.addAttribute("contacts", serv.getContacts(principal.getName()));
+        return "contacts";
     }
+
+    @PostMapping("/newContact")
+    public String newContact(@RequestParam("givenName") String givenName,
+                             @RequestParam("familyName") String familyName,
+                             @RequestParam("email") String email,
+                             @RequestParam("phoneNumber") String phoneNumber,
+                             @AuthenticationPrincipal OAuth2User principal, Model model) throws IOException, GeneralSecurityException {
+        Person person = new Person();
+
+        List<Name> names = new ArrayList<>();
+        names.add(new Name().setGivenName(givenName).setFamilyName(familyName));
+        person.setNames(names);
+
+        List<EmailAddress> emails = new ArrayList<>();
+        emails.add(new EmailAddress().setValue(email));
+        person.setEmailAddresses(emails);
+
+        List<PhoneNumber> phones = new ArrayList<>();
+        phones.add(new PhoneNumber().setValue(phoneNumber));
+        person.setPhoneNumbers(phones);
+
+        serv.newContact(person,principal.getName());
+
+        model.addAttribute("contacts", serv.getContacts(principal.getName()));
+        return "contacts";
+    }
+
+    @DeleteMapping(value="/deleteContact")
+    public String deleteContact(@PathVariable String resourceName, @AuthenticationPrincipal OAuth2User principal) throws IOException, GeneralSecurityException {
+
+        serv.deleteContact(resourceName,principal.getName());
+
+        return "redirect:contacts";
+    }
+
 }
 

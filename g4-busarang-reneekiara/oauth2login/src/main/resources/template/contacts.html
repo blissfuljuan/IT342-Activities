@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <style>
+    body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #3c4043;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #185abc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+         .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%; /* Could be more or less, depending on screen size */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Google Contacts</h1>
+<button id="createContactBtn"> Create </button>
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create New Contact</h2>
+        <form id="contactForm" th:action="@{/newContact}" method="post">
+            <label for="givenName">Given Name:</label><br>
+            <input type="text" id="givenName" name="givenName"><br>
+            <label for="familyName">Family Name:</label><br>
+            <input type="text" id="familyName" name="familyName"><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email"><br>
+            <label for="phoneNumber">Phone Number:</label><br>
+            <input type="tel" id="phoneNumber" name="phoneNumber"><br><br>
+            <button type="submit">Create Contact</button>
+        </form>
+    </div>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names[0].displayName}"></td>
+        <td th:text="${contact.emailAddresses[0].value}"></td>
+        <td th:text="${contact.phoneNumbers[0].value}"></td>
+        <td><button>Edit</button><button onclick="deleteContact('${contact.resourceName}')">Delete</button></td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+
+        var modal = document.getElementById("contactModal");
+
+        var btn = document.getElementById("createContactBtn");
+
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function deleteContact(resourceName) {
+            if (confirm("Are you sure you want to delete this contact?")) {
+               await =
+            }
+        }
+    </script>
+
+</body>
+</html>
