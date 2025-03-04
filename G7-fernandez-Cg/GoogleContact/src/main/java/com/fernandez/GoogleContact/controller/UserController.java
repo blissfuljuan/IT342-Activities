@@ -26,10 +26,15 @@ public class UserController {
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
 
-    @GetMapping("")
-    public String index() {
-        return "home";  // Return home view
+    @Controller
+    public class HomeController {
+
+        @GetMapping("/")
+        public String home() {
+            return "redirect:/index";
+        }
     }
+
 
     @GetMapping("/user-info")
     public String getUserInfo(@AuthenticationPrincipal Object principal, Model model) {
