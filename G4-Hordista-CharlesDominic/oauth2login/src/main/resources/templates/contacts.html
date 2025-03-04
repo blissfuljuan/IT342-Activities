@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Google Contacts</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .contact-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .contact-card:hover {
+        transform: scale(1.05);
+    }
+    .search-input {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+  </style>
+
+  <script>
+    function filterContacts() {
+        let input = document.getElementById("search").value.toLowerCase();
+        let cards = document.getElementsByClassName("contact-card");
+
+        for (let card of cards) {
+            let name = card.getAttribute("data-name").toLowerCase();
+            let email = card.getAttribute("data-email").toLowerCase();
+            let phone = card.getAttribute("data-phone").toLowerCase();
+            card.style.display = (name.includes(input) || email.includes(input) || phone.includes(input)) ? "block" : "none";
+        }
+    }
+  </script>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">📞 Google Contacts</h2>
+
+  <!-- Search Bar -->
+  <div class="input-group mb-4 search-input">
+    <span class="input-group-text">🔍</span>
+    <input type="text" id="search" class="form-control" placeholder="Search contacts..." onkeyup="filterContacts()">
+  </div>
+
+  <!-- Contacts Grid -->
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col" th:each="contact : ${contacts}">
+      <div class="card shadow-sm border-0 rounded-4 contact-card p-3"
+           th:data-name="${contact.split(' - ')[0]}"
+           th:data-email="${contact.split(' - ')[1]}"
+           th:data-phone="${contact.split(' - ')[2]}">
+
+        <div class="card-body text-center">
+          <h5 class="card-title fw-bold" th:text="${contact.split(' - ')[0]}">John Doe</h5>
+          <p class="card-text text-muted">
+            ✉ <span th:text="${contact.split(' - ')[1]}">john.doe@example.com</span>
+          </p>
+          <p class="card-text">
+            📞 <span th:text="${contact.split(' - ')[2]}">+123456789</span>
+          </p>
+
+
+          <a th:href="@{'mailto:' + ${contact.split(' - ')[1]}}" class="btn btn-outline-secondary btn-sm">
+            ✉ Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="text-center mt-4">
+    <a href="/user-info" class="btn btn-dark">⬅ Back to Profile</a>
+  </div>
+</div>
+
+</body>
+</html>
