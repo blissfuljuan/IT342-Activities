@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Map;
 
 @Controller
-public class UserController {
+public class userController {
 
     private final GooglePeopleService googlePeopleService;
 
-    public UserController(GooglePeopleService googlePeopleService) {
+    public userController(GooglePeopleService googlePeopleService) {
         this.googlePeopleService = googlePeopleService;
     }
 
