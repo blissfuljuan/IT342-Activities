@@ -1,54 +1,36 @@
 package com.kho.googlecontacts.controller;
 
-import com.kho.googlecontacts.model.Contact;
-
+import com.google.api.services.people.v1.model.Person;
 import com.kho.googlecontacts.service.GoogleContactsService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.List;
 
-@Controller
-@RequestMapping("/contacts")
+@RestController
+@RequestMapping("/api/contacts")
 public class ContactsController {
-    private final GoogleContactsService contactsService;
 
-    // Constructor Injection
-    public ContactsController(GoogleContactsService contactsService) {
-        this.contactsService = contactsService;
+    private final GoogleContactsService googleContactsService;
+
+    public ContactsController(GoogleContactsService googleContactsService) {
+        this.googleContactsService = googleContactsService;
     }
 
     @GetMapping
-    public String getContacts(@AuthenticationPrincipal OAuth2User principal, Model model) {
-        // Retrieve contacts for the authenticated user
-        List<Contact> contacts = contactsService.getContacts(principal);
-        model.addAttribute("contacts", contacts);
-        return "contacts";  // Return to the 'contacts.html' template
+    public List<Person> getContacts(
+            @RequestParam(defaultValue = "50") int pageSize,
+            @RequestParam(required = false) String pageToken) throws IOException {
+        List<Person> contacts = googleContactsService.getContacts(pageSize, pageToken);
+        System.out.println("Fetched Contacts: " + contacts);
+        return contacts;
     }
 
-    // Modify Contact
-    @PostMapping("/modify")
-    public String modifyContact(@AuthenticationPrincipal OAuth2User principal, Contact contact) {
-        contactsService.modifyContact(principal, contact);
-        return "redirect:/contacts";  // After modification, go back to the contacts page
-    }
-
-    // Add Contact
-    @PostMapping("/add")
-    public String addContact(@AuthenticationPrincipal OAuth2User principal, Contact contact) {
-        contactsService.addContact(principal, contact);
-        return "redirect:/contacts";
-    }
-
-    // Remove Contact
-    @PostMapping("/remove")
-    public String removeContact(@AuthenticationPrincipal OAuth2User principal, Long contactId) {
-        contactsService.removeContact(principal, contactId);
-        return "redirect:/contacts";
+    @GetMapping("/next-page")
+    public String getNextPageToken(
+            @RequestParam(defaultValue = "50") int pageSize,
+            @RequestParam(required = false) String pageToken) throws IOException {
+        return googleContactsService.getNextPageToken(pageSize, pageToken);
     }
 }
