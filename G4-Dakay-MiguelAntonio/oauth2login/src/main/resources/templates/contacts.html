@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <script>
+        async function deleteContact(resourceName) {
+            if (!confirm("Are you sure you want to delete this contact?")) return;
+
+            try {
+                const response = await fetch(`/deleteContact?resourceName=${resourceName}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert("Contact deleted successfully");
+                    location.reload(); // Refresh the page to reflect changes
+                } else {
+                    alert("Failed to delete contact");
+                }
+            } catch (error) {
+                console.error("Error deleting contact:", error);
+                alert("Error deleting contact");
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Google Contacts</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names != null and contact.names[0] != null ? contact.names[0].displayName : 'No Name'}"></td>
+        <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></td>
+        <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Phone'}"></td>
+        <td>
+            <button>Edit</button>
+            <button th:attr="onclick='deleteContact(\'' + ${contact.resourceName} + '\')'">Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<form action="/addContact" method="post">
+    <input type="text" name="givenName" placeholder="First Name" required>
+    <input type="text" name="familyName" placeholder="Last Name" required>
+    <input type="text" name="email" placeholder="Email" required>
+    <input type="text" name="mobile" placeholder="Phone No." required>
+    <button type="submit">Add Contact</button>
+</form>
+</body>
+</html>
