@@ -8,11 +8,9 @@ import com.google.api.services.people.v1.model.*;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
+
 import com.google.api.client.json.jackson2.JacksonFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,11 +35,10 @@ public class ContactController {
                 credential
         ).setApplicationName("Fundnote").build();
 
-        // Retrieve Google Contacts
         ListConnectionsResponse response = peopleService.people().connections()
                 .list("people/me")
                 .setPageSize(10)
-                .setPersonFields("names,emailAddresses,phoneNumbers") // Include phoneNumbers
+                .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
 
         List<Person> connections = response.getConnections();
@@ -57,7 +54,8 @@ public class ContactController {
                     String phone = person.getPhoneNumbers() != null && !person.getPhoneNumbers().isEmpty()
                             ? person.getPhoneNumbers().get(0).getValue()
                             : "No Number";
-                    return name + " - " + email + " - " + phone;
+                    String resourceName = person.getResourceName();
+                    return name + " - " + email + " - " + phone + " - " + resourceName;
                 })
                 .collect(Collectors.toList()) : List.of();
 
@@ -65,15 +63,13 @@ public class ContactController {
         return "contacts";
     }
 
-    // Show form to create contact
     @GetMapping("/new")
     public String showCreateContactForm(Model model) {
         model.addAttribute("contact", new Person());
         return "create-contact";
     }
 
-    // Handle form submission for creating a contact
-    @PostMapping("/contacts")
+    @PostMapping("/newContact")
     public String createContact(@RequestParam String name, @RequestParam String email, @RequestParam String phone,
                                 OAuth2AuthenticationToken authentication) throws Exception {
         Credential credential = credentialService.getGoogleCredential(authentication);
@@ -93,4 +89,77 @@ public class ContactController {
 
         return "redirect:/contacts";
     }
+
+    // DELETE CONTACT FUNCTION
+    @PostMapping("/delete")
+    public String deleteContact(@RequestParam String resourceName, OAuth2AuthenticationToken authentication) throws Exception {
+        Credential credential = credentialService.getGoogleCredential(authentication);
+
+        PeopleService peopleService = new PeopleService.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential
+        ).setApplicationName("Fundnote").build();
+
+        peopleService.people().deleteContact(resourceName).execute();
+
+        return "redirect:/contacts";
+    }
+
+    // UPDATE CONTACT - Show Edit Form
+    @GetMapping("/edit")
+    public String showEditContactForm(@RequestParam String resourceName, @RequestParam String name,
+                                      @RequestParam String email, @RequestParam String phone, Model model) {
+        model.addAttribute("resourceName", resourceName);
+        model.addAttribute("name", name);
+        model.addAttribute("email", email);
+        model.addAttribute("phone", phone);
+        return "edit-contact";
+    }
+
+    // UPDATE CONTACT - Process Update
+    @PostMapping("/update")
+    public String updateContact(@RequestParam String resourceName, @RequestParam String name,
+                                @RequestParam String email, @RequestParam String phone,
+                                OAuth2AuthenticationToken authentication, Model model) {
+        try {
+            Credential credential = credentialService.getGoogleCredential(authentication);
+
+            PeopleService peopleService = new PeopleService.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance(),
+                    credential
+            ).setApplicationName("Fundnote").build();
+
+            // 🔹 Retrieve existing contact to get etag
+            Person existingContact = peopleService.people().get(resourceName)
+                    .setPersonFields("names,emailAddresses,phoneNumbers,metadata")
+                    .execute();
+
+            if (existingContact == null || existingContact.getEtag() == null) {
+                model.addAttribute("error", "Failed to retrieve contact etag.");
+                return "error";
+            }
+
+            // 🔹 Create updated contact with etag
+            Person updatedContact = new Person()
+                    .setEtag(existingContact.getEtag())  // Required for updates
+                    .setNames(List.of(new Name().setGivenName(name)))
+                    .setEmailAddresses(List.of(new EmailAddress().setValue(email)))
+                    .setPhoneNumbers(List.of(new PhoneNumber().setValue(phone)));
+
+            // 🔹 Execute update request
+            peopleService.people().updateContact(resourceName, updatedContact)
+                    .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
+                    .execute();
+
+            return "redirect:/contacts";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Error updating contact: " + e.getMessage());
+            return "error";
+        }
+    }
+
+
 }

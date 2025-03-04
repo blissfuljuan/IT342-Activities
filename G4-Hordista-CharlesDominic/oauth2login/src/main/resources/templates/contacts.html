@@ -42,6 +42,11 @@
 <div class="container mt-5">
   <h2 class="text-center mb-4">📞 Google Contacts</h2>
 
+  <!-- Add New Contact Button -->
+  <div class="text-center mb-3">
+    <a th:href="@{/contacts/new}" class="btn btn-primary">➕ Add New Contact</a>
+  </div>
+
   <!-- Search Bar -->
   <div class="input-group mb-4 search-input">
     <span class="input-group-text">🔍</span>
@@ -65,10 +70,21 @@
             📞 <span th:text="${contact.split(' - ')[2]}">+123456789</span>
           </p>
 
-
           <a th:href="@{'mailto:' + ${contact.split(' - ')[1]}}" class="btn btn-outline-secondary btn-sm">
             ✉ Email
           </a>
+
+          <a th:href="@{/contacts/edit(resourceName=${contact.split(' - ')[3]}, name=${contact.split(' - ')[0]}, email=${contact.split(' - ')[1]}, phone=${contact.split(' - ')[2]})}" class="btn btn-warning btn-sm">
+            ✏️ Edit
+          </a>
+
+          <!-- Delete Contact Button -->
+          <form th:action="@{/contacts/delete}" method="post" class="d-inline">
+            <input type="hidden" name="resourceName" th:value="${contact.split(' - ')[3]}">
+            <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+          </form>
+
+
         </div>
       </div>
     </div>
