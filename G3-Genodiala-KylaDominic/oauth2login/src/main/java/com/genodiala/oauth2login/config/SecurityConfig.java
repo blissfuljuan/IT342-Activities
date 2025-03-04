@@ -9,15 +9,15 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+public class SecurityConfig  {
 
-public class SecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/user-info",true))
-                .logout(logout -> logout.logoutSuccessUrl("/login"))
+                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/googleuser", true))
                 .formLogin(form -> form.defaultSuccessUrl("/secured", true))
+                .logout(logout -> logout.logoutSuccessUrl("/"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
