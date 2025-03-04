@@ -4,14 +4,16 @@
     <title>User Information</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            color: #212529;
         }
         h2 {
-            color: #333;
+            color: #1a73e8;
             text-align: center;
+            margin-bottom: 30px;
         }
         table {
             border-collapse: collapse;
@@ -19,63 +21,73 @@
             max-width: 600px;
             margin: 20px auto;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
+            border: 1px solid #e9ecef;
+            padding: 16px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
+            color: #1a73e8;
+            font-weight: 500;
         }
         .user-picture {
             width: 100px;
             height: 100px;
             border-radius: 50%;
+            object-fit: cover;
         }
         .contacts-list {
             max-width: 600px;
             margin: 20px auto;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 24px;
         }
         .contacts-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 16px;
         }
         .contacts-list h3 {
             margin: 0;
+            color: #1a73e8;
         }
         .contacts-list li {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            color: #5f6368;
+        }
+        .contacts-list li:last-child {
+            border-bottom: none;
         }
         .manage-contacts-btn {
-            padding: 8px 15px;
-            background-color: #4CAF50;
+            padding: 8px 16px;
+            background-color: #1a73e8;
             color: white;
             text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         .manage-contacts-btn:hover {
-            background-color: #45a049;
+            background-color: #1557b0;
         }
         .attributes-container {
             max-width: 600px;
             margin: 20px auto;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 24px;
         }
     </style>
 </head>
