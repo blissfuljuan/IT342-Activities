@@ -14,7 +14,7 @@
     
     <button onclick="showAddPopup()">Add Contact</button>
 
-    <br>
+    </br>
     <table border="1">
         <thead>
             <tr>
@@ -39,7 +39,6 @@
 
     <p th:if="${error}" th:text="${error}"></p>
 
-    <!-- Add Contact Popup -->
     <div id="addPopup" style="display:none;">
         <h2>Add Contact</h2>
         <form id="addForm">
@@ -51,7 +50,6 @@
         </form>
     </div>
 
-    <!-- Edit Contact Popup -->
     <div id="editPopup" style="display:none;">
         <h2>Edit Contact</h2>
         <form id="editForm">
@@ -72,15 +70,15 @@
                 xhr.setRequestHeader(header, token);
             });
         });
-
+    
         function showAddPopup() {
             $('#addPopup').show();
         }
-
+    
         function closeAddPopup() {
             $('#addPopup').hide();
         }
-
+    
         $('#addForm').submit(function(e) {
             e.preventDefault();
             $.ajax({
@@ -98,7 +96,7 @@
                 }
             });
         });
-
+    
         function showEditPopup(resourceName, name, email, phone) {
             $('#editResourceName').val(resourceName);
             $('#editName').val(name);
@@ -106,31 +104,53 @@
             $('#editPhone').val(phone);
             $('#editPopup').show();
         }
-
+    
         function closeEditPopup() {
             $('#editPopup').hide();
         }
-
+    
         $('#editForm').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: '/contacts/edit',
-                type: 'POST',
-                data: {
-                    resourceName: $('#editResourceName').val(),
-                    name: $('#editName').val(),
-                    email: $('#editEmail').val(),
-                    phone: $('#editPhone').val()
-                },
-                success: function() { location.reload(); },
-                error: function(err) {
-                    console.error("Error updating contact:", err.responseJSON);
-                    alert(err.responseJSON ? err.responseJSON.message : 'Failed to update contact.');
-                }
-            });
+        e.preventDefault();
+
+        const resourceName = $('#editResourceName').val();
+        const name = $('#editName').val().trim();
+        const email = $('#editEmail').val().trim();
+        const phone = $('#editPhone').val().trim();
+
+        if (!resourceName) {
+            alert('Invalid contact. Please refresh the page.');
+            return;
+        }
+
+        if (!name || !email || !phone) {
+            alert('All fields are required.');
+            return;
+        }
+
+        console.log("Submitting edit form with:", { resourceName, name, email, phone });
+
+        $.ajax({
+            url: '/contacts/edit',
+            type: 'POST',
+            data: {
+                resourceName: resourceName,
+                name: name,
+                email: email,
+                phone: phone
+            },
+            success: function(response) {
+                console.log("Contact updated successfully:", response);
+                location.reload();
+            },
+            error: function(err) {
+                console.error("Error updating contact:", err.responseJSON);
+                alert(err.responseJSON ? err.responseJSON.message : 'Failed to update contact.');
+            }
         });
+    });
 
 
+    
         function deleteContact(resourceName) {
             if (confirm('Are you sure you want to delete this contact?')) {
                 $.ajax({

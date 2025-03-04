@@ -2,7 +2,6 @@ package com.pepito.midterm.Controller;
 
 import com.pepito.midterm.Service.GoogleContactService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -75,14 +74,21 @@ public class UserController {
 
     @PostMapping("/contacts/edit")
     public ResponseEntity<?> editContact(@AuthenticationPrincipal OAuth2User oAuth2User,
-                                          @RequestParam String resourceName,
-                                          @RequestParam String name,
-                                          @RequestParam String email,
-                                          @RequestParam String phone) {
+                                        @RequestParam String resourceName,
+                                        @RequestParam String name,
+                                        @RequestParam String email,
+                                        @RequestParam String phone) {
         try {
+            System.out.println("Received edit request:");
+            System.out.println("Resource Name: " + resourceName);
+            System.out.println("New Name: " + name);
+            System.out.println("New Email: " + email);
+            System.out.println("New Phone: " + phone);
+
             gserv.updateContact(oAuth2User, resourceName, name, email, phone);
             return ResponseEntity.ok(Map.of("status", "success", "message", "Contact updated successfully"));
         } catch (Exception e) {
+            System.err.println("Failed to update contact: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Failed to update contact: " + e.getMessage()));
         }
     }

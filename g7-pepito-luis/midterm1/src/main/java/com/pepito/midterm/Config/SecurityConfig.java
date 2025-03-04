@@ -7,20 +7,33 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+// public class SecurityConfig {
+//     @Bean
+//     public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
+//         return http
+//                 .authorizeHttpRequests(authorize -> authorize
+//                         .requestMatchers("/", "/user-info", "/contacts").authenticated()
+//                         .requestMatchers("/contacts/add", "/contacts/edit", "/contacts/delete").authenticated()
+//                         .anyRequest().authenticated()
+//                 )
+//                 .oauth2Login(oauth -> oauth.defaultSuccessUrl("/user-info", true))
+//                 .logout(logout -> logout.logoutSuccessUrl("/"))
+//                 .csrf(csrf -> csrf
+//                         .ignoringRequestMatchers("/contacts/add", "/contacts/edit", "/contacts/delete")
+//                 )
+//                 .build();
+//     }
+// }
+
 public class SecurityConfig {
-    @Bean
-    public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/user-info", "/contacts").authenticated()
-                        .requestMatchers("/contacts/add", "/contacts/edit", "/contacts/delete").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/user-info", true))
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/contacts/add", "/contacts/edit", "/contacts/delete")
-                )
-                .build();
+
+        @Bean
+        public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception{
+            return http
+                    .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                    .oauth2Login(oauth -> oauth.defaultSuccessUrl("/user-info", true))
+                    .logout(logout -> logout.logoutSuccessUrl("/"))
+                    .formLogin(formLogin -> formLogin.defaultSuccessUrl("/user-info", true))
+                    .build();
+        }
     }
-}
