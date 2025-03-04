@@ -3,19 +3,15 @@ package com.quitco.googlecontactsapi.config;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.people.v1.PeopleService;
+import com.quitco.googlecontactsapi.util.TokenFetcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -27,15 +23,12 @@ public class PeopleServiceConfig {
     private OAuth2AuthorizedClientService authorizedClientService;
 
     @Bean
+    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public PeopleService peopleService() throws GeneralSecurityException, IOException {
-        OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        String clientRegistrationId = authentication.getAuthorizedClientRegistrationId();
-        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(clientRegistrationId, authentication.getName());
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+        TokenFetcher tokenFetcher = new TokenFetcher(authorizedClientService);
+        String accessToken = tokenFetcher.fetchToken();
 
-        HttpRequestInitializer requestInitializer = request -> {
-            request.getHeaders().setAuthorization("Bearer " + accessToken.getTokenValue());
-        };
+        HttpRequestInitializer requestInitializer = request -> request.getHeaders().setAuthorization("Bearer " + accessToken);
 
         return new PeopleService.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),

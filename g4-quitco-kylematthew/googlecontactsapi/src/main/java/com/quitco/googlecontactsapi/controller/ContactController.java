@@ -3,12 +3,14 @@ package com.quitco.googlecontactsapi.controller;
 import com.google.api.services.people.v1.model.Person;
 import com.quitco.googlecontactsapi.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/contacts")
 public class ContactController {
 
@@ -16,7 +18,15 @@ public class ContactController {
     private ContactService contactService;
 
     @GetMapping("/getContacts")
-    public List<Person> listContacts() throws IOException {
+    public String listContacts(Model model) throws IOException {
+        List<Person> contacts = contactService.listContacts();
+        model.addAttribute("contacts", contacts);
+        return "contacts";
+    }
+
+    @GetMapping("/testGetContacts")
+    @ResponseBody
+    public List<Person> getContactsTest() throws IOException {
         return contactService.listContacts();
     }
 
