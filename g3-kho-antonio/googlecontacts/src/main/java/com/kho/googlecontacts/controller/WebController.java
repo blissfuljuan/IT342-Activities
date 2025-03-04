@@ -2,11 +2,14 @@ package com.kho.googlecontacts.controller;
 
 import com.google.api.services.people.v1.model.Person;
 import com.kho.googlecontacts.service.GoogleContactsService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -139,14 +142,16 @@ public class WebController {
     }
 
     @PostMapping("/api/contacts/create")
-    public String createContact(
+    public ResponseEntity<Void> createContact(
             @RequestParam String givenName,
             @RequestParam String familyName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber) throws IOException {
         Person newContact = googleContactsService.createContact(givenName, familyName, email, phoneNumber);
         System.out.println("Contact created: " + newContact.getResourceName());
-        return "redirect:/contacts";
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/contacts"))
+                .build();
     }
 
     @PostMapping("/api/contacts/update")

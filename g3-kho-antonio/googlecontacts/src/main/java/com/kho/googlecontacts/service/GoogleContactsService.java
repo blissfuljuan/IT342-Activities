@@ -178,6 +178,4 @@ public class GoogleContactsService {
             throw new IOException("Failed to delete contact in Google People API", e);
         }
     }
-
-
 }

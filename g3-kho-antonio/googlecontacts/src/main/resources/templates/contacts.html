@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Google Contacts</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arial:wght@300;400;600&display=swap">
+
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
     <style>
         body {
-            background-color: #e9ecef;
-            font-family: 'Roboto', sans-serif;
-            color: #343a40;
+            background-color: #f4f7f9;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            color: #2c3e50;
         }
         .container {
             margin-top: 40px;
             max-width: 900px;
             background: #ffffff;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e6e9ed;
         }
         .header-title {
             text-align: center;
-            color: #007bff;
-            font-weight: 500;
+            color: #2980b9;
+            font-weight: 600;
             margin-bottom: 25px;
             font-size: 32px;
         }
@@ -38,21 +40,36 @@
         .search-container {
             max-width: 300px;
         }
-        /* Enhance pagination style */
         .pagination .page-link {
-            color: #007bff;
+            color: #2980b9;
         }
-        .pagination .page-item.disabled .page-link {
-            color: #adb5bd;
+        .pagination .page-item.active .page-link {
+            background-color: #2980b9;
+            border-color: #2980b9;
         }
         .page-info {
             margin-top: 10px;
             text-align: center;
             color: #6c757d;
         }
-        /* Button hover effects */
-        .btn-warning:hover, .btn-danger:hover {
-            opacity: 0.9;
+        .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .btn-info {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #f39c12;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f4f7;
         }
     </style>
 </head>
@@ -73,13 +90,11 @@
         </div>
         <!-- Search Form -->
         <div class="search-container">
-            <form action="/contacts" method="GET">
-                <div class="input-group">
-                    <input type="text" name="search" class="form-control" placeholder="Search contacts..."
-                           th:value="${search}">
-                    <button type="submit" class="btn btn-outline-primary">Search</button>
-                </div>
-            </form>
+            <div class="input-group">
+                <input type="text" id="contactSearch" name="search" class="form-control" placeholder="Search contacts..."
+                       th:value="${search}">
+                <button type="button" class="btn btn-outline-primary">Search</button>
+            </div>
         </div>
     </div>
 
@@ -93,7 +108,7 @@
                 </div>
                 <div class="modal-body">
                     <!-- Add Contact Form -->
-                    <form action="/api/contacts/create" method="POST">
+                    <form id="addContactForm" action="/api/contacts/create" method="POST">
                         <div class="mb-3">
                             <label for="givenName" class="form-label">First Name</label>
                             <input type="text" class="form-control" id="givenName" name="givenName" required>
@@ -226,11 +241,71 @@
             </div>
         </div>
     </div>
-
 </div>
 
-<!-- Bootstrap JS (Required for Modal) -->
+<!-- Bootstrap JS and Custom Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Remove client-side keyup search as search is handled server side -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dynamic Contact Addition
+        const addContactForm = document.getElementById('addContactForm');
+
+        addContactForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(addContactForm);
+
+            fetch('/api/contacts/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect to contacts page to refresh
+                    window.location.href = '/contacts';
+                    return;
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add contact. Please try again.');
+            });
+        });
+
+        // Dynamic Search
+        const searchInput = document.getElementById('contactSearch');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                const searchTerm = this.value;
+
+                fetch(`/contacts?search=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.text())
+                .then(html => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+
+                    const newTableBody = tempDiv.querySelector('#contactsTable tbody');
+                    const paginationContainer = tempDiv.querySelector('.pagination');
+                    const pageInfo = tempDiv.querySelector('.page-info');
+
+                    if (newTableBody) {
+                        document.querySelector('#contactsTable tbody').innerHTML = newTableBody.innerHTML;
+                    }
+
+                    document.querySelector('.pagination').innerHTML = paginationContainer.innerHTML;
+                    document.querySelector('.page-info').innerHTML = pageInfo.innerHTML;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }, 300);
+        });
+    });
+</script>
 </body>
 </html>
