@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contacts</title>
+</head>
+<body>
+<h1>Contact List</h1>
+<form th:action="@{/contacts/add}" method="post">
+    <input type="text" name="names[0].displayName" placeholder="Name" required />
+    <input type="email" name="emailAddresses[0].value" placeholder="Email" required />
+    <button type="submit" class="btn btn-primary">Add New Contact</button>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td>
+            <form th:action="@{'/contacts/update/' + ${contact.resourceName}}" method="post">
+                <input type="text" name="names[0].displayName" th:value="${contact.names[0].displayName}" required />
+                <input type="email" name="emailAddresses[0].value" th:value="${contact.emailAddresses != null && contact.emailAddresses[0] != null ? contact.emailAddresses[0].value : ''}" required />
+                <button type="submit" class="btn btn-primary">Update</button>
+            </form>
+        </td>
+        <td th:text="${contact.emailAddresses != null && contact.emailAddresses[0] != null ? contact.emailAddresses[0].value : 'N/A'}">Email</td>
+        <td>
+            <form th:action="@{'/contacts/delete/' + ${contact.resourceName}}" method="post">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
