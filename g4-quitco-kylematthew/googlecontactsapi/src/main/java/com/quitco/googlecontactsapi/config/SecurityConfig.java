@@ -18,6 +18,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/secured", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
+                .formLogin(form -> form.defaultSuccessUrl("/secured", true))
                 .csrf(csrf -> csrf.disable())
                 .build();
     }

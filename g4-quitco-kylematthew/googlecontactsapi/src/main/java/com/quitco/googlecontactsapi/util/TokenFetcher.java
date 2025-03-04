@@ -15,17 +15,16 @@ public class TokenFetcher {
     }
 
     public String fetchToken() {
-        OAuth2AuthenticationToken authentication = getAuthenticationToken();
-        if (authentication == null) {
-            throw new IllegalStateException("No authenticated user found in security context");
-        }
-        String clientRegistrationId = authentication.getAuthorizedClientRegistrationId();
-        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(clientRegistrationId, authentication.getName());
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-        return accessToken.getTokenValue();
-    }
+        OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-    private OAuth2AuthenticationToken getAuthenticationToken() {
-        return (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException("User is not authorized");
+        }
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                authentication.getAuthorizedClientRegistrationId(), authentication.getName());
+        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+
+        return accessToken.getTokenValue();
     }
 }

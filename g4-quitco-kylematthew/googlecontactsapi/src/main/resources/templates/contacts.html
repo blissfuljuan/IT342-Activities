@@ -1,51 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Contacts</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
-                margin: 0;
-                padding: 0;
+<head>
+    <title>Contacts</title>
+    <script>
+            function confirmDelete(event) {
+                if (!confirm('Are you sure you want to delete this contact?')) {
+                    event.preventDefault();
+                }
             }
-            h1 {
-                text-align: center;
-                color: #333;
-            }
-            table {
-                width: 80%;
-                margin: 20px auto;
-                border-collapse: collapse;
-                background-color: #fff;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-            th, td {
-                padding: 12px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-            }
-            th {
-                background-color: #f2f2f2;
-            }
-            tr:hover {
-                background-color: #f1f1f1;
-            }
-        </style>
-        <table border="1">
-            <thead>
-            <tr>
-                <th>Display Name</th>
-                <th>Resource Name</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="contact : ${contacts}">
-                <td th:text="${contact.names[0].displayName}"></td>
-                <td th:text="${contact.resourceName}"></td>
-            </tr>
-            </tbody>
-        </table>
-        </body>
-    </head>
+        </script>
+</head>
+<body>
+<div>
+    Google Contacts:
+</div>
+<button>
+    <a href="#">Back</a>
+</button>
+<button>
+    <a href="#">+Contact</a>
+</button>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Emails</th>
+        <th>Phones</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names[0].displayName}"></td>
+        <td>
+            <ul>
+                <li th:each="email : ${contact.emailAddresses}" th:text="${email.value}"></li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}"></li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <form th:action="#" th:method="post">
+                    <button type="submit">Edit</button>
+                </form>
+                <form th:action="@{/contacts/deleteContact/{id}(id=${contact.resourceName})}" th:method="post" onsubmit="confirmDelete(event)">
+                    <button type="submit">Delete</button>
+                </form>
+            </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<button>
+    <a href="/logout">Logout</a>
+</button>
+</body>
 </html>

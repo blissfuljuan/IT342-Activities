@@ -17,14 +17,15 @@ public class ContactService {
     public List<Person> listContacts() throws IOException {
         ListConnectionsResponse response = peopleService.people().connections()
                 .list("people/me")
-                .setPersonFields("names,emailAddresses")
+                .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
+
         return response.getConnections();
     }
 
     public Person getContact(String resourceName) throws IOException {
         return peopleService.people().get(resourceName)
-                .setPersonFields("names,emailAddresses")
+                .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
     }
 
@@ -34,7 +35,7 @@ public class ContactService {
 
     public Person updateContact(String resourceName, Person contact) throws IOException {
         return peopleService.people().updateContact(resourceName, contact)
-                .setUpdatePersonFields("names,emailAddresses")
+                .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
     }
 

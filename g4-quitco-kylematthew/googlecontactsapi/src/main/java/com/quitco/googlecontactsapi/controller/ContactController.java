@@ -21,6 +21,7 @@ public class ContactController {
     public String listContacts(Model model) throws IOException {
         List<Person> contacts = contactService.listContacts();
         model.addAttribute("contacts", contacts);
+
         return "contacts";
     }
 
@@ -36,8 +37,9 @@ public class ContactController {
     }
 
     @PostMapping("/createContact")
-    public Person createContact(@RequestBody Person contact) throws IOException {
-        return contactService.createContact(contact);
+    public String createContact(@RequestBody Person contact) throws IOException {
+        contactService.createContact(contact);
+        return "redirect:/contacts/getContacts";
     }
 
     @PutMapping("/updateContact/{resourceName}")
@@ -45,8 +47,9 @@ public class ContactController {
         return contactService.updateContact(resourceName, contact);
     }
 
-    @DeleteMapping("/deleteContact/{resourceName}")
-    public void deleteContact(@PathVariable String resourceName) throws IOException {
-        contactService.deleteContact(resourceName);
+    @RequestMapping(value="/deleteContact/people/{resourceName}", method= RequestMethod.POST)
+    public String deleteContact(@PathVariable String resourceName) throws IOException {
+        contactService.deleteContact("people/" + resourceName);
+        return "redirect:/contacts/getContacts";
     }
 }
