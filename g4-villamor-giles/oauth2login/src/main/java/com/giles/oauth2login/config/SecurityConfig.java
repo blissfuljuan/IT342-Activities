@@ -15,10 +15,9 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/user-info", true))
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/contacts", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .formLogin(form -> form.defaultSuccessUrl("/secured", true))
-                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 }

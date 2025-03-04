@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>Google Contacts</h1>
+
+    <div class="mb-3">
+        <button class="btn btn-success" data-toggle="modal" data-target="#addContactModal">Add New Contact</button>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : 'N/A'}"></td>
+            <td th:text="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : 'N/A'}"></td>
+            <td th:text="${contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : 'N/A'}"></td> <!-- Display Phone Number -->
+            <td>
+                <form th:action="@{/contacts/update/{resourceName}(resourceName=${contact.resourceName})}" method="post" style="display:inline;">
+                    <!-- Simulate PUT with hidden method -->
+                    <input type="hidden" name="_method" value="PUT"/>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                </form>
+
+
+                <form th:action="@{/contacts/delete/{resourceName}(resourceName=${contact.resourceName})}" method="post" style="display:inline;">
+                    <!-- Simulate DELETE with hidden method -->
+                    <input type="hidden" name="_method" value="DELETE"/>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Add New Contact Modal -->
+    <div class="modal fade" id="addContactModal" tabindex="-1" role="dialog" aria-labelledby="addContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/contacts}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <div class="form-group">
+                            <input type="text" name="names[0].givenName" placeholder="First Name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="names[0].familyName" placeholder="Last Name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="emailAddresses[0].value" placeholder="Email" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" name="phoneNumbers[0].value" placeholder="Phone Number" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Contact</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="mt-4">
+        <form th:action="@{/logout}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-secondary">Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Bootstrap JS for modal functionality -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
