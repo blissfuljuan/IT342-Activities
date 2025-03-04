@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Contacts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #4285f4;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 20px;
+        }
+        .btn-custom {
+            background-color: #4285f4;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            margin: 5px;
+        }
+        .btn-custom:hover {
+            background-color: #357abd;
+            color: white;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            border-top: none;
+        }
+        .action-buttons {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Your Contacts</h2>
+                <div>
+                    <a href="/contact/add-form" class="btn btn-custom">
+                        <i class="fa fa-plus"></i> Add New Contact
+                    </a>
+                    <a href="/user-info" class="btn btn-custom">
+                        <i class="fa fa-user"></i> Profile
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="contact : ${contacts}">
+                                <td th:text="${contact.names != null and !contact.names.empty} ? ${contact.names[0].displayName} : ''">Name</td>
+                                <td th:text="${contact.emailAddresses != null and !contact.emailAddresses.empty} ? ${contact.emailAddresses[0].value} : ''">Email</td>
+                                <td th:text="${contact.phoneNumbers != null and !contact.phoneNumbers.empty} ? ${contact.phoneNumbers[0].value} : ''">Phone</td>
+                                <td class="action-buttons">
+                                    <a th:href="@{'/contacts/edit/people/' + ${contact.resourceName.substring(7)}}" class="btn btn-sm btn-primary">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>
+                                    <a th:href="@{'/contacts/delete/people/' + ${contact.resourceName.substring(7)}}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Are you sure you want to delete this contact?')">
+                                        <i class="fa fa-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <title>User Profile - Google Contacts Manager</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --win11-background: #f3f3f3;
+            --win11-card: rgba(255, 255, 255, 0.9);
+            --win11-accent: #0078d4;
+            --win11-text: #202020;
+            --win11-border: rgba(0, 0, 0, 0.1);
+            --win11-success: #0f7b0f;
+            --win11-danger: #c42b1c;
+        }
+
+        body {
+            background-color: var(--win11-background);
+            color: var(--win11-text);
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .win11-card {
+            background: var(--win11-card);
+            border: 1px solid var(--win11-border);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .profile-card {
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: var(--win11-card);
+            border-bottom: 1px solid var(--win11-border);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .profile-header h2 {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .profile-body {
+            padding: 1.5rem;
+            background: var(--win11-card);
+        }
+
+        .profile-section {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .profile-label {
+            color: #666;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-value {
+            color: var(--win11-text);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .btn-win11 {
+            border-radius: 4px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-win11:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-win11-primary {
+            background: var(--win11-accent);
+            color: white;
+        }
+
+        .btn-win11-primary:hover {
+            background: #006cc1;
+            color: white;
+        }
+
+        .btn-win11-danger {
+            background: var(--win11-danger);
+            color: white;
+        }
+
+        .btn-win11-danger:hover {
+            background: #a82416;
+            color: white;
+        }
+
+        .alert {
+            border-radius: 4px;
+            border: none;
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 120, 212, 0.1);
+            color: var(--win11-accent);
+        }
+
+        /* Windows 11 Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card win11-card profile-card">
+                    <div class="profile-header">
+                        <h2 class="text-center m-0">Profile</h2>
+                    </div>
+                    <div class="profile-body">
+                        <div sec:authorize="isAuthenticated()">
+                            <div class="profile-section">
+                                <div class="profile-label">Name</div>
+                                <div class="profile-value" th:text="${name}"></div>
+                            </div>
+                            <div class="profile-section">
+                                <div class="profile-label">Email</div>
+                                <div class="profile-value" th:text="${email}"></div>
+                            </div>
+                            <div class="d-flex justify-content-center gap-3 mt-4">
+                                <a href="/contacts" class="btn btn-win11 btn-win11-primary">
+                                    <i class="bi bi-people"></i>
+                                    <span>View Contacts</span>
+                                </a>
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-win11 btn-win11-danger">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div sec:authorize="!isAuthenticated()" class="text-center">
+                            <div class="alert mb-4">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Please log in to view your profile</span>
+                            </div>
+                            <a href="/oauth2/authorization/google" class="btn btn-win11 btn-win11-primary">
+                                <i class="bi bi-google"></i>
+                                <span>Login with Google</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
