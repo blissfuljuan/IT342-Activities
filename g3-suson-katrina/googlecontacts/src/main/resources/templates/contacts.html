@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffe6f2;
+            font-family: 'Poppins', sans-serif;
+        }
+        .container {
+            margin-top: 40px;
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid #ff6699;
+        }
+        .header-title {
+            text-align: center;
+            color: #cc3366;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .contact-card {
+            background: #ffccd5;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #ff6699;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .contact-info {
+            font-size: 16px;
+            color: #333;
+        }
+        .btn-success {
+            background-color: #ff6699;
+            border: none;
+        }
+        .btn-success:hover {
+            background-color: #cc3366;
+        }
+        .btn-warning {
+            background-color: #ff85a2;
+            border: none;
+        }
+        .btn-warning:hover {
+            background-color: #e65c8a;
+        }
+        .btn-danger {
+            background-color: #ff3366;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #cc0033;
+        }
+
+        .btn-primary {
+            background-color: #ff6699; /* Pink color */
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #cc3366; /* Darker pink for hover */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="header-title">Google Contacts</h1>
+
+    <div class="d-flex justify-content-between mb-3">
+        <input type="text" id="searchBar" class="form-control me-2" placeholder="Search contact..." onkeyup="searchContacts()" style="max-width: 70%;">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addContactModal">
+            Add Contact
+        </button>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Add Contact Form -->
+                    <form action="/api/contacts/create" method="POST">
+                        <div class="mb-3">
+                            <label for="givenName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="givenName" name="givenName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="familyName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="familyName" name="familyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Contact</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacts Table -->
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact No</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}"
+            th:if="${contact.names != null and contact.names.size() > 0}">
+            <td th:text="${contact.names[0].displayName}"></td>
+            <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></td>
+            <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Number'}"></td>
+            <td class="action-buttons">
+                <!-- Edit Button (Opens Modal) -->
+                <button class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                    Edit
+                </button>
+
+
+                <form action="/api/contacts/delete" method="POST" class="d-inline">
+                    <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+
+                <!-- Edit Contact Modal for Each Contact -->
+        <tr th:each="contact : ${contacts}">
+            <div class="modal fade"
+                 th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"
+                 tabindex="-1"
+                 aria-labelledby="editContactModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editContactModalLabel">Edit Contact</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Edit Contact Form -->
+                            <form th:action="@{/api/contacts/update}" method="POST">
+                                <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                                <div class="mb-3">
+                                    <label for="editGivenName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="editGivenName" name="givenName"
+                                           th:value="${contact.names[0].givenName}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editFamilyName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="editFamilyName" name="familyName"
+                                           th:value="${contact.names[0].familyName}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="editEmail" name="email"
+                                           th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editPhoneNumber" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="editPhoneNumber" name="phoneNumber"
+                                           th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap JS (Required for Modal) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function searchContacts() {
+        let input = document.getElementById("searchBar").value.toLowerCase();
+        let table = document.querySelector("table tbody");
+        let rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            let nameCell = rows[i].getElementsByTagName("td")[0]; // First column (Name)
+            if (nameCell) {
+                let name = nameCell.textContent.toLowerCase();
+                if (name.includes(input)) {
+                    rows[i].style.display = ""; // Show row
+                } else {
+                    rows[i].style.display = "none"; // Hide row
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
