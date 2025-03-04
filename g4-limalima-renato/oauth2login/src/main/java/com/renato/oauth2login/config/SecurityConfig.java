@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/user-info", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .formLogin(form -> form.defaultSuccessUrl("/secured", true))
-                .csrf(AbstractHttpConfigurer::disable)
+                //.csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 

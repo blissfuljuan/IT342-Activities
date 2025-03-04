@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Google Contacts</h2>
+
+    <!-- ADD CONTACT FORM -->
+    <form th:action="@{/contacts/add}" method="post">
+        <div class="row">
+            <div class="col">
+                <input type="text" name="firstName" class="form-control" placeholder="First Name" required>
+            </div>
+            <div class="col">
+                <input type="text" name="lastName" class="form-control" placeholder="Last Name" required>
+            </div>
+            <div class="col">
+                <input type="text" name="phoneNumber" class="form-control" placeholder="Phone Number">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-success">Add Contact</button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-bordered mt-4">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact.names[0].displayName}"></td>
+            <td th:text="${contact.phoneNumbers != null ? contact.phoneNumbers[0].value : 'N/A'}"></td>
+            <td>
+                <!-- UPDATE CONTACT FORM -->
+                <form th:action="@{/contacts/update}" method="post" class="d-inline">
+                    <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                    <input type="text" name="firstName" placeholder="New First Name" required>
+                    <input type="text" name="lastName" placeholder="New Last Name" required>
+                    <input type="text" name="phoneNumber" placeholder="New Phone Number">
+                    <button type="submit" class="btn btn-warning btn-sm">Update</button>
+                </form>
+
+                <!-- DELETE CONTACT -->
+                <form th:action="@{/contacts/delete}" method="post" class="d-inline">
+                    <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
