@@ -146,10 +146,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="contact : ${contacts}" th:if="${contact.names != null and !contact.names.isEmpty()}">
-            <td th:text="${contact.names[0].displayName}"></td>
-            <td th:text="${contact.emailAddresses != null and !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : 'No Email'}"></td>
-            <td th:text="${contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : 'No Number'}"></td>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${(contact.names != null and !contact.names.isEmpty() and contact.names[0].displayName != null and !contact.names[0].displayName.isEmpty()) ? contact.names[0].displayName : 'N/A'}"
+                th:classappend="${(contact.names == null or contact.names.isEmpty() or contact.names[0].displayName == null or contact.names[0].displayName.isEmpty()) ? 'na-text' : ''}">
+            </td>
+            <td th:text="${(contact.emailAddresses != null and !contact.emailAddresses.isEmpty() and contact.emailAddresses[0].value != null and !contact.emailAddresses[0].value.isEmpty()) ? contact.emailAddresses[0].value : 'N/A'}"
+                th:classappend="${(contact.emailAddresses == null or contact.emailAddresses.isEmpty() or contact.emailAddresses[0].value == null or contact.emailAddresses[0].value.isEmpty()) ? 'na-text' : ''}">
+            </td>
+            <td th:text="${(contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty() and contact.phoneNumbers[0].value != null and !contact.phoneNumbers[0].value.isEmpty()) ? contact.phoneNumbers[0].value : 'N/A'}"
+                th:classappend="${(contact.phoneNumbers == null or contact.phoneNumbers.isEmpty() or contact.phoneNumbers[0].value == null or contact.phoneNumbers[0].value.isEmpty()) ? 'na-text' : ''}">
+            </td>
             <td class="action-buttons">
                 <!-- Edit Button (Opens Modal) -->
                 <button class="btn btn-warning btn-sm"
@@ -157,12 +163,14 @@
                         th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
                     Edit
                 </button>
-                <!-- Delete Button with Confirmation -->
-                <form action="/api/contacts/delete" method="POST" class="d-inline"
-                      onsubmit="return confirm('Are you sure you want to delete this contact?');">
-                    <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
+                <!-- Delete Button (Opens Confirmation Modal) -->
+                <button class="btn btn-danger btn-sm delete-contact-btn"
+                        th:attr="data-resource-name=${contact.resourceName},
+                                 data-contact-name=${contact.names[0].displayName != null
+                                                     ? contact.names[0].displayName
+                                                     : 'Unnamed Contact'}">
+                    Delete
+                </button>
             </td>
         </tr>
         </tbody>
@@ -194,7 +202,30 @@
         <small>Showing <span th:text="${contacts.size()}"></span> contacts per page</small>
     </div>
 
-    <!-- Edit Contact Modals for each contact -->
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the contact
+                    <strong id="deleteContactName"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteContactForm" action="/api/contacts/delete" method="POST">
+                        <input type="hidden" name="resourceName" id="deleteResourceName">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Contact Modals -->
     <div th:each="contact : ${contacts}" th:if="${contact.names != null and !contact.names.isEmpty()}">
         <div class="modal fade"
              th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"
@@ -283,7 +314,7 @@
             searchTimeout = setTimeout(() => {
                 const searchTerm = this.value;
 
-                fetch(`/contacts?search=${encodeURIComponent(searchTerm)}`)
+                fetch(/contacts?search=${encodeURIComponent(searchTerm)})
                 .then(response => response.text())
                 .then(html => {
                     const tempDiv = document.createElement('div');
@@ -299,12 +330,38 @@
 
                     document.querySelector('.pagination').innerHTML = paginationContainer.innerHTML;
                     document.querySelector('.page-info').innerHTML = pageInfo.innerHTML;
+
+                    // Rebind delete and edit buttons
+                    setupDeleteButtons();
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
             }, 300);
         });
+
+        // Delete Confirmation Modal Setup
+        function setupDeleteButtons() {
+            const deleteButtons = document.querySelectorAll('.delete-contact-btn');
+            const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const deleteContactName = document.getElementById('deleteContactName');
+            const deleteResourceName = document.getElementById('deleteResourceName');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const contactName = this.getAttribute('data-contact-name');
+                    const resourceName = this.getAttribute('data-resource-name');
+
+                    deleteContactName.textContent = contactName;
+                    deleteResourceName.value = resourceName;
+
+                    deleteConfirmModal.show();
+                });
+            });
+        }
+
+        // Initial setup of delete buttons
+        setupDeleteButtons();
     });
 </script>
 </body>
