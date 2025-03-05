@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Google Contacts Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-danger text-white">
+                        <h3>Error</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger" th:if="${error}">
+                            <p th:text="${error}">Error message will be displayed here</p>
+                        </div>
+                        <div class="alert alert-danger" th:unless="${error}">
+                            <p>An unexpected error occurred. Please try again or contact support.</p>
+                        </div>
+                        <div class="mt-4">
+                            <a href="/login" class="btn btn-primary">Return to Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
