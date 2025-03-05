@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info - Google Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --pink-primary: #FF69B4;
+            --pink-secondary: #FFB6C1;
+            --pink-background: #FFF0F5;
+            --pink-light: #FFC0CB;
+        }
+
+        body {
+            background-color: var(--pink-background);
+        }
+
+        .navbar {
+            background-color: white !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--pink-primary) !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            font-weight: bold;
+            color: var(--pink-primary) !important;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid var(--pink-secondary);
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        .user-info {
+            text-align: left;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--pink-light);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 3px solid var(--pink-primary);
+        }
+
+        .user-details {
+            flex-grow: 1;
+        }
+
+        .user-details h3 {
+            color: var(--pink-primary);
+        }
+
+        .nav-buttons {
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--pink-primary);
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--pink-secondary);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/contacts">Contacts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/user-info">Profile</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h1 style="color: var(--pink-primary);">User Information</h1>
+
+    <div class="user-info">
+        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+        <div class="user-details">
+            <h3>Welcome, <span th:text="${name}">User</span>!</h3>
+            <p>Email: <span th:text="${email}">email@example.com</span></p>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="/contacts" class="btn">View My Contacts</a>
+        <a href="/logout" class="btn">Logout</a>
+    </div>
+</div>
+</body>
+</html>
