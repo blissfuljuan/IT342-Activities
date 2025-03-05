@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-OAuth2demoApplication<OAuth2demo>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "Delima.com.example.OAuth2demo.OAuth2demoApplication",
+            "projectName": "OAuth2demo",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
