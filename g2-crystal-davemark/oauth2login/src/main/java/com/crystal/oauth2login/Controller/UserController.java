@@ -25,4 +25,6 @@ public class UserController {
         return "<h1>This is a SECURED enpoint.</h1>";
     }
 
+    
+
 }
