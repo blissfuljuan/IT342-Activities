@@ -8,7 +8,7 @@
 		<version>3.4.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.gabison</groupId>
+	<groupId>com.gemongala</groupId>
 	<artifactId>oauth2login</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>oauth2login</name>
