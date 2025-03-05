@@ -10,8 +10,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;  
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.api.services.people.v1.model.Person;
 
 import Agramon.com.example.project.Service.ContactService;
@@ -35,15 +36,77 @@ public class UserController {
         return "Hello secure";  
     }
 
-    @GetMapping("/Post")
-    public String Create() {
-        return "Hello secure";  
+    @GetMapping("/homepage")
+public String homepage() {
+    return "homepage";      
+}
+
+     @GetMapping("/contacts/add")
+    public String showAddContactForm(Model model) {
+        model.addAttribute("contact", new Person()); // Assuming 'Person' is your contact model
+        return "add-contact"; // This should match the HTML file name
     }
 
+    @PostMapping("/add")
+    public String addContact(@AuthenticationPrincipal OAuth2User user,
+                             @RequestParam String name,
+                             @RequestParam String email,
+                             @RequestParam(required = false) String phone,
+                             Model model) {
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            contactService.addContact(user, name, email, phone);
+            model.addAttribute("message", "Contact added successfully!");
+        } catch (IOException e) {
+            System.out.println(" Error adding contact: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to add contact.");
+            return "error"; // Ensure you have error.html to display failures
+        }
+
+        return "redirect:/contacts"; 
+    }
+    @PostMapping("/contacts/update")
+    public String updateContact(@AuthenticationPrincipal OAuth2User user,
+    @RequestParam String resourceName,
+    @RequestParam String name,
+    @RequestParam(required = false) String email,
+    @RequestParam(required = false) String phone) throws IOException {
+
+// Ensure the name is required
+if (name == null || name.trim().isEmpty()) {
+throw new IllegalArgumentException("Name is required.");
+}
+
+// Handle optional email and phone
+String emailValue = (email != null && !email.trim().isEmpty()) ? email : null;
+String phoneValue = (phone != null && !phone.trim().isEmpty()) ? phone : null;
+
+// Call the service method
+contactService.updateContact(user, resourceName, name, emailValue, phoneValue);
+
+return "redirect:/contacts"; 
+}
+
+@PostMapping("/contacts/delete")
+public String deleteContact(@AuthenticationPrincipal OAuth2User user,
+                            @RequestParam String resourceName) throws IOException {
+    
+    contactService.deleteContact(user, resourceName);
+
+    return "redirect:/contacts"; 
+}
+
+
+    
+
    
-    @GetMapping("/contact")
+    @GetMapping("/contacts")
     public String getGoogleContacts(@AuthenticationPrincipal OAuth2User user, Model model) throws IOException {
-        System.out.println("Fetching contacts..."); // ✅ Debug log
+        System.out.println("Fetching contacts..."); 
 
         if (user == null) {
             System.out.println("User is null, redirecting to login...");
@@ -51,10 +114,10 @@ public class UserController {
         }
 
         List<Person> contacts = contactService.getContacts(user);
-        System.out.println("Contacts fetched: " + contacts.size()); // ✅ Debug log
+        System.out.println("Contacts fetched: " + contacts.size()); 
 
         model.addAttribute("contacts", contacts);
-        return "contacts"; // ✅ Must match contacts.html in templates
+        return "contacts"; 
     }
     
 
