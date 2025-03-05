@@ -1,4 +1,4 @@
-package com.revilleza.oauth2login.service;
+package com.revilleza.google.contacts.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -8,15 +8,18 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
 import com.google.api.services.people.v1.model.Person;
-import com.revilleza.oauth2login.model.Contact;
-import org.springframework.beans.factory.annotation.Value;
+import com.revilleza.google.contacts.model.Contact;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +31,19 @@ public class GoogleContactsService {
 
     private static PeopleService peopleService;
 
-    public GoogleContactsService(OAuth2AuthorizedClientService authorizedClientService) {
+    public GoogleContactsService(OAuth2AuthorizedClientService authorizedClientService) throws GeneralSecurityException, IOException {
         this.authorizedClientService = authorizedClientService;
+
+
     }
 
-    public List getContacts(String principalName) {
+    public List getContacts(OAuth2AuthenticationToken token) {
         ListConnectionsResponse response = null;
+        System.out.println("Token: " + token);
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-
             OAuth2AuthorizedClient client = authorizedClientService
-                    .loadAuthorizedClient("google", principalName);
+                    .loadAuthorizedClient("google", token.getName());
 
             if (client == null) {
                 throw new RuntimeException("OAuth2 client not found");
@@ -46,9 +51,8 @@ public class GoogleContactsService {
 
             OAuth2AccessToken accessToken = client.getAccessToken();
             GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken.getTokenValue());
-
-
             peopleService = new PeopleService.Builder(HTTP_TRANSPORT,JSON_FACTORY,credential).build();
+
             response = peopleService.people().connections().list("people/me")
                     .setPersonFields("names,emailAddresses,phoneNumbers")
                     .execute();
