@@ -11,6 +11,8 @@ import java.util.Map;
 @RestController
 public class UserController {
 
+
+
     @GetMapping
     public String index(){
         return "<h1> Welcome, this is the landing page</h1>";
