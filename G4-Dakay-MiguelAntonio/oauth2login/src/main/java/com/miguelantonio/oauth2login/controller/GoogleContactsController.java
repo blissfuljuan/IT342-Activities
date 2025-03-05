@@ -5,10 +5,14 @@ import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
 import com.miguelantonio.oauth2login.service.GooglePeopleService;
 import com.google.api.services.people.v1.model.Person;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,11 +56,14 @@ public class GoogleContactsController {
 
     @PostMapping("/createContact")
     @PreAuthorize("isAuthenticated()")
-    public String createContact(@RequestParam(required = true) String name,
-                                @RequestParam(required = false) String email,
-                                @AuthenticationPrincipal OAuth2User user) throws IOException, GeneralSecurityException {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Name parameter is required.");
+    public String createContact(@RequestParam String givenName,
+                            @RequestParam String familyName,
+                            @RequestParam String email,
+                            @RequestParam String mobile,
+                            @AuthenticationPrincipal OAuth2User user) throws IOException, GeneralSecurityException {
+
+        if (givenName == null || givenName.isEmpty()) {
+            throw new IllegalArgumentException("First name is required.");
         }
 
         // Retrieve access token
@@ -64,20 +71,12 @@ public class GoogleContactsController {
                 .loadAuthorizedClient("google", user.getName())
                 .getAccessToken();
 
-        // Create a new contact object
-        Person newContact = new Person();
-        newContact.setNames(Collections.singletonList(new Name().setGivenName(name)));
-
-        // Add email if provided
-        if (email != null && !email.isEmpty()) {
-            newContact.setEmailAddresses(Collections.singletonList(new EmailAddress().setValue(email)));
-        }
-
-        // Call the service to create the contact
-        googlePeopleService.createContact(accessToken, newContact, email);
+        // Call service to create contact
+        googlePeopleService.createContact(givenName, familyName, email, mobile, accessToken);
 
         return "redirect:/contacts";
     }
+
 
     @DeleteMapping("/deleteContact")
     @PreAuthorize("isAuthenticated()")
@@ -92,5 +91,42 @@ public class GoogleContactsController {
         googlePeopleService.deleteContact(accessToken, resourceName);
 
         return "Contact deleted successfully";
+    }
+
+    @PutMapping("/updateContact")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> updateContact(
+            @RequestParam String resourceName,
+            @RequestParam(required = false, defaultValue = "") String givenName,
+            @RequestParam(required = false, defaultValue = "") String email,
+            @RequestParam(required = false, defaultValue = "") String mobile,
+            @AuthenticationPrincipal OAuth2User user) {
+
+        try {
+            // 🔹 Debugging: Print received values
+            System.out.println("Updating contact with:");
+            System.out.println("resourceName: " + resourceName);
+            System.out.println("givenName: " + givenName);
+            System.out.println("email: " + email);
+            System.out.println("mobile: " + mobile);
+
+            // Get OAuth token
+            OAuth2AccessToken accessToken = authorizedClientService
+                    .loadAuthorizedClient("google", user.getName())
+                    .getAccessToken();
+
+            // 🔹 Debugging: Print access token (first 10 chars for security)
+            System.out.println("Access Token: " + accessToken.getTokenValue().substring(0, 10) + "...");
+
+            // Call the service method
+            googlePeopleService.updateContact(resourceName, givenName, email, mobile, accessToken);
+
+            return ResponseEntity.ok("Contact updated successfully");
+
+        } catch (Exception e) {
+            e.printStackTrace(); // 🔹 Debugging: Print full error in console
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating contact: " + e.getMessage());
+        }
     }
 }
