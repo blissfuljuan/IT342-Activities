@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Google Contacts</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f3;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 70px;
+  font-weight: 600;
+  background-image: linear-gradient(to left, #553c9a, #b393d3);
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+    }
+    .btn-primary {
+      background-color: #1a73e8;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background-color: #1557b0;
+    }
+    .btn-success {
+      background-color: #28a745;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    .btn-danger {
+      background-color: #d93025;
+      border: none;
+      color: white;
+    }
+    .btn-danger:hover {
+      background-color: #b31412;
+    }
+    .table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #202124;
+    }
+    .table tr:hover {
+      background-color: #e3f2fd;
+    }
+    .alert-danger {
+      background-color: #fce8e6;
+      border: 1px solid #f28b82;
+      color: #d93025;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Google Contacts</h1>
+    <a href="http://localhost:8080/logout" class="btn btn-danger">Logout</a>
+  </div>
+
+  <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addContactModal">
+    Add Contact
+  </button>
+
+  <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/api/contacts/create" method="POST">
+            <div class="mb-3">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" name="givenName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" name="familyName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" name="phoneNumber">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save Contact</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${error}" class="alert alert-danger" role="alert">
+    <p th:text="${error}"></p>
+  </div>
+
+  <table class="table">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Contact No</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}" th:if="${contact.names != null and !contact.names.isEmpty()}">
+      <td th:text="${contact.names[0].displayName} ?: 'No Name'"></td>
+      <td th:text="${contact.emailAddresses != null and !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : 'No Email'}"></td>
+      <td th:text="${contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : 'No Number'}"></td>
+      <td>
+        <button class="btn btn-warning btn-sm">Edit</button>
+        <form action="/api/contacts/delete" method="POST" class="d-inline">
+          <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
