@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/IT342-Activities-Bandola.iml" filepath="$PROJECT_DIR$/.idea/IT342-Activities-Bandola.iml" />
-      <module fileurl="file://$PROJECT_DIR$/g4-bandola-markjanzen/oauth2login/oauth2login.iml" filepath="$PROJECT_DIR$/g4-bandola-markjanzen/oauth2login/oauth2login.iml" />
     </modules>
   </component>
 </project>

@@ -7,14 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="oauth2login" />
+        <module name="googlecontactsapi" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="oauth2login" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="googlecontactsapi" options="-parameters" />
       <module name="oauth2login" options="-parameters" />
     </option>
   </component>
