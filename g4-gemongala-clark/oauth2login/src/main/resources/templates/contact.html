@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Contacts - Cartoon Contacts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFD1DC;
+            font-family: 'Comic Neue', cursive;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #FF6B6B;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .navbar a:hover {
+            color: #4ECDC4;
+        }
+        .container {
+            max-width: 1200px;  /* Allows the container to expand but not become too wide */
+            margin: 0 auto;     /* Centers the container */
+            padding: 30px 20px; /* Increased vertical padding */
+        }
+        .table td, .table th {
+            padding: 12px 15px;  /* More consistent cell padding */
+            vertical-align: middle; /* Vertically center content */
+        }
+        .table-responsive {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;         /* Ensure table takes full width */
+            overflow-x: auto;    /* Horizontal scroll if needed */
+        }
+        .table {
+            margin-bottom: 0;
+            width: 100%;
+        }
+        .table th {
+            background-color: #4ECDC4;
+            color: white;
+            border-bottom: 3px solid #45B7AA;
+        }
+        .table tr:nth-child(even) {
+            background-color: #F7F7F7;
+        }
+        .table tr:hover {
+            background-color: #E6F2F0;
+        }
+        .table td {
+            padding: 12px 8px;  /* Increases vertical and horizontal padding */
+        }
+
+        .table tr {
+            line-height: 1.5;  /* Adds more space between rows */
+        }
+
+        .btn-group-sm {
+            display: flex;
+            justify-content: center;
+            gap: 10px;  /* Adds space between Edit and Delete buttons */
+        }
+        .btn-add-contact {
+            background-color: #4ECDC4;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .btn-add-contact:hover {
+            background-color: #45B7AA;
+        }
+        .btn-edit {
+            background-color: #FFA726;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+        .btn-delete {
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 10px;
+        }
+        .alert {
+            background-color: #FFECB3;
+            border-left: 5px solid #FFA726;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px; /* More space between button and table */
+        }
+        .table th:nth-child(1) { width: 25%; }  /* Name */
+        .table th:nth-child(2) { width: 30%; }  /* Email */
+        .table th:nth-child(3) { width: 25%; }  /* Phone */
+        .table th:nth-child(4) { width: 20%; }  /* Actions */
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div>
+        <a href="/contacts">Contacts</a>
+        <a href="/user-info">Profile</a>
+        <a href="/logout" style="float: right;">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>My Contacts</h1>
+        <a href="/contact/add-form" class="btn btn-add-contact">
+            + Add New Contact
+        </a>
+    </div>
+
+    <div class="alert alert-info" th:if="${contacts == null || contacts.isEmpty()}">
+        You don't have any contacts yet. Click "Add New Contact" to create one.
+    </div>
+
+    <div class="table-responsive" th:unless="${contacts == null || contacts.isEmpty()}">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="contact : ${contacts}">
+                <td>
+                    <span th:if="${not #lists.isEmpty(contact.names)}"
+                          th:text="${contact.names[0].displayName}">Name</span>
+                    <span th:unless="${not #lists.isEmpty(contact.names)}">N/A</span>
+                </td>
+                <td>
+                    <span th:if="${not #lists.isEmpty(contact.emailAddresses)}"
+                          th:text="${contact.emailAddresses[0].value}">Email</span>
+                    <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}">N/A</span>
+                </td>
+                <td>
+                    <span th:if="${not #lists.isEmpty(contact.phoneNumbers)}"
+                          th:text="${contact.phoneNumbers[0].value}">Phone</span>
+                    <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}">N/A</span>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}" class="btn btn-edit">
+                            Edit
+                        </a>
+                        <a th:href="@{'/contacts/delete/' + ${contact.resourceName}}"
+                           class="btn btn-delete"
+                           onclick="return confirm('Are you sure you want to delete this contact?')">
+                            Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+</body>
+</html>
