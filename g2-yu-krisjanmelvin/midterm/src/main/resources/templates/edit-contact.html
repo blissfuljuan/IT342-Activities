@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Contact</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+  <h1>Edit Contact</h1>
+  <div class="form-container active">
+    <form th:action="@{/contacts/update/{id}(id=${contact.resourceName.replace('/', '_')})}" th:object="${contact}" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <input type="text" th:field="*{firstName}" placeholder="First Name" th:value="${contact.firstName ?: ''}" required>
+      <span th:errors="*{firstName}" class="error"></span>
+      <input type="text" th:field="*{lastName}" placeholder="Last Name" th:value="${contact.lastName ?: ''}">
+      <input type="text" th:field="*{email}" placeholder="Email" th:value="${contact.email ?: ''}" required>
+      <span th:errors="*{email}" class="error"></span>
+      <input type="tel" th:field="*{phoneNumber}" placeholder="Phone (11 digits)"
+             th:value="${contact.phoneNumber ?: ''}" pattern="[0-9]{11}" maxlength="11"
+             title="Phone number must be exactly 11 digits" required>
+      <span th:errors="*{phoneNumber}" class="error"></span>
+      <button type="submit">Update Contact</button>
+      <a th:href="@{/contacts}" class="button">Cancel</a>
+    </form>
+  </div>
+</div>
+</body>
+</html>
