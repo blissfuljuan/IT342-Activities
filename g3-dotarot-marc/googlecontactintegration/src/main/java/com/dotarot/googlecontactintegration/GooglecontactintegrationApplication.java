@@ -1,13 +1,13 @@
-package com.dotarot.googlecontacts;
+package com.dotarot.googlecontactintegration;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GooglecontactsApplication {
+public class GooglecontactintegrationApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GooglecontactsApplication.class, args);
+		SpringApplication.run(GooglecontactintegrationApplication.class, args);
 	}
 
 }

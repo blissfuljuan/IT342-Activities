@@ -1,10 +1,10 @@
-package com.dotarot.googlecontacts;
+package com.dotarot.googlecontactintegration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GooglecontactsApplicationTests {
+class GooglecontactintegrationApplicationTests {
 
 	@Test
 	void contextLoads() {
