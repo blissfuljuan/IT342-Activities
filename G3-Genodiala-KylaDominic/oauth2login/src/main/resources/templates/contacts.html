@@ -118,7 +118,7 @@
       text-align: right;
     }
     .btn-add {
-      background-color: #4CAF50;
+      background-color: #2f2f30;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -126,36 +126,61 @@
       cursor: pointer;
     }
     .btn-add:hover {
-      background-color: #45a049;
+      background-color: #62dcce;
     }
     .add-contact-modal {
-      width: 400px !important;
-      padding: 30px !important;
+      background-color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      text-align: left;
+      width: 450px;
+      margin: 10% auto;
     }
     .add-contact-form {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 20px;
     }
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 8px;
     }
     .form-group label {
       font-weight: bold;
-      color: #333;
+      color: #555;
     }
     .form-group input {
-      padding: 8px;
+      padding: 12px;
       border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
+      border-radius: 6px;
+      font-size: 16px;
     }
     .form-group input:focus {
-      border-color: #4CAF50;
+      border-color: #2f2f30;
       outline: none;
-      box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+      box-shadow: 0 0 5px rgba(47, 47, 48, 0.2);
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 25px;
+    }
+    .btn-save {
+      background-color: #2f2f30;
+      padding: 12px 24px;
+    }
+    .btn-save:hover {
+      background-color: #62dcce;
+    }
+    .btn-cancel {
+      background-color: #2f2f30;
+      padding: 12px 24px;
+    }
+    .btn-cancel:hover {
+      background-color: #62dcce;
     }
     .toast-container {
       position: fixed;
@@ -182,11 +207,10 @@
   </style>
 </head>
 <body>
-<div class="nav-buttons">
-  <a href="/googleuser" class="nav-btn">Back to Profile</a>
-</div>
-
 <div class="contacts-container">
+  <div class="nav-buttons" style="text-align: left;">
+    <a href="/googleuser" class="nav-btn">Back to Profile</a>
+  </div>
   <h2>Contacts</h2>
 
   <div id="addContactModal" class="modal">

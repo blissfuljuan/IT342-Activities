@@ -1,99 +1,103 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User Information</title>
+    <title>Google Information</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #e0e0e0;
         }
-        h2 {
-            color: #333;
+        .id-card {
+            width: 350px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
             text-align: center;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .id-card-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 0;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
+        .id-card-body {
+            padding: 20px;
         }
-        th {
-            background-color: #f2f2f2;
-        }
-        .user-picture {
+        .id-card-body img {
             width: 100px;
             height: 100px;
             border-radius: 50%;
+            margin-bottom: 15px;
         }
-        .view-contacts-btn, .logout-btn {
-            display: inline-block;
-            width: 100px;
-            margin: 10px 5px;
+        .id-card-body h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+        }
+        .id-card-body p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .id-card-footer {
+            background-color: #ecf0f1;
+            padding: 10px 0;
+        }
+        .id-card-footer a {
+            margin: 0 10px;
             padding: 10px 20px;
-            background-color: #808080;
+            background-color: #2980b9;
             color: white;
-            text-align: center;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 5px;
             font-weight: bold;
         }
-        .view-contacts-btn:hover, .logout-btn:hover {
-            background-color: #696969;
+        .id-card-footer a:hover {
+            background-color: #3498db;
         }
         .attributes-container {
-            max-width: 600px;
-            margin: 20px auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
             padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .attributes-container h3 {
+            margin: 0 0 15px;
+        }
+        .attributes-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .attributes-container th, .attributes-container td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .attributes-container th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-<h2>Google User Information</h2>
-
-<table>
-    <tr>
-        <th>Profile Picture</th>
-        <td>
-            <img th:if="${picture}" th:src="${picture}" class="user-picture" alt="Profile Picture"/>
-        </td>
-    </tr>
-    <tr>
-        <th>Name</th>
-        <td th:text="${name}">-</td>
-    </tr>
-    <tr>
-        <th>Email</th>
-        <td th:text="${email}">-</td>
-    </tr>
-    <tr>
-        <th>Birthday</th>
-        <td th:text="${birthday}">-</td>
-    </tr>
-    <tr>
-        <th>Phone</th>
-        <td th:text="${phone}">-</td>
-    </tr>
-    <tr>
-        <th>Actions</th>
-        <td>
-            <a href="/api/contacts/view" class="view-contacts-btn">View Contacts</a>
-            <a href="/login" class="logout-btn">Logout</a>
-        </td>
-    </tr>
-</table>
+<div class="id-card">
+    <div class="id-card-header">
+        <h1>Google Information</h1>
+    </div>
+    <div class="id-card-body">
+        <img th:if="${picture}" th:src="${picture}" alt="Profile Picture"/>
+        <h2 th:text="${name}">Name</h2>
+        <p th:text="${email}">Email</p>
+        <p th:text="${birthday}">Birthday</p>
+        <p th:text="${phone}">Phone</p>
+    </div>
+    <div class="id-card-footer">
+        <a href="/api/contacts/view">View Contacts</a>
+        <a href="/login">Logout</a>
+    </div>
+</div>
 
 <div th:if="${#authentication != null}" class="attributes-container">
     <h3>All Available Attributes:</h3>
