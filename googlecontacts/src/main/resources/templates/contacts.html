@@ -149,11 +149,15 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" name="email" th:value="${contact.emailAddresses[0].value ?: ''}">
+                                    <input type="email" class="form-control" name="email"
+                                           th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
+
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" name="phoneNumber" th:value="${contact.phoneNumbers[0].value ?: ''}">
+                                    <input type="tel" class="form-control" name="phoneNumber"
+                                           th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}">
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

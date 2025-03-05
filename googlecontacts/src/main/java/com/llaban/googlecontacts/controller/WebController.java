@@ -52,7 +52,7 @@ public class WebController {
     @PostMapping("/api/contacts/create")
     public String createContact(
             @RequestParam String givenName,
-            @RequestParam String familyName,
+            @RequestParam(required = false) String familyName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber) {
         try {
@@ -69,7 +69,7 @@ public class WebController {
     public String updateContact(
             @RequestParam String resourceName,
             @RequestParam String givenName,
-            @RequestParam String familyName,
+            @RequestParam(required = false) String familyName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber) {
         try {
