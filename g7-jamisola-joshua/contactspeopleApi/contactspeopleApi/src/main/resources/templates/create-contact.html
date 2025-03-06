@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Contact</title>
+</head>
+<body>
+
+<h2>Create New Contact</h2>
+
+<form action="/contacts" method="post">
+    <label for="givenName">Given Name:</label>
+    <input type="text" id="givenName" name="givenName" required><br>
+
+    <label for="familyName">Family Name:</label>
+    <input type="text" id="familyName" name="familyName" required><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email"><br>
+
+    <label for="phoneNumber">Phone Number:</label>
+    <input type="tel" id="phoneNumber" name="phoneNumber"><br>
+
+    <button type="submit">Save Contact</button>
+</form>
+
+<a href="/contacts">Back to Contacts</a>
+
+</body>
+</html>

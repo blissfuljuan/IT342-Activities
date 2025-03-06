@@ -28,8 +28,7 @@
 <div class="profile-container">
     <h2>User Profile</h2>
     <img th:src="${picture}" alt="Profile Picture" class="profile-pic">
-    <p><strong>Name:</strong> <span th:text="${name}"></span></p>
-    <p><strong>Family Name:</strong> <span th:text="${family_name}"></span></p>
+    <p><strong>Name:</strong> <span th:text="${name + ' ' + lastName}"></span></p>
     <p><strong>Email:</strong> <span th:text="${email}"></span></p>
 
     <br><br>
