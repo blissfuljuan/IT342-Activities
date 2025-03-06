@@ -7,7 +7,6 @@ import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.*;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
 import com.google.api.services.people.v1.model.Person;
-import com.fernandez.GoogleContact.model.Contacts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -63,31 +62,6 @@ public class GoogleContactsService {
                 .build();
     }
 
-    public List<Contacts> getContacts(OAuth2User principal) {
-        List<Contacts> contactsList = new ArrayList<>();
-
-        if (principal == null) {
-            throw new RuntimeException("User is not authenticated");
-        }
-
-        try {
-            PeopleService peopleService = getPeopleService(principal);
-            List<Person> connections = getConnections(peopleService);
-
-            for (Person person : connections) {
-                Contacts contact = new Contacts();
-                contact.setResourceName(person.getResourceName());
-                contact.setName(getPersonName(person));
-                contact.setEmail(getPersonEmail(person));
-                contact.setPhoneNumber(getPersonPhoneNumber(person));
-                contactsList.add(contact);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error fetching contacts: " + e.getMessage(), e);
-        }
-
-        return contactsList;
-    }
 
     public List<Person> getConnectionsAsPeople(OAuth2User principal) {
         if (principal == null) {
@@ -182,45 +156,5 @@ public class GoogleContactsService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to fetch contact: " + e.getMessage(), e);
         }
-    }
-
-    public Contacts getContactById(OAuth2User principal, String resourceName) {
-        try {
-            Person person = getPersonById(principal, resourceName);
-
-            Contacts contact = new Contacts();
-            contact.setResourceName(resourceName);
-            contact.setName(getPersonName(person));
-            contact.setEmail(getPersonEmail(person));
-            contact.setPhoneNumber(getPersonPhoneNumber(person));
-
-            return contact;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch contact: " + e.getMessage(), e);
-        }
-    }
-
-    private String getPersonName(Person person) {
-        List<Name> names = person.getNames();
-        if (names != null && !names.isEmpty()) {
-            return names.get(0).getDisplayName();
-        }
-        return "";
-    }
-
-    private String getPersonEmail(Person person) {
-        List<EmailAddress> emailAddresses = person.getEmailAddresses();
-        if (emailAddresses != null && !emailAddresses.isEmpty()) {
-            return emailAddresses.get(0).getValue();
-        }
-        return "";
-    }
-
-    private String getPersonPhoneNumber(Person person) {
-        List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
-        if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
-            return phoneNumbers.get(0).getValue();
-        }
-        return "";
     }
 }

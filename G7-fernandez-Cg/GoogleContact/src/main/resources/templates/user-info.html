@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-
-    <title>User Info - Google Contacts</title>
     <meta charset="UTF-8">
-    <title>User Dashboard - Google Contacts</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
-        .profile-section { display: flex; align-items: center; padding: 20px; border-radius: 10px; background: #eef1f5; }
-        .profile-pic { width: 80px; height: 80px; border-radius: 50%; margin-right: 20px; object-fit: cover; }
-        .btn-custom { background-color: #28a745; color: white; padding: 8px 20px; border-radius: 5px; text-decoration: none; }
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/dashboard">📋 Dashboard</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/contacts">Contacts</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/user-info">Profile</a>
+                    <a class="nav-link" href="/user-info">Profile</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
@@ -41,19 +54,19 @@
     </div>
 </nav>
 <div class="container">
-    <h2 class="text-center mb-4">User Information</h2>
-    <div class="profile-section">
-        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-pic" alt="Profile picture">
-        <div>
-            <h4>Hello, <span th:text="${name}">User</span>!</h4>
-            <p>Email: <span th:text="${email}">email@example.com</span></p>
-        </div>
-    </div>
-    <div class="text-center mt-4">
-        <a href="/contacts" class="btn-custom">View Contacts</a>
+    <h1>My Profile</h1>
+    <img th:src="${user.picture}" alt="Profile Picture" class="profile-picture">
+    <p><strong>Display Name:</strong> <span th:text="${user.name}"></span></p>
+    <p><strong>First Name:</strong> <span th:text="${user.givenName}"></span></p>
+    <p><strong>Last Name:</strong> <span th:text="${user.familyName}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <br>
+    <div class="btn-container">
+        <a href="/contacts" class="btn btn-primary">View Contacts</a>
         <a href="/logout" class="btn btn-danger">Logout</a>
     </div>
 </div>
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
