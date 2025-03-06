@@ -13,7 +13,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login").permitAll()
+                        .requestMatchers("/", "/login", "/error", "/create-contact", "/contact/update").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth.defaultSuccessUrl("/dashboard", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))

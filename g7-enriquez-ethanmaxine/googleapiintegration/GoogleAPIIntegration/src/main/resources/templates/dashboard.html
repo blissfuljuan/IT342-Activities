@@ -4,18 +4,41 @@
   <title>Google Contacts</title>
 </head>
 <body>
-<h1>Your Google Contacts</h1>
-<table border="1">
-  <tr>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Phone Number</th>
-  </tr>
-  <tr th:each="contact : ${contacts}">
-    <td th:text="${contact.names != null and contact.names[0] != null ? contact.names[0].displayName : 'No Name'}"></td>
-    <td th:text="${contact != null and contact.emailAddresses != null and not #lists.isEmpty(contact.emailAddresses) ? contact.emailAddresses[0].value : 'No Email'}"></td>
-    <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers[0] != null ? contact.phoneNumbers[0].value : 'No Phone'}"></td>
-  </tr>
-</table>
+  <h1>Google Contacts</h1>
+    <!-- Form to Create a New Contact -->
+
+    <h2>Create New Contact</h2>
+    <form th:action="@{/create-contact}" method="post">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required><br><br>
+  
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required><br><br>
+  
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" name="phone" required><br><br>
+  
+      <button type="submit">Create Contact</button>
+    </form>
+
+  <table border="1" style="width: 25%; border-collapse: collapse; margin-top: 20px;">
+      <thead>
+          <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Update</th>
+              <th>Delete</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr th:each="contact : ${contacts}">
+              <td th:text="${contact['names'] != null ? contact['names'][0]['displayName'] : 'N/A'}">Name</td>
+              <td th:text="${contact['emailAddresses'] != null ? contact['emailAddresses'][0]['value'] : 'N/A'}">Email</td>
+              <td th:text="${contact['phoneNumbers'] != null ? contact['phoneNumbers'][0]['value'] : 'N/A'}">Phone</td>
+
+          </tr>
+      </tbody>
+  </table>
 </body>
 </html>

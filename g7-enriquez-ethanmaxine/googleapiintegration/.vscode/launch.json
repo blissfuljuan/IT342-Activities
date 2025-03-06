@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-GoogleApiIntegrationApplication<GoogleAPIIntegration>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.Enriquez.GoogleAPIIntegration.GoogleApiIntegrationApplication",
+            "projectName": "GoogleAPIIntegration",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
