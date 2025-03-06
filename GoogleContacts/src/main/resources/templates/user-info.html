@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+	<title>User Info - Google Contacts</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	<style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #000;
+            border-radius: 7px;
+        }
+        .user-info {
+            text-align: left;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #c9c8cb;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+        }
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        .user-details {
+            flex-grow: 1;
+        }
+        .nav-buttons {
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #2074ec;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #185bbd;
+            color: white !important;
+        }
+        h1 {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+        }
+        h1 span:nth-child(1) { color: #4285F4; }
+        h1 span:nth-child(2) { color: #EA4335; }
+        h1 span:nth-child(3) { color: #FBBC05; }
+        h1 span:nth-child(4) { color: #4285F4; }
+        h1 span:nth-child(5) { color: #34A853; }
+        h1 span:nth-child(6) { color: #EA4335; }
+    </style>
+</head>
+<body>
+<br>
+<h1>
+	<span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span> Contact Application
+</h1>
+<br><br>
+<div class="container">
+	<h2>User Information</h2>
+
+	<div class="user-info">
+		<img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+		<div class="user-details">
+			<h4>Welcome, <span th:text="${name}">User</span>!</h4>
+			<p>Email: <span th:text="${email}">email@example.com</span></p>
+		</div>
+	</div>
+
+	<div class="nav-buttons">
+		<a href="/contacts" class="btn">View My Contacts</a>
+		<a href="/logout" class="btn">Logout</a>
+	</div>
+</div>
+</body>
+</html>
