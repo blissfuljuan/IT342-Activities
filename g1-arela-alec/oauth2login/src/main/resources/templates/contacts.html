@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Contact Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #4285f4;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .contacts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .contacts-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            color: #4a5568;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .contacts-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+            vertical-align: top;
+        }
+
+        .contacts-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .form-container {
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .form-title {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .contact-list {
+            margin-bottom: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #a0aec0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .contacts-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .form-container {
+                padding: 1rem;
+            }
+        }
+
+        /* Add new styles for contact info display */
+        .contact-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .contact-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: #f8fafc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .contact-info-item i {
+            color: #4a5568;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Contact Management</h1>
+            <div class="nav-buttons">
+                <a href="/index" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <button onclick="showAddForm()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Add Contact
+                </button>
+            </div>
+        </div>
+
+        <!-- Add Contact Form -->
+        <div id="addContactForm" class="form-container">
+            <h2 class="form-title">Add New Contact</h2>
+            <form id="addContactForm" autocomplete="on">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" id="firstName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" id="lastName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Birthday</label>
+                    <input type="date" id="birthday" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Addresses</label>
+                    <div id="addEmailList" class="contact-list"></div>
+                    <button type="button" onclick="addEmailField('addEmailList')" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Add Email
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Numbers</label>
+                    <div id="addPhoneList" class="contact-list"></div>
+                    <button type="button" onclick="addPhoneField('addPhoneList')" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Add Phone
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Add Contact</button>
+                    <button type="button" onclick="hideAddForm()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Update Contact Form -->
+        <div id="updateContactForm" class="form-container">
+            <h2 class="form-title">Update Contact</h2>
+            <form id="updateContactForm" autocomplete="on">
+                <input type="hidden" id="resourceName">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" id="updateFirstName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" id="updateLastName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Birthday</label>
+                    <input type="date" id="updateBirthday" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Addresses</label>
+                    <div id="updateEmailList" class="contact-list"></div>
+                    <button type="button" onclick="addEmailField('updateEmailList')" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Add Email
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Numbers</label>
+                    <div id="updatePhoneList" class="contact-list"></div>
+                    <button type="button" onclick="addPhoneField('updatePhoneList')" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Add Phone
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Update Contact</button>
+                    <button type="button" onclick="hideUpdateForm()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="main-content">
+            <table class="contacts-table" id="contacts-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Birthday</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="loading">
+                            <i class="fas fa-spinner"></i> Loading contacts...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function showAddForm() {
+            document.getElementById('addContactForm').style.display = 'block';
+            document.getElementById('updateContactForm').style.display = 'none';
+            clearAddForm();
+            addEmailField('addEmailList');
+            addPhoneField('addPhoneList');
+        }
+
+        function hideAddForm() {
+            document.getElementById('addContactForm').style.display = 'none';
+        }
+
+        function showUpdateForm(resourceName, name, emailAddresses, phoneNumbers, birthdays) {
+            try {
+                document.getElementById('updateContactForm').style.display = 'block';
+                document.getElementById('addContactForm').style.display = 'none';
+
+                // Set resource name
+                document.getElementById('resourceName').value = resourceName;
+
+                // Split name into first and last name
+                const nameParts = name.split(" ");
+                document.getElementById('updateFirstName').value = nameParts[0] || "";
+                document.getElementById('updateLastName').value = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+                // Set birthday if available
+                if (birthdays && birthdays.length > 0 && birthdays[0].date) {
+                    const date = birthdays[0].date;
+                    const formattedDate = `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+                    document.getElementById('updateBirthday').value = formattedDate;
+                } else {
+                    document.getElementById('updateBirthday').value = '';
+                }
+
+                // Clear and populate email fields
+                const emailList = document.getElementById('updateEmailList');
+                emailList.innerHTML = '';
+                if (emailAddresses && emailAddresses.length > 0) {
+                    emailAddresses.forEach(email => {
+                        const div = document.createElement('div');
+                        div.className = 'contact-item';
+                        div.innerHTML = `
+                            <input type="email" class="form-input" value="${email.value}" required>
+                            <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        emailList.appendChild(div);
+                    });
+                } else {
+                    addEmailField('updateEmailList');
+                }
+
+                // Clear and populate phone fields
+                const phoneList = document.getElementById('updatePhoneList');
+                phoneList.innerHTML = '';
+                if (phoneNumbers && phoneNumbers.length > 0) {
+                    phoneNumbers.forEach(phone => {
+                        const div = document.createElement('div');
+                        div.className = 'contact-item';
+                        div.innerHTML = `
+                            <input type="tel" class="form-input" value="${phone.value}" required>
+                            <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        phoneList.appendChild(div);
+                    });
+                } else {
+                    addPhoneField('updatePhoneList');
+                }
+            } catch (error) {
+                console.error("Error in showUpdateForm:", error);
+                alert("There was an error displaying the update form. Please try again.");
+            }
+        }
+
+        function hideUpdateForm() {
+            document.getElementById('updateContactForm').style.display = 'none';
+        }
+
+        function addEmailField(containerId) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'contact-item';
+            div.innerHTML = `
+                <input type="email" class="form-input" placeholder="Email Address" required>
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addPhoneField(containerId) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'contact-item';
+            div.innerHTML = `
+                <input type="tel" class="form-input" placeholder="Phone Number" required>
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function getContactValues(containerId) {
+            const container = document.getElementById(containerId);
+            const inputs = container.getElementsByTagName('input');
+            return Array.from(inputs).map(input => input.value).filter(value => value.trim() !== '');
+        }
+
+        function clearAddForm() {
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('birthday').value = '';
+            document.getElementById('addEmailList').innerHTML = '';
+            document.getElementById('addPhoneList').innerHTML = '';
+        }
+
+        function showEmptyState() {
+            const tbody = document.querySelector('#contacts-table tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-address-book"></i>
+                        <p>No contacts found</p>
+                        <button onclick="showAddForm()" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Your First Contact
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function showLoadingState() {
+            const tbody = document.querySelector('#contacts-table tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="loading">
+                        <i class="fas fa-spinner"></i> Loading contacts...
+                    </td>
+                </tr>
+            `;
+        }
+
+        function fetchContacts() {
+            showLoadingState();
+            $.get("/contacts", function (data) {
+                const tbody = document.querySelector('#contacts-table tbody');
+                tbody.innerHTML = '';
+
+                try {
+                    if (typeof data === "string") {
+                        data = JSON.parse(data);
+                    }
+
+                    if (!data.connections || data.connections.length === 0) {
+                        showEmptyState();
+                        return;
+                    }
+
+                    data.connections.forEach(contact => {
+                        const name = contact.names ? contact.names[0].displayName : "No Name";
+                        
+                        // Format emails with icons
+                        let emailsHtml = '<div class="contact-info-list">';
+                        if (contact.emailAddresses && contact.emailAddresses.length > 0) {
+                            emailsHtml += contact.emailAddresses.map(e => 
+                                `<div class="contact-info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    ${e.value}
+                                </div>`
+                            ).join('');
+                        } else {
+                            emailsHtml += `<div class="contact-info-item">
+                                <i class="fas fa-envelope"></i>
+                                No Email
+                            </div>`;
+                        }
+                        emailsHtml += '</div>';
+
+                        // Format phone numbers with icons
+                        let phonesHtml = '<div class="contact-info-list">';
+                        if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+                            phonesHtml += contact.phoneNumbers.map(p => 
+                                `<div class="contact-info-item">
+                                    <i class="fas fa-phone"></i>
+                                    ${p.value}
+                                </div>`
+                            ).join('');
+                        } else {
+                            phonesHtml += `<div class="contact-info-item">
+                                <i class="fas fa-phone"></i>
+                                No Phone
+                            </div>`;
+                        }
+                        phonesHtml += '</div>';
+                        
+                        let birthday = "No Birthday";
+                        if (contact.birthdays && contact.birthdays.length > 0 && contact.birthdays[0].date) {
+                            const date = contact.birthdays[0].date;
+                            birthday = `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+                        }
+
+                        // Escape special characters in the name
+                        const escapedName = name.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                        
+                        // Create safe JSON strings for the data
+                        const safeEmailAddresses = JSON.stringify(contact.emailAddresses || []).replace(/"/g, '&quot;');
+                        const safePhoneNumbers = JSON.stringify(contact.phoneNumbers || []).replace(/"/g, '&quot;');
+                        const safeBirthdays = JSON.stringify(contact.birthdays || []).replace(/"/g, '&quot;');
+                        const safeResourceName = contact.resourceName.replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${name}</td>
+                            <td>${emailsHtml}</td>
+                            <td>${phonesHtml}</td>
+                            <td>
+                                <div class="contact-info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    ${birthday}
+                                </div>
+                            </td>
+                            <td class="action-buttons">
+                                <button onclick='handleUpdate("${safeResourceName}", "${escapedName}", ${safeEmailAddresses}, ${safePhoneNumbers}, ${safeBirthdays})' class="btn btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteContact('${safeResourceName}')" class="btn btn-delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error("Error parsing contacts:", error);
+                    alert("Failed to process contact data.");
+                }
+            }).fail(function (xhr) {
+                if (xhr.status === 403) {
+                    alert("Access Denied: Insufficient Permissions. Please log in again.");
+                    window.location.href = "/logout";
+                } else {
+                    alert("Failed to fetch contacts.");
+                }
+            });
+        }
+
+        $("#addContactForm").submit(function (event) {
+            event.preventDefault();
+            const emails = getContactValues('addEmailList');
+            const phones = getContactValues('addPhoneList');
+            
+            $.post("/contacts/add", {
+                firstName: $("#firstName").val(),
+                lastName: $("#lastName").val(),
+                birthday: $("#birthday").val(),
+                emails: emails,
+                phoneNumbers: phones
+            }).done(function () {
+                alert("Contact added successfully!");
+                hideAddForm();
+                fetchContacts();
+            }).fail(function () {
+                alert("Failed to add contact.");
+            });
+        });
+
+        $("#updateContactForm").submit(function (event) {
+            event.preventDefault();
+            const emails = getContactValues('updateEmailList');
+            const phones = getContactValues('updatePhoneList');
+
+            const updateData = {
+                resourceName: $("#resourceName").val(),
+                firstName: $("#updateFirstName").val(),
+                lastName: $("#updateLastName").val(),
+                birthday: $("#updateBirthday").val(),
+                emails: emails,
+                phoneNumbers: phones
+            };
+
+            $.ajax({
+                url: "/contacts/update",
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify(updateData),
+                success: function (response) {
+                    if (response.includes("Error")) {
+                        alert(response);
+                    } else {
+                        alert("Contact updated successfully!");
+                        hideUpdateForm();
+                        fetchContacts();
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Update error:", xhr.responseText);
+                    alert("Failed to update contact. Please try again.");
+                }
+            });
+        });
+
+        function deleteContact(resourceName) {
+            if (confirm("Are you sure you want to delete this contact?")) {
+                $.ajax({
+                    url: "/contacts/delete",
+                    type: "DELETE",
+                    data: { resourceName: resourceName },
+                    success: function () {
+                        alert("Contact deleted successfully!");
+                        fetchContacts();
+                    },
+                    error: function () {
+                        alert("Failed to delete contact.");
+                    }
+                });
+            }
+        }
+
+        // Add this new function to handle the update click
+        function handleUpdate(resourceName, name, emailAddresses, phoneNumbers, birthdays) {
+            try {
+                console.log("Update clicked for:", { resourceName, name, emailAddresses, phoneNumbers, birthdays });
+                showUpdateForm(resourceName, name, emailAddresses, phoneNumbers, birthdays);
+            } catch (error) {
+                console.error("Error in handleUpdate:", error);
+                alert("There was an error preparing the update form. Please try again.");
+            }
+        }
+
+        $(document).ready(function () {
+            fetchContacts();
+        });
+    </script>
+</body>
+</html>

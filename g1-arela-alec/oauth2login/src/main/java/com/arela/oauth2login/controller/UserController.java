@@ -10,19 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    @GetMapping
-    public String index() {
-        return "<h1>WELCOME, This is the landing page<h1>";
-    }
-
     @GetMapping("/user-info")
-    public Map<String, Object> getUser( @AuthenticationPrincipal OAuth2User oAuth2User){
+    public Map<String, Object> getUser(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return oAuth2User.getAttributes();
     }
 
-    @GetMapping("user")
-    public OAuth2User get( @AuthenticationPrincipal OAuth2User oAuth2User){
+    @GetMapping("/user")
+    public OAuth2User get(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return oAuth2User;
     }
-
 }
