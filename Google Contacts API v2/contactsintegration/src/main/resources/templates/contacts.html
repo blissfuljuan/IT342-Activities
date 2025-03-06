@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Google Contacts</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f1f3f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+            width: 600px;
+            text-align: center;
+        }
+
+        .welcome {
+            font-size: 20px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 20px;
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #d9d9d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #5f6368;
+            margin-right: 10px;
+        }
+
+        .contact-details {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .contact-name {
+            font-size: 20px;
+            font-weight: 500;
+            color: #202124;
+        }
+
+        .contact-email, .contact-phone {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 10px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(to right, #60aaff, #00398f);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(to right, #700000, #ff6262);
+            color: white;
+        }
+
+        .btn-add {
+            background: linear-gradient(to bottom, #51ff85, #00520e);
+            color: white;
+            margin-top: 15px;
+            display: inline-block;
+            padding: 8px 15px;
+            font-size: 26px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 25px;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .logout {
+            background: linear-gradient(to bottom, #b9b9b9, #303030);
+            position: fixed;
+            bottom: 35px;
+            right: 35px;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .logout:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 16px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: left;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-close {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="welcome" th:text="'Welcome, ' + ${username}"></div>
+        <h1>Your Google Contacts</h1>
+
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <ul class="contact-list" th:if="${contacts}">
+            <li class="contact-item" th:each="contact : ${contacts}">
+                <div class="contact-photo" th:text="${#strings.substring(contact.name, 0, 1)}"></div>
+                <div class="contact-details">
+                    <div class="contact-name" th:text="${contact.name}"></div>
+                    <div class="contact-email" th:text="${contact.email}"></div>
+                    <div class="contact-phone" th:text="${contact.phone}"></div>
+                </div>
+                <div class="action-buttons">
+                    <!-- Edit Button -->
+                    <button class="btn btn-edit" th:attr="data-resource=${contact.resourceName}, data-name=${contact.name}, data-email=${contact.email}, data-phone=${contact.phone}" onclick="openEditModal(this)">Edit</button>
+
+                    <!-- Delete Button -->
+                    <form th:action="@{/contacts/delete}" method="post" style="display:inline;" onsubmit="confirmDelete(event)">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                        <button type="submit" class="btn btn-delete">Delete</button>
+                    </form>
+                    
+                    <script>
+                        function confirmDelete(event) {
+                            console.log("Delete button clicked.");
+                            // You can optionally add a confirmation alert
+                            if (!confirm("Are you sure you want to delete this contact?")) {
+                                event.preventDefault();
+                            }
+                        }
+                    </script>
+                </div>
+            </li>
+        </ul>
+
+        <p th:if="${contacts == null or #lists.isEmpty(contacts)}">No contacts found.</p>
+
+        <!-- Add Contact Button -->
+        <button class="btn-add" onclick="openAddModal()">+</button>
+
+        <!-- Logout Form -->
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout">Logout</button>
+        </form>
+    </div>
+
+    <!-- Add/Edit Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Add Contact</div>
+            <form id="contactForm" th:action="@{${formAction}}" method="post">
+                <input type="hidden" id="resourceName" name="resourceName">
+                <label>Name:</label>
+                <input type="text" id="contactName" name="name" required>
+                <label>Email:</label>
+                <input type="email" id="contactEmail" name="email" required>
+                <label>Phone:</label>
+                <input type="text" id="contactPhone" name="phone" required>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn">Save</button>
+                    <button type="button" class="btn modal-close" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Add Contact";
+            document.getElementById("contactForm").action = "/contacts/add";
+            document.getElementById("contactName").value = "";
+            document.getElementById("contactEmail").value = "";
+            document.getElementById("contactPhone").value = "";
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function openEditModal(button) {
+            document.getElementById("modalTitle").innerText = "Edit Contact";
+            document.getElementById("contactForm").action = "/contacts/edit";
+            document.getElementById("resourceName").value = button.getAttribute("data-resource");
+            document.getElementById("contactName").value = button.getAttribute("data-name");
+            document.getElementById("contactEmail").value = button.getAttribute("data-email");
+            document.getElementById("contactPhone").value = button.getAttribute("data-phone");
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("contactModal").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
