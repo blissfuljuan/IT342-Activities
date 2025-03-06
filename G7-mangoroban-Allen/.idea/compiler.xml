@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="googleContacts" />
         <module name="oauth2login" />
         <module name="googlecontact" />
       </profile>
@@ -13,6 +14,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="googleContacts" options="-parameters" />
       <module name="googlecontact" options="-parameters" />
       <module name="oauth2login" options="-parameters" />
     </option>

@@ -1,23 +1,17 @@
 package com.mangoroban.googlecontact.Service;
 
 import com.mangoroban.googlecontact.model.Contacts;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.*;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.json.JsonFactory;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.AccessToken;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 

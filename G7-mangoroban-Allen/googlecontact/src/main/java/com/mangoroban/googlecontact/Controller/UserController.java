@@ -1,20 +1,13 @@
 package com.mangoroban.googlecontact.Controller;
 
-import com.mangoroban.googlecontact.model.Contacts;
 import com.mangoroban.googlecontact.Service.GoogleContactsService;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
-import com.google.api.services.people.v1.model.ListConnectionsResponse;
 import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.io.IOException;
@@ -24,12 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,31 +41,24 @@ public class UserController {
     public String getUserInfo(@AuthenticationPrincipal Object principal, Model model) {
         if (principal instanceof OidcUser) {
             OidcUser oidcUser = (OidcUser) principal;
-            // Extract OIDC user info
             String name = oidcUser.getFullName();
             String email = oidcUser.getEmail();
             String pictureUrl = oidcUser.getPicture();
-
-            // Add attributes to model
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("pictureUrl", pictureUrl);
         } else if (principal instanceof OAuth2User) {
             OAuth2User oauth2User = (OAuth2User) principal;
-            // Extract OAuth2 user info
             String name = oauth2User.getAttribute("name");
             String email = oauth2User.getAttribute("email");
             String pictureUrl = oauth2User.getAttribute("picture");
-
-            // Add attributes to model
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("pictureUrl", pictureUrl);
         } else {
-            return "redirect:/"; // Redirect if not authenticated
+            return "redirect:/";
         }
-
-        return "user-info"; // Return the view name
+        return "user-info";
     }
 
     @GetMapping("/contacts")
@@ -84,7 +66,6 @@ public class UserController {
         if (principal == null) {
             return "redirect:/";
         }
-
         List<Person> connections = googleContactsService.getConnectionsAsPeople(principal);
         model.addAttribute("contacts", connections);
         return "contact";
@@ -102,9 +83,6 @@ public class UserController {
             @RequestParam(required = false) String phoneNumber,
             @AuthenticationPrincipal OAuth2User principal,
             Model model) {
-
-        System.out.println("Adding contact: " + name + ", " + email + ", " + phoneNumber);
-
         try {
             googleContactsService.addContact(principal, name, email, phoneNumber);
             return "redirect:/contacts";
@@ -119,29 +97,19 @@ public class UserController {
             @PathVariable String contactId,
             @AuthenticationPrincipal OAuth2User principal,
             Model model) {
-
         try {
-            // Fetch the contact by ID
             Person contact = googleContactsService.getPersonById(principal, "people/" + contactId);
-
             if (contact == null) {
                 throw new RuntimeException("Contact not found.");
             }
-
-            // Add the contact to the model
             model.addAttribute("contact", contact);
-
-            // Return the edit form template
             return "editContact";
-
         } catch (RuntimeException e) {
-            // Log the error and add an error message to the model
             model.addAttribute("error", "Failed to load contact: " + e.getMessage());
-            return "redirect:/contacts"; // Redirect to the contacts list with an error message
+            return "redirect:/contacts";
         }
     }
 
-    // POST: Handle the form submission
     @PostMapping("/contacts/edit/people/{contactId}")
     public String updateContact(
             @PathVariable String contactId,
@@ -150,61 +118,28 @@ public class UserController {
             @RequestParam String phoneNumber,
             @AuthenticationPrincipal OAuth2User principal,
             Model model) {
-
         try {
-            // Fetch the contact to get the current etag
             Person existingContact = googleContactsService.getPersonById(principal, "people/" + contactId);
             if (existingContact == null) {
                 throw new RuntimeException("Contact not found.");
             }
-
-            // Create a person for update
             Person updatePerson = new Person();
-            updatePerson.setEtag(existingContact.getEtag()); // Set the etag
-
-            // Update name if provided
-            if (displayName != null && !displayName.isEmpty()) {
-                Name personName = new Name();
-                personName.setDisplayName(displayName);
-                personName.setGivenName(displayName);
-                updatePerson.setNames(Arrays.asList(personName));
-            }
-
-            // Update email if provided
-            if (email != null && !email.isEmpty()) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setValue(email);
-                emailAddress.setType("home");
-                updatePerson.setEmailAddresses(Arrays.asList(emailAddress));
-            }
-
-            // Update phone if provided
-            if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                PhoneNumber personPhone = new PhoneNumber();
-                personPhone.setValue(phoneNumber);
-                personPhone.setType("mobile");
-                updatePerson.setPhoneNumbers(Arrays.asList(personPhone));
-            }
-
-            // Determine which fields to update
+            updatePerson.setEtag(existingContact.getEtag());
+            if (!displayName.isEmpty()) updatePerson.setNames(Arrays.asList(new Name().setDisplayName(displayName)));
+            if (!email.isEmpty()) updatePerson.setEmailAddresses(Arrays.asList(new EmailAddress().setValue(email)));
+            if (!phoneNumber.isEmpty()) updatePerson.setPhoneNumbers(Arrays.asList(new PhoneNumber().setValue(phoneNumber)));
             List<String> updatePersonFields = new ArrayList<>();
-            if (displayName != null && !displayName.isEmpty()) updatePersonFields.add("names");
-            if (email != null && !email.isEmpty()) updatePersonFields.add("emailAddresses");
-            if (phoneNumber != null && !phoneNumber.isEmpty()) updatePersonFields.add("phoneNumbers");
-
-            // Validate that at least one field is being updated
+            if (!displayName.isEmpty()) updatePersonFields.add("names");
+            if (!email.isEmpty()) updatePersonFields.add("emailAddresses");
+            if (!phoneNumber.isEmpty()) updatePersonFields.add("phoneNumbers");
             if (updatePersonFields.isEmpty()) {
                 throw new RuntimeException("No fields provided for update.");
             }
-
-            // Perform the update
             googleContactsService.updateContact(principal, "people/" + contactId, updatePerson, updatePersonFields);
-
-            return "redirect:/contacts"; // Redirect to contacts list after successful update
-
+            return "redirect:/contacts";
         } catch (RuntimeException e) {
             model.addAttribute("error", "Failed to update contact: " + e.getMessage());
-            return "editContact"; // Return to the edit page with an error message
+            return "editContact";
         }
     }
 
