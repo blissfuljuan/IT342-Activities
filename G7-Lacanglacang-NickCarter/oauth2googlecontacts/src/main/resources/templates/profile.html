@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/google.ico" type="image/png">
+
     <title>User Profile</title>
     <style>
         /* General Styles */
@@ -102,7 +104,7 @@
         <p class="profile-info"><strong>First Name:</strong> <span th:text="${user.given_name}"></span></p>
         <p class="profile-info"><strong>Last Name:</strong> <span th:text="${user.family_name}"></span></p>
 
-        <a href="/contacts-page" class="btn">View Contacts</a>
+        <a href="/contacts" class="btn">View Contacts</a>
     </div>
 
     <p th:if="${error}" style="color: red;" th:text="${error}"></p>
