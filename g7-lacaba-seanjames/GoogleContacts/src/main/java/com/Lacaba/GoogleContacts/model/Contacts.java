@@ -1,19 +1,27 @@
 package com.Lacaba.GoogleContacts.model;
 
 public class Contacts {
+    private String resourceName;
     private String name;
     private String email;
+    private String phoneNumber;
 
-    // **No-Args Constructor (Needed for Spring & JSON Processing)**
-    public Contacts() {}
+    public Contacts() {
+    }
 
-    // **Parameterized Constructor**
     public Contacts(String name, String email) {
         this.name = name;
         this.email = email;
     }
 
-    // **Getters and Setters**
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
+
     public String getName() {
         return name;
     }
@@ -29,4 +37,14 @@ public class Contacts {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }
+
+
