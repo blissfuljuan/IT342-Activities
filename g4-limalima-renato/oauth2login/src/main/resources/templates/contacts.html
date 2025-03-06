@@ -9,8 +9,8 @@
 <div class="container mt-5">
     <h2>Google Contacts</h2>
 
-    <!-- ADD CONTACT FORM -->
-    <form th:action="@{/contacts/add}" method="post">
+    <!-- ADD CONTACT -->
+    <form th:action="@{/add}" method="post">
         <div class="row">
             <div class="col">
                 <input type="text" name="firstName" class="form-control" placeholder="First Name" required>
@@ -40,17 +40,17 @@
             <td th:text="${contact.names[0].displayName}"></td>
             <td th:text="${contact.phoneNumbers != null ? contact.phoneNumbers[0].value : 'N/A'}"></td>
             <td>
-                <!-- UPDATE CONTACT FORM -->
-                <form th:action="@{/contacts/update}" method="post" class="d-inline">
+                <!-- UPDATE CONTACT  -->
+                <form th:action="@{/update}" method="post" class="d-inline">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
-                    <input type="text" name="firstName" placeholder="New First Name" required>
-                    <input type="text" name="lastName" placeholder="New Last Name" required>
-                    <input type="text" name="phoneNumber" placeholder="New Phone Number">
+                    <input type="text" name="firstName" th:value="${contact.names[0].givenName}" required>
+                    <input type="text" name="lastName" th:value="${contact.names[0].familyName}" required>
+                    <input type="text" name="phoneNumber" th:value="${contact.phoneNumbers != null ? contact.phoneNumbers[0].value : ''}">
                     <button type="submit" class="btn btn-warning btn-sm">Update</button>
                 </form>
 
                 <!-- DELETE CONTACT -->
-                <form th:action="@{/contacts/delete}" method="post" class="d-inline">
+                <form th:action="@{/delete}" method="post" class="d-inline">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
