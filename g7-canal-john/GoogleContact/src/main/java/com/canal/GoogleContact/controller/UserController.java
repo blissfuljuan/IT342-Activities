@@ -50,6 +50,7 @@ public class UserController {
 
     @GetMapping("/user-info")
     public String getUserInfo(@AuthenticationPrincipal Object principal, Model model) {
+
         if (principal instanceof OidcUser) {
             OidcUser oidcUser = (OidcUser) principal;
             // Extract OIDC user info
