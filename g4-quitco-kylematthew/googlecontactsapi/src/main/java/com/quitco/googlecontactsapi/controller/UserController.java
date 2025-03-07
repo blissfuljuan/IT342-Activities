@@ -2,18 +2,19 @@ package com.quitco.googlecontactsapi.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.Map;
 
-@RestController
+@Controller
 public class UserController {
 
-    @GetMapping
-    public String index(){
-        return "Hello User! This is the landing page of my website!";
+    @GetMapping("/")
+    public String index() {
+        return "index";
     }
 
     @GetMapping("/user-info")

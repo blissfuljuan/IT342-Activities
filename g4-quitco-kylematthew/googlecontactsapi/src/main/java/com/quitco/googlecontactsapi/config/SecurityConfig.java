@@ -15,10 +15,14 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/contacts/**").authenticated()
-                        .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/secured", true))
+                        .anyRequest().permitAll())
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/secured", true))
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/secured", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
-                .formLogin(form -> form.defaultSuccessUrl("/secured", true))
                 .csrf(csrf -> csrf.disable())
                 .build();
     }

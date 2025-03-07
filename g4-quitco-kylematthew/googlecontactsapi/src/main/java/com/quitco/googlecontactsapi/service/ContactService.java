@@ -34,6 +34,9 @@ public class ContactService {
     }
 
     public Person updateContact(String resourceName, Person contact) throws IOException {
+        Person existingContact = getContact(resourceName);
+        contact.setEtag(existingContact.getEtag());
+
         return peopleService.people().updateContact(resourceName, contact)
                 .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
                 .execute();

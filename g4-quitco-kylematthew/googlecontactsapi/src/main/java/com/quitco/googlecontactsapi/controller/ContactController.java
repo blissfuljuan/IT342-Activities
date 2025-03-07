@@ -1,6 +1,9 @@
 package com.quitco.googlecontactsapi.controller;
 
+import com.google.api.services.people.v1.model.EmailAddress;
+import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
+import com.google.api.services.people.v1.model.PhoneNumber;
 import com.quitco.googlecontactsapi.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,14 +40,29 @@ public class ContactController {
     }
 
     @PostMapping("/createContact")
-    public String createContact(@RequestBody Person contact) throws IOException {
+    public String createContact(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String email, @RequestParam String phone) throws IOException {
+        Person contact = new Person();
+
+        contact.setNames(List.of(new Name().setGivenName(firstName).setFamilyName(lastName)));
+        contact.setEmailAddresses(List.of(new EmailAddress().setValue(email)));
+        contact.setPhoneNumbers(List.of(new PhoneNumber().setValue(phone)));
+
         contactService.createContact(contact);
+
         return "redirect:/contacts/getContacts";
     }
 
-    @PutMapping("/updateContact/{resourceName}")
-    public Person updateContact(@PathVariable String resourceName, @RequestBody Person contact) throws IOException {
-        return contactService.updateContact(resourceName, contact);
+    @PostMapping("/updateContact/people/{resourceName}")
+    public String updateContact(@PathVariable String resourceName, @RequestParam String firstName, @RequestParam String lastName, @RequestParam String email, @RequestParam String phone) throws IOException {
+        Person contact = new Person();
+
+        contact.setNames(List.of(new Name().setGivenName(firstName).setFamilyName(lastName)));
+        contact.setEmailAddresses(List.of(new EmailAddress().setValue(email)));
+        contact.setPhoneNumbers(List.of(new PhoneNumber().setValue(phone)));
+
+        contactService.updateContact("people/" + resourceName, contact);
+
+        return "redirect:/contacts/getContacts";
     }
 
     @RequestMapping(value="/deleteContact/people/{resourceName}", method= RequestMethod.POST)
