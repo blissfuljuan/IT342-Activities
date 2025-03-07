@@ -9,19 +9,23 @@
 
     <h2>Create New Contact</h2>
     <form th:action="@{/create-contact}" method="post">
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required><br><br>
-  
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" name="firstName" required><br><br>
+    
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" name="lastName"><br><br>
+    
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" required><br><br>
-  
+    
       <label for="phone">Phone:</label>
       <input type="text" id="phone" name="phone" required><br><br>
-  
+    
       <button type="submit">Create Contact</button>
     </form>
+    
 
-  <table border="1" style="width: 25%; border-collapse: collapse; margin-top: 20px;">
+  <table border="1">
       <thead>
           <tr>
               <th>Name</th>
@@ -36,7 +40,13 @@
               <td th:text="${contact['names'] != null ? contact['names'][0]['displayName'] : 'N/A'}">Name</td>
               <td th:text="${contact['emailAddresses'] != null ? contact['emailAddresses'][0]['value'] : 'N/A'}">Email</td>
               <td th:text="${contact['phoneNumbers'] != null ? contact['phoneNumbers'][0]['value'] : 'N/A'}">Phone</td>
-
+              <td></td>
+              <td>
+                <form th:action="@{/contacts/delete}" method="post" style="display:inline;">
+                  <input type="hidden" name="resourceName" th:value="${contact['resourceName'] != null ? contact['resourceName'] : ''}">
+                  <button type="submit">Delete</button>
+              </form>
+              </td>
           </tr>
       </tbody>
   </table>

@@ -10,13 +10,20 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultsecuritychain(HttpSecurity http) throws Exception{
         return http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/error", "/create-contact", "/contact/update").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/dashboard", true))
-                .logout(logout -> logout.logoutSuccessUrl("/"))
+                .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers("/","/login","/error", "/dashboard", "/create-contact", "/contacts/delete").permitAll() // permit all for / and /login
+                    .anyRequest().authenticated()
+                )
+                .oauth2Login(auth -> auth
+                    .defaultSuccessUrl("/dashboard", true)
+                )
+                .logout(logout -> logout
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                )
+                .csrf().disable()
                 .build();
-    }
-}
+    }}

@@ -4,18 +4,18 @@ public class Contact {
     private String name;
     private String email;
     private String phone;
-    private String id;
+    private String resourceName;
 
     // Constructors (default and parameterized)
     public Contact(){
 
     }
 
-    public Contact(String phone, String email, String name, String id) {
+    public Contact(String phone, String email, String name,String resourceName) {
             this.name =  name;
             this.email = email;
             this.phone = phone;
-            this.id = id;
+            this.resourceName = resourceName;
 
     }
     // Getters and setters
@@ -45,9 +45,9 @@ public class Contact {
     }
 
     public String getId(){
-        return id;
+        return resourceName;
     }
-    public void setId(String id){
-        this.id = id;
+    public void setId(String resourceName){
+        this. resourceName = resourceName;
     }
 }
