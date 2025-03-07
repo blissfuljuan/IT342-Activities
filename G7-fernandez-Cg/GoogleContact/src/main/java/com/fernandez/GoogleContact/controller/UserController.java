@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class UserController {
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
+    @Autowired
+    private GoogleContactsService GoogleContactsService;
     @GetMapping("/user-info")
     public String getUser(@AuthenticationPrincipal OAuth2User oAuth2User, Model model) {
         if (oAuth2User != null) {
