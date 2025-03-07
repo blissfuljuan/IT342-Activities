@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Google Contacts</title>
+    <link rel="stylesheet" th:href="@{/css/contacts.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/contacts.js}" defer></script>
+    
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
@@ -14,7 +17,7 @@
     
     <button onclick="showAddPopup()">Add Contact</button>
 
-    </br>
+    <br>
     <table border="1">
         <thead>
             <tr>
@@ -39,132 +42,29 @@
 
     <p th:if="${error}" th:text="${error}"></p>
 
-    <div id="addPopup" style="display:none;">
+    <div id="overlay"></div>
+
+    <div id="addPopup" class="popup">
         <h2>Add Contact</h2>
         <form id="addForm">
-            <label>Name: <input type="text" id="addName" required></label><br>
-            <label>Email: <input type="email" id="addEmail" required></label><br>
-            <label>Phone: <input type="text" id="addPhone" required></label><br>
+            <label>Name: <input type="text" id="addName" required></label>
+            <label>Email: <input type="email" id="addEmail" required></label>
+            <label>Phone: <input type="text" id="addPhone" required></label>
             <button type="submit">Add</button>
             <button type="button" onclick="closeAddPopup()">Cancel</button>
         </form>
     </div>
 
-    <div id="editPopup" style="display:none;">
+    <div id="editPopup" class="popup">
         <h2>Edit Contact</h2>
         <form id="editForm">
             <input type="hidden" id="editResourceName">
-            <label>Name: <input type="text" id="editName" required></label><br>
-            <label>Email: <input type="email" id="editEmail" required></label><br>
-            <label>Phone: <input type="text" id="editPhone" required></label><br>
+            <label>Name: <input type="text" id="editName" required></label>
+            <label>Email: <input type="email" id="editEmail" required></label>
+            <label>Phone: <input type="text" id="editPhone" required></label>
             <button type="submit">Save</button>
             <button type="button" onclick="closeEditPopup()">Cancel</button>
         </form>
     </div>
-
-    <script>
-        $(document).ready(function() {
-            var token = $("meta[name='_csrf']").attr("content");
-            var header = $("meta[name='_csrf_header']").attr("content");
-            $(document).ajaxSend(function(e, xhr, options) {
-                xhr.setRequestHeader(header, token);
-            });
-        });
-    
-        function showAddPopup() {
-            $('#addPopup').show();
-        }
-    
-        function closeAddPopup() {
-            $('#addPopup').hide();
-        }
-    
-        $('#addForm').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: '/contacts/add',
-                type: 'POST',
-                data: {
-                    name: $('#addName').val(),
-                    email: $('#addEmail').val(),
-                    phone: $('#addPhone').val()
-                },
-                success: function() { location.reload(); },
-                error: function(err) {
-                    console.error("Error adding contact:", err.responseJSON);
-                    alert(err.responseJSON ? err.responseJSON.message : 'Failed to add contact.');
-                }
-            });
-        });
-    
-        function showEditPopup(resourceName, name, email, phone) {
-            $('#editResourceName').val(resourceName);
-            $('#editName').val(name);
-            $('#editEmail').val(email);
-            $('#editPhone').val(phone);
-            $('#editPopup').show();
-        }
-    
-        function closeEditPopup() {
-            $('#editPopup').hide();
-        }
-    
-        $('#editForm').submit(function(e) {
-        e.preventDefault();
-
-        const resourceName = $('#editResourceName').val();
-        const name = $('#editName').val().trim();
-        const email = $('#editEmail').val().trim();
-        const phone = $('#editPhone').val().trim();
-
-        if (!resourceName) {
-            alert('Invalid contact. Please refresh the page.');
-            return;
-        }
-
-        if (!name || !email || !phone) {
-            alert('All fields are required.');
-            return;
-        }
-
-        console.log("Submitting edit form with:", { resourceName, name, email, phone });
-
-        $.ajax({
-            url: '/contacts/edit',
-            type: 'POST',
-            data: {
-                resourceName: resourceName,
-                name: name,
-                email: email,
-                phone: phone
-            },
-            success: function(response) {
-                console.log("Contact updated successfully:", response);
-                location.reload();
-            },
-            error: function(err) {
-                console.error("Error updating contact:", err.responseJSON);
-                alert(err.responseJSON ? err.responseJSON.message : 'Failed to update contact.');
-            }
-        });
-    });
-
-
-    
-        function deleteContact(resourceName) {
-            if (confirm('Are you sure you want to delete this contact?')) {
-                $.ajax({
-                    url: '/contacts/delete',
-                    type: 'POST',
-                    data: { resourceName: resourceName },
-                    success: function() { location.reload(); },
-                    error: function(err) {
-                        console.error("Error deleting contact:", err.responseJSON);
-                        alert(err.responseJSON ? err.responseJSON.message : 'Failed to delete contact.');
-                    }
-                });
-            }
-        }
-    </script>
 </body>
 </html>
