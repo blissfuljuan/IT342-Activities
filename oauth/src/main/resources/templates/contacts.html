@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Google Contacts</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #F5FBFF;
+            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+        }
+
+        /* Universal Button Styling */
+        .btn {
+            background-color:  #3A5F88 !important;
+            color: white !important;
+            border: none !important;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .btn:hover {
+            background-color: #333 !important;
+        }
+
+/* Contact Card Styling */
+.contact-card {
+    background: white;
+    width: 250px;
+    height: 350px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
+
+    /* Flexbox for centering content */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers content horizontally */
+    justify-content: center; /* Centers content vertically */
+    text-align: center;
+}
+
+
+        .contact-info {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .action-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Title -->
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="header-title">Google Contacts</h1>
+        </div>
+    </div>
+
+    <!-- Search Bar and Add Contact Button (Aligned with Contact Cards) -->
+    <div class="row justify-content-center">
+        <div class="col-md-6 d-flex align-items-center">
+            <input type="text" id="searchBar" class="form-control me-2" placeholder="Search contacts..." onkeyup="searchContacts()">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                +
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- Contact Cards Display -->
+    <div class="container">
+        <div class="row justify-content-center" id="contactsContainer">
+            <div class="col-md-3 p-1 m-3 d-flex justify-content-center" th:each="contact : ${contacts}" th:if="${contact.names != null and contact.names.size() > 0}">
+                <div class="contact-card text-center w-100">
+                    <!-- Contact Image -->
+                    <img th:if="${contact.photos != null and contact.photos.size() > 0}"
+                         th:src="${contact.photos[0].url}"
+                         alt="Contact Image"
+                         class="contact-img rounded-circle">
+                    <img th:unless="${contact.photos != null and contact.photos.size() > 0}"
+                         src="/static/default-profile.jpg"
+                         alt="Default Image"
+                         class="contact-img rounded-circle">
+
+                    <h5 class="mt-2" th:text="${contact.names[0].displayName}"></h5>
+                    <p th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></p>
+                    <p th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Number'}"></p>
+
+                    <!-- Edit & Delete Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                            Edit
+                        </button>
+                        <form action="/api/contacts/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Add Contact Modal -->
+<div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+            </div>
+            <div class="modal-body">
+                <!-- Add Contact Form -->
+                <form action="/api/contacts/create" method="POST">
+                    <div class="mb-3">
+                        <label for="givenName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="givenName" name="givenName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="familyName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="familyName" name="familyName" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Contact</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Edit Contact Modals -->
+    <div th:each="contact : ${contacts}">
+        <div class="modal fade" th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Contact</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form th:action="@{/api/contacts/update}" method="POST">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                            <div class="mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="givenName" th:value="${contact.names[0].givenName}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="familyName" th:value="${contact.names[0].familyName}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="phoneNumber" th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript Functions -->
+<script>
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this contact?");
+    }
+
+    function searchContacts() {
+        const input = document.getElementById('searchBar').value.toUpperCase();
+        const contactColumns = document.querySelectorAll('.col-md-3');
+
+        contactColumns.forEach(column => {
+            const card = column.querySelector('.contact-card');
+            const name = card.querySelector('h5').textContent.toUpperCase();
+            const email = card.querySelector('p:nth-of-type(1)').textContent.toUpperCase();
+            const phone = card.querySelector('p:nth-of-type(2)').textContent.toUpperCase();
+
+            if (name.includes(input) || email.includes(input) || phone.includes(input)) {
+                column.classList.remove("d-none");
+            } else {
+                column.classList.add("d-none");
+            }
+        });
+    }
+</script>
+</body>
+</html>
