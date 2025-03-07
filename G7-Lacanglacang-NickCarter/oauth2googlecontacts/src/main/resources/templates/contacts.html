@@ -270,6 +270,7 @@
                             <button type="button" class="btn btn-secondary" onclick="addPhoneNumber()">+ Add
                                 More</button>
 
+
                             <div class="modal-footer" style="justify-content: center;">
                                 <button type="submit" class="btn btn-primary">Save Contact</button>
                             </div>
@@ -333,7 +334,9 @@
                             <div class="modal-content">
                                 <div class="modal-body">
                                     <!-- Edit Contact Form -->
-                                    <form th:action="@{/api/contacts/update}" method="POST">
+                                    <form th:action="@{/api/contacts/update}" method="POST"
+                                        onsubmit="return debugEditForm(this)">
+
                                         <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
                                         <div class="mb-3">
                                             <label for="editGivenName" class="form-label">First Name</label>
@@ -345,26 +348,39 @@
                                             <input type="text" class="form-control" id="editFamilyName"
                                                 name="familyName" th:value="${contact.names[0].familyName}" required>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="editEmail" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="editEmail" name="email"
-                                                th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
-                                        </div>
-                                        <div
-                                            id="phoneNumbersContainer-[[${#strings.replace(contact.resourceName, '/', '_')}]]">
-                                            <div class="mb-3" th:each="phone, iterStat : ${contact.phoneNumbers}">
-                                                <label class="form-label"
-                                                    th:text="'Phone Number ' + (${iterStat.index + 1})"></label>
-                                                <input type="tel" class="form-control" name="phoneNumbers[]"
-                                                    th:value="${phone.value}">
+                                        <div id="editEmailsContainer"
+                                            th:id="'editEmailsContainer-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                                            <label class="form-label">Emails</label>
+
+                                            <div th:each="i : ${#numbers.sequence(0, 3)}">
+                                                <input type="email" class="form-control email-input mb-2"
+                                                    name="emails[]"
+                                                    th:value="${contact.emailAddresses != null and i < contact.emailAddresses.size() ? contact.emailAddresses[i].value : ''}"
+                                                    placeholder="Enter email address" th:id="'emailInput-' + ${i}"
+                                                    th:style="${contact.emailAddresses == null or i >= contact.emailAddresses.size() ? 'display: none;' : ''}">
                                             </div>
                                         </div>
+                                        <!-- Add More Button -->
+                                        <button type="button" class="btn btn-secondary mt-2"
+                                            onclick="showNextEmailField(this)">Add More</button>
 
-                                        <!-- Add More Phone Number Button -->
-                                        <button type="button" class="btn btn-secondary"
-                                            th:attr="onclick='addPhoneNumberEdit(' + '\'' + ${#strings.replace(contact.resourceName, '/', '_')} + '\'' + ')'">
-                                            + Add More
-                                        </button>
+
+                                        <div id="editPhoneNumbersContainer"
+                                            th:id="'editPhoneNumbersContainer-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                                            <label class="form-label">Phone Numbers</label>
+
+                                            <div th:each="i : ${#numbers.sequence(0, 3)}">
+                                                <input type="tel" class="form-control phone-input mb-2"
+                                                    name="phoneNumbers[]"
+                                                    th:value="${contact.phoneNumbers != null and i < contact.phoneNumbers.size() ? contact.phoneNumbers[i].value : ''}"
+                                                    placeholder="Enter phone number" th:id="'phoneInput-' + ${i}"
+                                                    th:style="${contact.phoneNumbers == null or i >= contact.phoneNumbers.size() ? 'display: none;' : ''}">
+                                            </div>
+                                        </div>
+                                        <!-- Add More Button -->
+                                        <button type="button" class="btn btn-secondary mt-2"
+                                            onclick="showNextPhoneNumberField(this)">Add More</button>
+
                                         <div class="modal-footer" style="justify-content: center;">
                                             <button type="submit" class="btn btn-primary">Save Changes</button>
                                         </div>
@@ -399,6 +415,36 @@
             return confirm("Are you sure you want to delete this contact?");
         }
 
+        function showNextPhoneNumberField(button) {
+            let container = button.previousElementSibling; // Get the phone number container
+            let inputs = container.querySelectorAll('.phone-input'); // Get all phone input fields
+
+            for (let input of inputs) {
+                if (input.style.display === 'none') {
+                    input.style.display = 'block'; // Show the hidden field
+                    return; // Stop after showing one field
+                }
+            }
+
+            // Hide the button when max 3 inputs are shown
+            button.style.display = 'none';
+        }
+
+        function showNextEmailField(button) {
+            let container = button.previousElementSibling;
+            let inputs = container.getElementsByClassName("email-input");
+
+            for (let i = 0; i < inputs.length; i++) {
+                if (inputs[i].style.display === "none") {
+                    inputs[i].style.display = "block";
+                    return;
+                }
+            }
+
+            button.style.display = 'none';
+        }
+
+
         function searchContacts() {
             const input = document.getElementById('searchBar');
             const filter = input.value.toUpperCase();
@@ -430,33 +476,51 @@
             }
         }
 
-        function addPhoneNumber() {
-            const container = document.getElementById('phoneNumbersContainer');
-            const div = document.createElement('div');
-            div.className = 'mb-3 phone-number-group';
-            div.innerHTML = `
-            <input type="tel" class="form-control" name="phoneNumbers[]" required>
-            <button type="button" class="btn btn-danger btn-sm mt-1" onclick="removePhoneNumber(this)">Remove</button>
-        `;
-            container.appendChild(div);
-        }
+        function addPhoneNumber(containerId) {
+            let container;
+            if (containerId) {
+                // This is for the edit modal
+                container = document.getElementById(`phoneNumbersContainer-${containerId}`);
+            } else {
+                // This is for the create modal
+                container = document.getElementById("phoneNumbersContainer");
+            }
 
-        function addPhoneNumberEdit(contactId) {
-            let container = document.getElementById("phoneNumbersContainer-" + contactId);
-            let newField = document.createElement("div");
-            newField.classList.add("mb-3");
+            if (container) {
+                let div = document.createElement("div");
+                div.classList.add("mb-3", "phone-number-group");
 
-            newField.innerHTML = `
-            <label class="form-label">Phone Number</label>
-            <input type="tel" class="form-control" name="phoneNumbers[]" required>
-        `;
+                let label = document.createElement("label");
+                label.classList.add("form-label");
+                label.innerText = "Phone Number";
 
-            container.appendChild(newField);
+                let input = document.createElement("input");
+                input.type = "tel";
+                input.classList.add("form-control");
+                input.name = "phoneNumbers[]";  // This ensures it's recognized as part of the array
+                input.required = true;
+
+                // Append the label and input to the new div
+                div.appendChild(label);
+                div.appendChild(input);
+
+                // Append the new phone number div to the container
+                container.appendChild(div);
+            }
         }
 
         function removePhoneNumber(button) {
             button.parentElement.remove();
         }
+
+        function debugEditForm(form) {
+            const formData = new FormData(form);
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+            return true;
+        }
+
 
     </script>
 </body>

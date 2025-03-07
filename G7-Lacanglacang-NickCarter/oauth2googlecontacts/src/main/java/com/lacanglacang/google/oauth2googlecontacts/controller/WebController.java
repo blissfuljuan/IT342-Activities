@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class WebController {
     public String createContact(
             @RequestParam String givenName,
             @RequestParam String familyName,
-            @RequestParam(required = false) String email,
+            @RequestParam(required = false) List<String> email,
             @RequestParam(required = false) List<String> phoneNumbers) throws IOException {
 
         Person newContact = googleContactsService.createContact(givenName, familyName, email, phoneNumbers);
@@ -68,10 +69,14 @@ public class WebController {
             @RequestParam String resourceName,
             @RequestParam String givenName,
             @RequestParam String familyName,
-            @RequestParam(required = false) String email,
+            @RequestParam(required = false) List<String> email,
             @RequestParam(required = false) List<String> phoneNumbers) {
 
         try {
+            // Log the received phone numbers for debugging
+            System.out.println("Updating contact with resourceName: " + resourceName);
+            System.out.println("Phone Numbers: " + phoneNumbers);
+
             // Update contact using service method
             googleContactsService.updateContact(resourceName, givenName, familyName, email, phoneNumbers);
             System.out.println("Contact updated: " + resourceName);
