@@ -8,8 +8,7 @@
 <div class="container mt-4">
   <h2>Contact Management</h2>
 
-  <!-- Contact Form -->
-  <form th:action="@{/thymeleaf/add}" th:object="${newContact}" method="post" class="mb-4">
+  <form th:action="@{/add}" th:object="${newContact}" method="post" class="mb-4">
     <div class="row">
       <div class="col-md-3">
         <input type="text" th:field="*{name}" class="form-control" placeholder="Name" required>
@@ -26,7 +25,6 @@
     </div>
   </form>
 
-  <!-- Contacts Table -->
   <table class="table table-bordered">
     <thead class="table-dark">
     <tr>
@@ -40,21 +38,14 @@
     <tr th:each="contact : ${contacts}">
       <td th:text="${contact.name}"></td>
       <td th:text="${contact.email}"></td>
-      <td th:text="${contact.phoneNumber}"></td>
+      <td th:text="${contact.phone}"></td>
       <td>
-        <!-- Edit Button (Triggers Modal) -->
         <button class="btn btn-warning btn-sm" th:attr="data-bs-target='#editModal-' + ${contact.id}" data-bs-toggle="modal">
-
           Edit
         </button>
 
-        <!-- Delete Button -->
-        <a th:href="@{/thymeleaf/delete/{id}(id=${contact.id})}" class="btn btn-danger btn-sm">
+        <a th:href="@{/delete/{id}(id=${contact.id})}" class="btn btn-danger btn-sm">Delete</a>
 
-          Delete
-        </a>
-
-        <!-- Edit Modal -->
         <div class="modal fade" th:id="'editModal-' + ${contact.id}" tabindex="-1">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -63,7 +54,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <div class="modal-body">
-                <form th:action="@{/thymeleaf/update/{id}(id=${contact.id})}" method="post">
+                <form th:action="@{/update/{id}(id=${contact.id})}" method="post">
                   <input type="hidden" th:value="${contact.id}" name="id">
                   <div class="mb-3">
                     <label>Name</label>
@@ -75,7 +66,7 @@
                   </div>
                   <div class="mb-3">
                     <label>Phone Number</label>
-                    <input type="text" name="phoneNumber" th:value="${contact.phoneNumber}" class="form-control" required>
+                    <input type="text" name="phone" th:value="${contact.phone}" class="form-control" required>
                   </div>
                   <button type="submit" class="btn btn-primary">Update</button>
                 </form>
@@ -90,7 +81,6 @@
   </table>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

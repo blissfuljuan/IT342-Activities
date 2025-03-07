@@ -16,25 +16,25 @@ public class ThymeLeafController {
     @GetMapping("/dashboard")
     public String getAllContacts(Model model) {
         model.addAttribute("contacts", contactService.getAllContacts());
-        model.addAttribute("newContact", new Contact()); // Empty object for form binding
-        return "contacts";
+        model.addAttribute("newContact", new Contact());
+        return "contacts"; // Thymeleaf template name
     }
 
     @PostMapping("/add")
     public String addContact(@ModelAttribute Contact contact) {
         contactService.createContact(contact);
-        return "redirect:/thymeleaf";
+        return "redirect:/dashboard";
     }
 
     @PostMapping("/update/{id}")
     public String updateContact(@PathVariable String id, @ModelAttribute Contact updatedContact) {
         contactService.updateContact(id, updatedContact);
-        return "redirect:/thymeleaf";
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteContact(@PathVariable String id) {
         contactService.deleteContact(id);
-        return "redirect:/thymeleaf";
+        return "redirect:/dashboard";
     }
 }
