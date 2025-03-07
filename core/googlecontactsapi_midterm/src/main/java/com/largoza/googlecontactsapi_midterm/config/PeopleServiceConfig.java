@@ -18,7 +18,7 @@ import com.largoza.googlecontactsapi_midterm.token.TokenFetcher;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 
 @Configuration
-public class ContactServiceConfig {
+public class PeopleServiceConfig {
     
     @Autowired
     private OAuth2AuthorizedClientService oAuthorizedClientService;

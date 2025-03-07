@@ -18,6 +18,6 @@ public class LoginController {
 
     @GetMapping("/home")
     public String home() {
-        return "hello world!";
+        return "home";
     }
 }

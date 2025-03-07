@@ -10,8 +10,8 @@ import java.util.Map;
 @Controller
 public class UserController {
     @GetMapping("/")
-    public String index() {
-        return "hello";
+    public String home() {
+        return "home";
     }
 
     @GetMapping("/user-info")
