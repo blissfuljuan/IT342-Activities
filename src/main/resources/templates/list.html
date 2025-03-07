@@ -32,15 +32,21 @@
                         <tr th:each="contact : ${contacts}">
                             <td>
                                 <i class="bi bi-person-circle me-2"></i>
-                                <span th:text="${contact.firstName + ' ' + contact.lastName}">John Doe</span>
+                                <span th:if="${contact.names != null && !contact.names.empty}" 
+                                      th:text="${contact.names[0].displayName}">John Doe</span>
+                                <span th:unless="${contact.names != null && !contact.names.empty}">No Name</span>
                             </td>
                             <td>
                                 <i class="bi bi-envelope me-2"></i>
-                                <span th:text="${contact.email}">john@example.com</span>
+                                <span th:if="${contact.emailAddresses != null && !contact.emailAddresses.empty}" 
+                                      th:text="${contact.emailAddresses[0].value}">john@example.com</span>
+                                <span th:unless="${contact.emailAddresses != null && !contact.emailAddresses.empty}">No Email</span>
                             </td>
                             <td>
                                 <i class="bi bi-telephone me-2"></i>
-                                <span th:text="${contact.phoneNumber}">+1234567890</span>
+                                <span th:if="${contact.phoneNumbers != null && !contact.phoneNumbers.empty}" 
+                                      th:text="${contact.phoneNumbers[0].value}">+1234567890</span>
+                                <span th:unless="${contact.phoneNumbers != null && !contact.phoneNumbers.empty}">No Phone</span>
                             </td>
                             <td class="text-center">
                                 <a th:href="@{/api/contacts/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
