@@ -3,6 +3,7 @@ package com.labajos.contactsapp.contactsintegration.service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,104 +83,109 @@ public class GoogleContactsService {
         }
     }
 
-    public String createContact(OAuth2AuthenticationToken authentication, String fullName, String email, String phoneNumber) {
+    public String createContact(OAuth2AuthenticationToken authentication, String fullName, String email, List<String> phoneNumbers) {
         try {
             String accessToken = getAccessToken(authentication);
             String url = "https://people.googleapis.com/v1/people:createContact";
-
+    
+            // Build JSON body with multiple phone numbers
+            StringBuilder phoneJson = new StringBuilder();
+            for (String phone : phoneNumbers) {
+                if (!phone.trim().isEmpty()) { // Skip empty phone numbers
+                    phoneJson.append("{\"value\": \"").append(phone).append("\"},");
+                }
+            }
+            String phonesString = phoneJson.length() > 0 ? phoneJson.substring(0, phoneJson.length() - 1) : "";
+    
             String jsonBody = "{"
                     + "\"names\": [{\"givenName\": \"" + fullName + "\"}],"
                     + "\"emailAddresses\": [{\"value\": \"" + email + "\"}],"
-                    + "\"phoneNumbers\": [{\"value\": \"" + phoneNumber + "\"}]"
+                    + "\"phoneNumbers\": [" + phonesString + "]"
                     + "}";
-
+    
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
-
+    
             HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
+    
             if (response.getStatusCode() != HttpStatus.OK) {
                 logger.error("Failed to create contact: {}", response.getStatusCode());
                 return "Error creating contact. Status: " + response.getStatusCode();
             }
-
+    
             return response.getBody();
         } catch (Exception e) {
             logger.error("Error creating contact", e);
             return "Error creating contact: " + e.getMessage();
         }
     }
-
+    
     public Contact updateContact(OAuth2AuthorizedClient client, String resourceName, Contact contact) 
-    throws IOException, GeneralSecurityException {
-    PeopleService service = createPeopleService(client);
-
-    try {
-        // Delete the old contact
+            throws IOException, GeneralSecurityException {
+        PeopleService service = createPeopleService(client);
+    
         try {
-            service.people().deleteContact(resourceName).execute();
-        } catch (GoogleJsonResponseException e) {
-            if (e.getStatusCode() == 404) {
-                // Try with and without "people/" prefix
-                String altResourceName = resourceName.startsWith("people/") ? 
-                    resourceName.substring(7) : "people/" + resourceName;
-                service.people().deleteContact(altResourceName).execute();
-            } else {
-                throw e;
+            // Delete the old contact
+            try {
+                service.people().deleteContact(resourceName).execute();
+            } catch (GoogleJsonResponseException e) {
+                if (e.getStatusCode() == 404) {
+                    String altResourceName = resourceName.startsWith("people/") ? 
+                        resourceName.substring(7) : "people/" + resourceName;
+                    service.people().deleteContact(altResourceName).execute();
+                } else {
+                    throw e;
+                }
             }
+            
+            String[] nameParts = contact.getName().split(" ", 2);
+            String givenName = nameParts[0];
+            String familyName = nameParts.length > 1 ? nameParts[1] : "";
+    
+            Person person = new Person()
+                    .setNames(Collections.singletonList(new Name()
+                            .setGivenName(givenName)
+                            .setFamilyName(familyName)))
+                    .setEmailAddresses(contact.getEmail().stream()
+                            .map(email -> new EmailAddress().setValue(email))
+                            .collect(Collectors.toList()))
+                    .setPhoneNumbers(contact.getPhone().stream()
+                            .filter(phone -> !phone.trim().isEmpty()) // Filter out empty strings
+                            .map(phone -> new PhoneNumber().setValue(phone))
+                            .collect(Collectors.toList()));
+    
+            Person created = Optional.ofNullable(service.people().createContact(person).execute())
+                    .orElseThrow(() -> new IOException("Failed to create contact"));
+            
+            Person retrievedContact = service.people().get(created.getResourceName())
+                    .setPersonFields("names,emailAddresses,phoneNumbers")
+                    .execute();
+    
+            return new Contact(
+                    (retrievedContact.getNames() != null && !retrievedContact.getNames().isEmpty()) ?
+                            retrievedContact.getNames().get(0).getGivenName() + 
+                            (retrievedContact.getNames().get(0).getFamilyName() != null ? 
+                            " " + retrievedContact.getNames().get(0).getFamilyName() : "")
+                            : contact.getName(),
+                    retrievedContact.getEmailAddresses() != null ?
+                            retrievedContact.getEmailAddresses().stream()
+                                    .map(EmailAddress::getValue)
+                                    .collect(Collectors.toList()) :
+                            new ArrayList<>(),
+                    retrievedContact.getPhoneNumbers() != null ?
+                            retrievedContact.getPhoneNumbers().stream()
+                                    .map(PhoneNumber::getValue)
+                                    .collect(Collectors.toList()) :
+                            new ArrayList<>(),
+                    retrievedContact.getResourceName()
+            );
+        } catch (Exception e) {
+            System.err.println("Error updating contact: " + e.getMessage());
+            throw e;
         }
-        
-        // Split full name into first and last name
-        String[] nameParts = contact.getName().split(" ", 2);
-        String givenName = nameParts[0]; // First word as given name
-        String familyName = nameParts.length > 1 ? nameParts[1] : ""; // Rest as last name
-        
-        // Create a new contact with the updated information
-        Person person = new Person()
-                .setNames(Collections.singletonList(new Name()
-                        .setGivenName(givenName)
-                        .setFamilyName(familyName)))
-                .setEmailAddresses(contact.getEmail().stream()
-                        .map(email -> new EmailAddress().setValue(email))
-                        .collect(Collectors.toList()))
-                .setPhoneNumbers(contact.getPhone().stream()
-                        .map(phone -> new PhoneNumber().setValue(phone))
-                        .collect(Collectors.toList()));
-
-        // Create new contact
-        Person created = Optional.ofNullable(service.people().createContact(person).execute())
-                .orElseThrow(() -> new IOException("Failed to create contact"));
-        
-        // Fetch the contact again to ensure names field is included
-        Person retrievedContact = service.people().get(created.getResourceName())
-                .setPersonFields("names,emailAddresses,phoneNumbers") // Explicitly request fields
-                .execute();
-
-        return new Contact(
-                (retrievedContact.getNames() != null && !retrievedContact.getNames().isEmpty()) ?
-                        retrievedContact.getNames().get(0).getGivenName() + 
-                        (retrievedContact.getNames().get(0).getFamilyName() != null ? 
-                        " " + retrievedContact.getNames().get(0).getFamilyName() : "")
-                        : contact.getName(), // Fallback to input name
-                retrievedContact.getEmailAddresses() != null ?
-                        retrievedContact.getEmailAddresses().stream()
-                                .map(EmailAddress::getValue)
-                                .collect(Collectors.toList()) :
-                        new ArrayList<>(),
-                retrievedContact.getPhoneNumbers() != null ?
-                        retrievedContact.getPhoneNumbers().stream()
-                                .map(PhoneNumber::getValue)
-                                .collect(Collectors.toList()) :
-                        new ArrayList<>(),
-                retrievedContact.getResourceName()
-        );
-    } catch (Exception e) {
-        System.err.println("Error updating contact: " + e.getMessage());
-        throw e;
     }
-}
 
     public void deleteContact(OAuth2AuthorizedClient client, String resourceName) throws IOException, GeneralSecurityException {
         PeopleService service = createPeopleService(client);

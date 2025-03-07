@@ -42,116 +42,109 @@ public class ContactsController {
     public String getContacts(Model model, OAuth2AuthenticationToken authentication) {
         try {
             String jsonResponse = googleContactsService.getContacts(authentication);
-
+    
             String username = authentication.getPrincipal().getAttribute("name");
             if (username == null) {
                 username = "User"; // Fallback if name is not available
             }
-
+    
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(jsonResponse);
-
-            List<Map<String, String>> contacts = new ArrayList<>();
-
+    
+            List<Map<String, Object>> contacts = new ArrayList<>(); // Changed to Object to accommodate List<String>
+    
             if (root.has("connections")) {
                 for (JsonNode connection : root.get("connections")) {
                     String name = connection.has("names") ? 
                                   connection.get("names").get(0).get("displayName").asText() : 
                                   "Unknown";
-
+    
                     String email = connection.has("emailAddresses") ? 
                                    connection.get("emailAddresses").get(0).get("value").asText() : 
                                    "No email";
-
-                    String phone = connection.has("phoneNumbers") ? 
-                                   connection.get("phoneNumbers").get(0).get("value").asText() : 
-                                   "No phone";
-
+    
+                    // Collect all phone numbers into a list
+                    List<String> phones = new ArrayList<>();
+                    if (connection.has("phoneNumbers")) {
+                        for (JsonNode phoneNode : connection.get("phoneNumbers")) {
+                            phones.add(phoneNode.get("value").asText());
+                        }
+                    }
+                    if (phones.isEmpty()) {
+                        phones.add("No phone");
+                    }
+    
                     String resourceName = connection.has("resourceName") ? 
                                           connection.get("resourceName").asText() : 
                                           "";
-
+    
                     // Generate initials for profile icon
                     String[] nameParts = name.split(" ");
                     String initials = nameParts.length > 1 ? 
                                       nameParts[0].substring(0, 1) + nameParts[1].substring(0, 1) : 
                                       nameParts[0].substring(0, 1);
                     initials = initials.toUpperCase();
-
+    
                     contacts.add(Map.of(
                         "name", name, 
                         "email", email, 
-                        "phone", phone,
+                        "phone", phones, // Now a List<String>
                         "initial", initials,
-                        "resourceName", resourceName // Needed for update/delete
+                        "resourceName", resourceName
                     ));
                 }
             }
-
+    
             model.addAttribute("username", username);
             model.addAttribute("contacts", contacts);
         } catch (Exception e) {
             model.addAttribute("error", "Failed to fetch contacts: " + e.getMessage());
         }
-
+    
         return "contacts";
     }
 
     @PostMapping("/add")
     public String createContact(@RequestParam String name,
-        @RequestParam String email,
-        @RequestParam String phone,
-        OAuth2AuthenticationToken authentication,
-        Model model) {
-            String response = googleContactsService.createContact(authentication, name, email, phone);
-            model.addAttribute("message", response);
-            return "redirect:/contacts"; // Refresh the contacts list
-        }
-
-        @PostMapping("/edit")
-        public String updateContact(
-                @RequestParam String resourceName,
-                @RequestParam String name,
-                @RequestParam String email,
-                @RequestParam String phone,
-                @RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient authorizedClient,
-                RedirectAttributes redirectAttributes) {
-            try {
-                // Debug logging
-                System.out.println("Update Contact - Input data:");
-                System.out.println("Resource Name: " + resourceName);
-                System.out.println("Name: " + name);
-                System.out.println("Email: " + email);
-                System.out.println("Phone: " + phone);
-        
-                Contact contact = new Contact(
-                    name, // Corrected name
-                    Arrays.asList(email), // Wrap email in a list
-                    Arrays.asList(phone), // Wrap phone in a list
-                    resourceName
-                );
-        
-                System.out.println("Contact object created:");
-                System.out.println("Name: " + contact.getName());
-                System.out.println("Email list: " + contact.getEmail());
-                System.out.println("Phone list: " + contact.getPhone());
-        
-                googleContactsService.updateContact(authorizedClient, resourceName, contact);
-                redirectAttributes.addFlashAttribute("success", "Contact updated successfully");
-            } catch (Exception e) {
-                String errorMsg = e.getMessage();
-                if (errorMsg.contains("NOT_FOUND")) {
-                    errorMsg = "Contact not found or was deleted. Please refresh the page and try again.";
-                } else if (errorMsg.contains("INVALID_ARGUMENT")) {
-                    errorMsg = "Invalid contact information provided. Please check all fields and try again.";
-                }
-                System.err.println("Error in updateContact: " + errorMsg);
-                e.printStackTrace();
-                redirectAttributes.addFlashAttribute("error", "Error updating contact: " + errorMsg);
+            @RequestParam String email,
+            @RequestParam(value = "phone") List<String> phones, // Changed to List<String>
+            OAuth2AuthenticationToken authentication,
+            Model model) {
+        String response = googleContactsService.createContact(authentication, name, email, phones);
+        model.addAttribute("message", response);
+        return "redirect:/contacts";
+    }
+    
+    @PostMapping("/edit")
+    public String updateContact(
+            @RequestParam String resourceName,
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam(value = "phone") List<String> phones, // Changed to List<String>
+            @RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient authorizedClient,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Contact contact = new Contact(
+                name,
+                Arrays.asList(email),
+                phones, // Pass the list directly
+                resourceName
+            );
+            googleContactsService.updateContact(authorizedClient, resourceName, contact);
+            redirectAttributes.addFlashAttribute("success", "Contact updated successfully");
+        } catch (Exception e) {
+            String errorMsg = e.getMessage();
+            if (errorMsg.contains("NOT_FOUND")) {
+                errorMsg = "Contact not found or was deleted. Please refresh the page and try again.";
+            } else if (errorMsg.contains("INVALID_ARGUMENT")) {
+                errorMsg = "Invalid contact information provided. Please check all fields and try again.";
             }
-            return "redirect:/contacts";
+            System.err.println("Error in updateContact: " + errorMsg);
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error updating contact: " + errorMsg);
         }
-        
+        return "redirect:/contacts";
+    }        
     
     // This method handles the deletion of contacts. Make sure the form sends a DELETE request.
     @PostMapping("/delete")
