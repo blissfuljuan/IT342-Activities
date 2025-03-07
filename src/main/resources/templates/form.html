@@ -127,8 +127,8 @@
                     resourceId = resourceId.substring(7);
                 }
                 
-                // Make PUT request
-                fetch(`/contacts/edit/${resourceId}`, {
+                // Make PUT request to the new API endpoint
+                fetch(`/api/contacts/edit/${resourceId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -138,7 +138,9 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        showMessage('Contact updated successfully! Redirecting to contacts list...', false);
+                        return response.json().then(data => {
+                            showMessage('Contact updated successfully! Redirecting to contacts list...', false);
+                        });
                     } else {
                         throw new Error(`Failed to update contact (Status: ${response.status})`);
                     }
