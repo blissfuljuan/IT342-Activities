@@ -8,7 +8,7 @@
     <style>
         body {
     background-color: #121212;
-    color: #CFCFCF;
+    color: #2b2a2a;
     font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
@@ -84,6 +84,11 @@
     /* Action Buttons */
     .action-buttons button {
         margin-right: 5px;
+
+    .google-title span {
+    display: inline-block;
+    letter-spacing: -2px; /* Adjust this value to bring letters closer */
+        }
     }
 
 
@@ -95,7 +100,15 @@
 
 <div class="container">
     <div class="header-container">
-        <h1 class="header-title">Google Contacts</h1>
+        <h1 class="header-title google-title">
+            <span style="color: #4285F4;">G</span>
+            <span style="color: #EA4335;">o</span>
+            <span style="color: #FBBC05;">o</span>
+            <span style="color: #4285F4;">g</span>
+            <span style="color: #34A853;">l</span>
+            <span style="color: #EA4335;">e</span>
+            <span style="color: #4285F4;"> Contacts</span>
+        </h1>
     </div>
 
     <!-- Search Bar with Sort Dropdown -->
@@ -126,14 +139,25 @@
                             <label for="familyName" class="form-label">Last Name</label>
                             <input type="text" class="form-control" id="familyName" name="familyName" required>
                         </div>
+
+                        <!-- Email Section -->
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email">
+                            <label class="form-label">Emails</label>
+                            <div id="emailFields">
+                                <input type="email" class="form-control mb-2" name="emails">
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" onclick="addEmailField()">+ Add Email</button>
                         </div>
+
+                        <!-- Phone Number Section -->
                         <div class="mb-3">
-                            <label for="phoneNumber" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                            <label class="form-label">Phone Numbers</label>
+                            <div id="phoneFields">
+                                <input type="tel" class="form-control mb-2" name="phoneNumbers">
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" onclick="addPhoneField()">+ Add Phone</button>
                         </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save Contact</button>
@@ -145,7 +169,7 @@
     </div>
 
     <!-- Contacts Table -->
-    <table class="table table-bordered table-hover" id="contactsTable">
+    <table class="table table-dark table-striped" id="contactsTable">
         <thead>
         <tr>
             <th>Name</th>
@@ -155,11 +179,25 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="contact : ${contacts}"
-            th:if="${contact.names != null and contact.names.size() > 0}">
+        <tr th:each="contact : ${contacts}" th:if="${contact.names != null and contact.names.size() > 0}">
             <td th:text="${contact.names[0].displayName}"></td>
-            <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></td>
-            <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Number'}"></td>
+
+            <!-- Displaying All Email Addresses -->
+            <td>
+                <ul th:if="${contact.emailAddresses != null and contact.emailAddresses.size() > 0}">
+                    <li th:each="email : ${contact.emailAddresses}" th:text="${email.value}"></li>
+                </ul>
+                <span th:if="${contact.emailAddresses == null or contact.emailAddresses.size() == 0}">No Email</span>
+            </td>
+
+            <!-- Displaying All Phone Numbers -->
+            <td>
+                <ul th:if="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0}">
+                    <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}"></li>
+                </ul>
+                <span th:if="${contact.phoneNumbers == null or contact.phoneNumbers.size() == 0}">No Number</span>
+            </td>
+
             <td class="action-buttons">
                 <!-- Edit Button (Opens Modal) -->
                 <button class="btn btn-warning btn-sm"
@@ -168,11 +206,16 @@
                     Edit
                 </button>
 
-
-                <form action="/api/contacts/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
+                <!-- Delete Button -->
+                <form th:action="@{/api/contacts/delete}" method="POST" class="d-inline" onsubmit="return confirmDelete()">
                     <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
                 <!-- Edit Contact Modal for Each Contact -->
         <tr th:each="contact : ${contacts}">
@@ -184,33 +227,35 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editContactModalLabel">Edit Contact</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title">Edit Contact</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <!-- Edit Contact Form -->
                             <form th:action="@{/api/contacts/update}" method="POST">
                                 <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+
+                                <!-- Email Fields -->
                                 <div class="mb-3">
-                                    <label for="editGivenName" class="form-label">First Name</label>
-                                    <input type="text" class="form-control" id="editGivenName" name="givenName"
-                                           th:value="${contact.names[0].givenName}" required>
+                                    <label class="form-label">Emails</label>
+                                    <div class="email-fields">
+                                        <th:block th:each="email : ${contact.emailAddresses}">
+                                            <input type="email" class="form-control mb-2" name="emails" th:value="${email.value}">
+                                        </th:block>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" onclick="addEmailField(this)">+ Add Email</button>
                                 </div>
+
+                                <!-- Phone Number Fields -->
                                 <div class="mb-3">
-                                    <label for="editFamilyName" class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" id="editFamilyName" name="familyName"
-                                           th:value="${contact.names[0].familyName}" required>
+                                    <label class="form-label">Phone Numbers</label>
+                                    <div class="phone-fields">
+                                        <th:block th:each="phone : ${contact.phoneNumbers}">
+                                            <input type="tel" class="form-control mb-2" name="phoneNumbers" th:value="${phone.value}">
+                                        </th:block>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" onclick="addPhoneField(this)">+ Add Phone</button>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="editEmail" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="editEmail" name="email"
-                                           th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editPhoneNumber" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="editPhoneNumber" name="phoneNumber"
-                                           th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}">
-                                </div>
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -221,11 +266,8 @@
                 </div>
             </div>
         </tr>
-        </tbody>
-    </table>
-</div>
 
-<!-- Bootstrap JS (Required for Modal) -->
+        <!-- Bootstrap JS (Required for Modal) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Custom JavaScript for search, sort and delete confirmation -->
@@ -246,6 +288,48 @@
             }
         }
     });
+
+    function addEmailField(button) {
+    let modal = button.closest('.modal'); // Ensure this applies to the correct modal
+    let emailContainer = modal.querySelector(".email-fields");
+
+    let newEmailField = document.createElement("input");
+    newEmailField.type = "email";
+    newEmailField.className = "form-control mb-2";
+    newEmailField.name = "emails"; // Correctly sets the name for form submission
+
+    emailContainer.appendChild(newEmailField);
+}
+
+function addPhoneField(button) {
+    let modal = button.closest('.modal');
+    let phoneContainer = modal.querySelector(".phone-fields");
+
+    let newPhoneField = document.createElement("input");
+    newPhoneField.type = "tel";
+    newPhoneField.className = "form-control mb-2";
+    newPhoneField.name = "phoneNumbers"; // Correct name for form submission
+
+    phoneContainer.appendChild(newPhoneField);
+}
+
+function addEmailField() {
+        let emailFields = document.getElementById("emailFields");
+        let newField = document.createElement("input");
+        newField.type = "email";
+        newField.className = "form-control mb-2";
+        newField.name = "emails"; // Sends as a list
+        emailFields.appendChild(newField);
+    }
+
+    function addPhoneField() {
+        let phoneFields = document.getElementById("phoneFields");
+        let newField = document.createElement("input");
+        newField.type = "tel";
+        newField.className = "form-control mb-2";
+        newField.name = "phoneNumbers"; // Sends as a list
+        phoneFields.appendChild(newField);
+    }
 
     function confirmDelete() {
         return confirm("Are you sure you want to delete this contact?");

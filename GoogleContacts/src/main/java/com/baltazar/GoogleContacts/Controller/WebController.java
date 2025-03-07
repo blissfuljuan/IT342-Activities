@@ -41,16 +41,16 @@ public class WebController {
     public String createContact(
             @RequestParam String givenName,
             @RequestParam String familyName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber) throws IOException {
+            @RequestParam(required = false) List<String> emails,
+            @RequestParam(required = false) List<String> phoneNumbers) throws IOException {
 
         // Create contact using service method
-        Person newContact = googleContactsService.createContact(givenName, familyName, email, phoneNumber);
+        Person newContact = googleContactsService.createContact(givenName, familyName, emails, phoneNumbers);
         System.out.println("Contact created: " + newContact.getResourceName());
 
-        // Redirect to contacts page after creation
         return "redirect:/contacts";
     }
+
 
     // Endpoint to update an existing contact's information
     @PostMapping("/api/contacts/update")
@@ -58,12 +58,12 @@ public class WebController {
             @RequestParam String resourceName,
             @RequestParam String givenName,
             @RequestParam String familyName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber) {
+            @RequestParam(required = false) List<String> emails,
+            @RequestParam(required = false) List<String> phoneNumbers) {
 
         try {
             // Update contact using service method
-            googleContactsService.updateContact(resourceName, givenName, familyName, email, phoneNumber);
+            googleContactsService.updateContact(resourceName, givenName, familyName, emails, phoneNumbers);
             System.out.println("Contact updated: " + resourceName);
             return "redirect:/contacts";
         } catch (IOException e) {
@@ -71,6 +71,7 @@ public class WebController {
             return "error";
         }
     }
+
 
     // Endpoint to delete a contact by its resource name
     @PostMapping("/api/contacts/delete")
