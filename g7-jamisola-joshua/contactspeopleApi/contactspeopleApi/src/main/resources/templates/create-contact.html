@@ -1,29 +1,111 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Create Contact</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Create New Contact</h2>
+<div class="container">
+    <h2>Create New Contact</h2>
+    <form action="/contacts" method="post">
+        <label for="givenName">Given Name:</label>
+        <input type="text" id="givenName" name="givenName" required><br>
 
-<form action="/contacts" method="post">
-    <label for="givenName">Given Name:</label>
-    <input type="text" id="givenName" name="givenName" required><br>
+        <label for="familyName">Family Name:</label>
+        <input type="text" id="familyName" name="familyName" required><br>
 
-    <label for="familyName">Family Name:</label>
-    <input type="text" id="familyName" name="familyName" required><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email"><br>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email"><br>
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber"><br>
 
-    <label for="phoneNumber">Phone Number:</label>
-    <input type="tel" id="phoneNumber" name="phoneNumber"><br>
+        <button type="submit">Save Contact</button>
+    </form>
 
-    <button type="submit">Save Contact</button>
-</form>
-
-<a href="/contacts">Back to Contacts</a>
+    <a href="/contacts">Back to Contacts</a>
+</div>
 
 </body>
 </html>

@@ -20,7 +20,7 @@
         border-bottom: 1px solid #ddd;
     }
     th {
-        background-color: #007bff;
+        background-color: #010463;
         color: white;
     }
     tr:nth-child(even) {
@@ -39,7 +39,7 @@
         cursor: pointer;
     }
     .edit-btn {
-        background-color: #ffc107;
+        background-color: #566118;
         border: none;
         color: white;
     }
@@ -47,17 +47,53 @@
         background-color: #dc3545;
         border: none;
         color: white;
+
+    }
+
+    .head{
+         display: flex;
+         justify-content: space-between;
+         align-items: center; /* Vertically center items */
+         padding: 10px 20px; /* Add some padding */
+         background-color: #f4f4f9; /* Light background */
+         border-bottom: 1px solid #ddd; /* Add a subtle border */
+    }
+
+    .head button{
+            padding: 10px 20px;
+            background-color: #010463;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+    }
+
+    .head button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+    }
+
+    .buttons-container {
+            display: flex;
+            align-items: center; /* Vertically center items */
+            gap: 10px;
+        }
+    .backtoprofile{
+            background-color: #a3a4e6;
     }
   </style>
 </head>
 <body>
 
-<h2>Contact List</h2>
-
-<form action="/add-contact" method="get" style="margin-top: 20px;">
-  <button type="submit">Add Contact</button>
-</form>
-
+<div class="head">
+  <h2>Contact List</h2>
+  <div class="buttons-container">
+    <a href="/user-profile">Back to Profile</a>
+    <form action="/add-contact" method="get">
+      <button type="submit">Add Contact</button>
+    </form>
+  </div>
+</div>
 <table>
   <thead>
   <tr>

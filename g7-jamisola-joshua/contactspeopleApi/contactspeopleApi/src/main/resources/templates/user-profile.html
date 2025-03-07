@@ -25,7 +25,7 @@
     </style>
 </head>
 <body>
-<div class="profile-container">
+<div class="profile-container" th:with="name=${given_name}, lastName=${family_name}, email=${email}, picture=${picture}">
     <h2>User Profile</h2>
     <img th:src="${picture}" alt="Profile Picture" class="profile-pic">
     <p><strong>Name:</strong> <span th:text="${name + ' ' + lastName}"></span></p>

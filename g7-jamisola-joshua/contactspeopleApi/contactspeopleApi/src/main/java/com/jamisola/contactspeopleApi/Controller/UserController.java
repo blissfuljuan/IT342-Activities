@@ -31,12 +31,8 @@ public class UserController {
     @GetMapping("/user-profile")
     public String getUserProfile(Model model, @AuthenticationPrincipal OAuth2User user) {
         if (user != null) {
-            model.addAttribute("name", user.getAttribute("given_name")); // First Name
-            model.addAttribute("lastName", user.getAttribute("family_name")); // Last Name
-            model.addAttribute("email", user.getAttribute("email"));
-            model.addAttribute("picture", user.getAttribute("picture"));
+            model.addAllAttributes(user.getAttributes()); // Add all attributes to the model
         }
         return "user-profile"; // Ensure user-profile.html exists
     }
-
 }
