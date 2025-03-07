@@ -5,6 +5,22 @@
     <title>Add New Contact</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script>
+        function addField(type) {
+            let container = document.getElementById(type + "Container");
+            let inputGroup = document.createElement("div");
+            inputGroup.className = "input-group mb-2";
+            inputGroup.innerHTML = `
+                <input type="${type === 'emails' ? 'email' : 'tel'}" class="form-control" name="${type}[]" required>
+                <button type="button" class="btn btn-danger" onclick="removeField(this)"><i class="bi bi-trash"></i></button>
+            `;
+            container.appendChild(inputGroup);
+        }
+
+        function removeField(button) {
+            button.parentElement.remove();
+        }
+    </script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
@@ -26,9 +42,8 @@
         </div>
     </div>
 </nav>
+
 <div class="container mt-4">
-
-
     <div class="card">
         <div class="card-header bg-primary text-white">
             <h2>Add New Contact</h2>
@@ -42,14 +57,39 @@
                     <label for="displayName" class="form-label">Name</label>
                     <input type="text" class="form-control" id="displayName" name="displayName" required>
                 </div>
+
+                <!-- Emails Section -->
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email">
+                    <label class="form-label">Emails</label>
+                    <div id="emailsContainer">
+                        <div class="input-group mb-2">
+                            <input type="email" class="form-control" name="emails[]" required>
+                            <button type="button" class="btn btn-danger" onclick="removeField(this)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addField('emails')">
+                        <i class="bi bi-plus-circle"></i> Add Email
+                    </button>
                 </div>
+
+                <!-- Phone Numbers Section -->
                 <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                    <label class="form-label">Phone Numbers</label>
+                    <div id="phoneNumbersContainer">
+                        <div class="input-group mb-2">
+                            <input type="tel" class="form-control" name="phoneNumbers[]" required>
+                            <button type="button" class="btn btn-danger" onclick="removeField(this)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addField('phoneNumbers')">
+                        <i class="bi bi-plus-circle"></i> Add Phone Number
+                    </button>
                 </div>
+
                 <div class="d-flex justify-content-between">
                     <a href="/contacts" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary">Save Contact</button>

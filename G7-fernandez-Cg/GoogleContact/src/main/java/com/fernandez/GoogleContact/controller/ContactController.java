@@ -40,15 +40,15 @@ public class ContactController {
     @PostMapping("/contact/add")
     public String addContact(
             @RequestParam("displayName") String name,
-            @RequestParam String email,
-            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) List<String> emails,
+            @RequestParam(required = false) List<String> phoneNumbers,
             @AuthenticationPrincipal OAuth2User principal,
             Model model) {
 
-        System.out.println("Adding contact: " + name + ", " + email + ", " + phoneNumber);
+        System.out.println("Adding contact: " + name + ", Emails: " + emails + ", Phone Numbers: " + phoneNumbers);
 
         try {
-            GoogleContactsService.addContact(principal, name, email, phoneNumber);
+            GoogleContactsService.addContact(principal, name, emails, phoneNumbers);
             return "redirect:/contacts";
         } catch (Exception e) {
             model.addAttribute("error", "Failed to add contact: " + e.getMessage());
@@ -83,13 +83,13 @@ public class ContactController {
         }
     }
 
-    // POST: Handle the form submission
+    // POST: Handle the form submission with multiple emails and phone numbers
     @PostMapping("/contacts/edit/people/{contactId}")
     public String updateContact(
             @PathVariable String contactId,
             @RequestParam String displayName,
-            @RequestParam String email,
-            @RequestParam String phoneNumber,
+            @RequestParam(required = false) String[] emails,
+            @RequestParam(required = false) String[] phoneNumbers,
             @AuthenticationPrincipal OAuth2User principal,
             Model model) {
 
@@ -112,27 +112,69 @@ public class ContactController {
                 updatePerson.setNames(Arrays.asList(personName));
             }
 
-            // Update email if provided
-            if (email != null && !email.isEmpty()) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setValue(email);
-                emailAddress.setType("home");
-                updatePerson.setEmailAddresses(Arrays.asList(emailAddress));
+            // Update emails if provided
+            if (emails != null && emails.length > 0) {
+                List<EmailAddress> emailAddresses = new ArrayList<>();
+
+                for (int i = 0; i < emails.length; i++) {
+                    String email = emails[i].trim();
+                    if (email != null && !email.isEmpty()) {
+                        EmailAddress emailAddress = new EmailAddress();
+                        emailAddress.setValue(email);
+
+                        // Assign different types based on index or default to "other" if more than predefined types
+                        if (i == 0) {
+                            emailAddress.setType("home");
+                        } else if (i == 1) {
+                            emailAddress.setType("work");
+                        } else {
+                            emailAddress.setType("other");
+                        }
+
+                        emailAddresses.add(emailAddress);
+                    }
+                }
+
+                if (!emailAddresses.isEmpty()) {
+                    updatePerson.setEmailAddresses(emailAddresses);
+                }
             }
 
-            // Update phone if provided
-            if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                PhoneNumber personPhone = new PhoneNumber();
-                personPhone.setValue(phoneNumber);
-                personPhone.setType("mobile");
-                updatePerson.setPhoneNumbers(Arrays.asList(personPhone));
+            // Update phone numbers if provided
+            if (phoneNumbers != null && phoneNumbers.length > 0) {
+                List<PhoneNumber> personPhones = new ArrayList<>();
+
+                for (int i = 0; i < phoneNumbers.length; i++) {
+                    String phone = phoneNumbers[i].trim();
+                    if (phone != null && !phone.isEmpty()) {
+                        PhoneNumber personPhone = new PhoneNumber();
+                        personPhone.setValue(phone);
+
+                        // Assign different types based on index
+                        if (i == 0) {
+                            personPhone.setType("mobile");
+                        } else if (i == 1) {
+                            personPhone.setType("home");
+                        } else if (i == 2) {
+                            personPhone.setType("work");
+                        } else {
+                            personPhone.setType("other");
+                        }
+
+                        personPhones.add(personPhone);
+                    }
+                }
+
+                if (!personPhones.isEmpty()) {
+                    updatePerson.setPhoneNumbers(personPhones);
+                }
             }
 
             // Determine which fields to update
             List<String> updatePersonFields = new ArrayList<>();
             if (displayName != null && !displayName.isEmpty()) updatePersonFields.add("names");
-            if (email != null && !email.isEmpty()) updatePersonFields.add("emailAddresses");
-            if (phoneNumber != null && !phoneNumber.isEmpty()) updatePersonFields.add("phoneNumbers");
+            if (emails != null && emails.length > 0) updatePersonFields.add("emailAddresses");
+            if (phoneNumbers != null && phoneNumbers.length > 0) updatePersonFields.add("phoneNumbers");
 
             // Validate that at least one field is being updated
             if (updatePersonFields.isEmpty()) {
@@ -149,6 +191,7 @@ public class ContactController {
             return "editContact"; // Return to the edit page with an error message
         }
     }
+
 
     @DeleteMapping("/contacts/delete/{contactId}")
     @ResponseBody

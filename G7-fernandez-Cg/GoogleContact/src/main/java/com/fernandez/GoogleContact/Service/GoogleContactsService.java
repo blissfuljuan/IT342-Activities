@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -84,8 +85,7 @@ public class GoogleContactsService {
 
         return response.getConnections() != null ? response.getConnections() : new ArrayList<>();
     }
-
-    public void addContact(OAuth2User principal, String name, String email, String phoneNumber) {
+    public void addContact(OAuth2User principal, String name, List<String> emails, List<String> phoneNumbers) {
         try {
             PeopleService peopleService = getPeopleService(principal);
 
@@ -96,22 +96,34 @@ public class GoogleContactsService {
             Name personName = new Name();
             personName.setDisplayName(name);
             personName.setGivenName(name);
-            newPerson.setNames(Arrays.asList(personName));
+            newPerson.setNames(Collections.singletonList(personName));
 
-            // Add email if provided
-            if (email != null && !email.isEmpty()) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setValue(email);
-                emailAddress.setType("home");
-                newPerson.setEmailAddresses(Arrays.asList(emailAddress));
+            // Add emails if provided
+            if (emails != null && !emails.isEmpty()) {
+                List<EmailAddress> emailAddresses = new ArrayList<>();
+                for (String email : emails) {
+                    if (email != null && !email.isEmpty()) {
+                        EmailAddress emailAddress = new EmailAddress();
+                        emailAddress.setValue(email);
+                        emailAddress.setType("home");
+                        emailAddresses.add(emailAddress);
+                    }
+                }
+                newPerson.setEmailAddresses(emailAddresses);
             }
 
-            // Add phone if provided
-            if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                PhoneNumber personPhone = new PhoneNumber();
-                personPhone.setValue(phoneNumber);
-                personPhone.setType("mobile");
-                newPerson.setPhoneNumbers(Arrays.asList(personPhone));
+            // Add phone numbers if provided
+            if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
+                List<PhoneNumber> phoneList = new ArrayList<>();
+                for (String phone : phoneNumbers) {
+                    if (phone != null && !phone.isEmpty()) {
+                        PhoneNumber personPhone = new PhoneNumber();
+                        personPhone.setValue(phone);
+                        personPhone.setType("mobile");
+                        phoneList.add(personPhone);
+                    }
+                }
+                newPerson.setPhoneNumbers(phoneList);
             }
 
             // Create the contact
@@ -123,20 +135,33 @@ public class GoogleContactsService {
 
     public void updateContact(OAuth2User principal, String resourceName, Person updatePerson, List<String> updatePersonFields) {
         try {
+            if (updatePerson == null) {
+                throw new IllegalArgumentException("updatePerson object cannot be null.");
+            }
+
+            if (updatePersonFields == null || updatePersonFields.isEmpty()) {
+                throw new IllegalArgumentException("No fields specified for update.");
+            }
+
             PeopleService peopleService = getPeopleService(principal);
 
+            // Ensure the fields to be updated are properly formatted
+            String fieldsToUpdate = String.join(",", updatePersonFields);
+
             // Perform the update
-            peopleService.people().updateContact(resourceName, updatePerson)
-                    .setUpdatePersonFields(String.join(",", updatePersonFields))
+            peopleService.people()
+                    .updateContact(resourceName, updatePerson)
+                    .setUpdatePersonFields(fieldsToUpdate)  // Specify which fields to update
+                    .setPersonFields("emailAddresses,phoneNumbers,names")  // Include all necessary fields
                     .execute();
 
-            System.out.println("Contact updated successfully: {}"+ resourceName);
-
         } catch (IOException e) {
-            System.out.println("Failed to update contact: {}"+ e.getMessage()+ e);
-            throw new RuntimeException("Failed to update contact: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to update contact due to I/O error: " + e.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Unexpected error while updating contact: " + e.getMessage(), e);
         }
     }
+
 
     public void deleteContact(OAuth2User principal, String resourceName) {
         try {

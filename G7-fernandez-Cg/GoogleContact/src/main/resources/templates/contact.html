@@ -62,11 +62,15 @@
                     <span th:unless="${not #lists.isEmpty(contact.names)}">N/A</span>
                 </td>
                 <td>
-                    <span th:if="${not #lists.isEmpty(contact.emailAddresses)}" th:text="${contact.emailAddresses[0].value}">Email</span>
+                    <ul class="list-unstyled" th:if="${not #lists.isEmpty(contact.emailAddresses)}">
+                        <li th:each="email : ${contact.emailAddresses}" th:text="${email.value}"></li>
+                    </ul>
                     <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}">N/A</span>
                 </td>
                 <td>
-                    <span th:if="${not #lists.isEmpty(contact.phoneNumbers)}" th:text="${contact.phoneNumbers[0].value}">Phone</span>
+                    <ul class="list-unstyled" th:if="${not #lists.isEmpty(contact.phoneNumbers)}">
+                        <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}"></li>
+                    </ul>
                     <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}">N/A</span>
                 </td>
                 <td>
