@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <link rel="stylesheet" th:href="@{/css/contacts.css}">
+    <link rel="stylesheet" href="contacts.css">
+    <script>
+        function confirmDelete(firstName, lastName) {
+            // Create a meaningful confirmation message using the contact's name
+            const name = (firstName || '') + ' ' + (lastName || '');
+            const displayName = name.trim() || 'this contact';
+            
+            // Show confirmation dialog
+            return confirm('Are you sure you want to delete ' + displayName + '?');
+        }
+    </script>
+</head>
+<body>
+    <div class="header-container">
+        <h2>Your Google Contacts</h2>
+        <a href="/logout">Logout</a>
+    </div>
+    
+    <h3>Contact Management</h3>
+    <a href="/contacts/create" class="button">+ New Contact</a>
+    <!-- Error Message Handling -->
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <p th:if="${message}" th:text="${message}" style="color: green;"></p>
+
+    <!-- Contacts Table -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="contact : ${contacts}">
+                <td th:text="${contact.names != null and contact.names.size() > 0 ? contact.names[0].givenName : 'N/A'}">First Name</td>
+                <td th:text="${contact.names != null and contact.names.size() > 0 ? contact.names[0].familyName : 'N/A'}">Last Name</td>
+                <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'N/A'}">Email</td>
+                <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'N/A'}">Phone</td>
+                <td>
+                    <!-- Add this test link next to your existing Update link -->
+                    <a th:href="@{'/edit?resourceName=' + ${contact.resourceName}}" class="button update-button">Update Contact</a>
+                    <form action="/contacts/delete" method="post" style="display:inline;"
+                      th:onsubmit="return confirmDelete([[${contact.names != null and contact.names.size() > 0 ? contact.names[0].givenName : ''}]], 
+                                                       [[${contact.names != null and contact.names.size() > 0 ? contact.names[0].familyName : ''}]])">
+                    <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                    <button type="submit">Delete</button>
+                </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <!-- Form to Create a New Contact -->
+    <!-- <form action="/contacts" method="post">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required>
+        <br>
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required>
+        <br>
+        <button type="submit">Create Contact</button>
+    </form> -->
+
+</body>
+</html>

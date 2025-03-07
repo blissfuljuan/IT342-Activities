@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Contact</title>
+    <link rel="stylesheet" th:href="@{/css/contacts.css}">
+    <link rel="stylesheet" href="contacts.css">
+</head>
+<body>
+    
+    <!-- Error Message Handling -->
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    
+    <!-- Update Form -->
+    <div class="contact-container">
+        <h1 class="h2-create"><span class="blue-text">Update</span> <span class="white-text">Contact</span></h1>
+        <form action="/contacts/update" method="post">
+            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+            
+            <label for="firstName">First Name:</label>
+            <br>
+            <input type="text" id="firstName" name="firstName" 
+                th:value="${contact.names != null and contact.names.size() > 0 ? contact.names[0].givenName : ''}" required>
+            <br>
+            
+            <label for="lastName">Last Name:</label>
+            <br>
+            <input type="text" id="lastName" name="lastName" 
+                th:value="${contact.names != null and contact.names.size() > 0 ? contact.names[0].familyName : ''}" required>
+            <br>
+            
+            <label for="email">Email:</label>
+            <br>
+            <input type="email" id="email" name="email" 
+                th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}" required>
+            <br>
+            
+            <label for="phone">Phone:</label>
+            <br>
+            <input type="text" id="phone" name="phone" 
+                th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}" required>
+            <br>
+            
+            <button class="create-contact" type="submit">Update Contact</button>
+        </form>
+            <a href="/contacts" class="back-button">Back to Contacts</a>
+        
+    </div>
+    
+</body>
+</html>
