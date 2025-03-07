@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/IT342-Activities-Solasco.iml" filepath="$PROJECT_DIR$/.idea/IT342-Activities-Solasco.iml" />
-      <module fileurl="file://$PROJECT_DIR$/g1-solasco-ephraimjay/oauth2login/oauth2login.iml" filepath="$PROJECT_DIR$/g1-solasco-ephraimjay/oauth2login/oauth2login.iml" />
     </modules>
   </component>
 </project>

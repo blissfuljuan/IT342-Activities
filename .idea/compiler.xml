@@ -9,9 +9,6 @@
         <module name="oauth2login" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="oauth2login" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
