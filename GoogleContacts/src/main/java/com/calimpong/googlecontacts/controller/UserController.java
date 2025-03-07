@@ -62,7 +62,7 @@ public class UserController {
 
     @GetMapping("/contact/add-form")
     public String showAddContactForm(Model model) {
-        return "addContact";
+        return "add-contact";
     }
 
     @PostMapping("/contact/add")
@@ -100,7 +100,7 @@ public class UserController {
             // Add the contact to the model
             model.addAttribute("contact", contact);
             // Return the edit form template
-            return "editContact";
+            return "edit-contact";
         } catch (RuntimeException e) {
             // Log the error and add an error message to the model
             model.addAttribute("error", "Failed to load contact: " + e.getMessage());
@@ -163,7 +163,7 @@ public class UserController {
 
         } catch (RuntimeException e) {
             model.addAttribute("error", "Failed to update contact: " + e.getMessage());
-            return "editContact"; // Return to the edit page with an error message
+            return "edit-contact"; // Return to the edit page with an error message
         }
     }
 
