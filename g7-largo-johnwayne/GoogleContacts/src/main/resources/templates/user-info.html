@@ -1,114 +1,505 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User Info - Google Contacts</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Royal Contacts - User Profile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
+        :root {
+            --royal-purple: #4a0080;
+            --royal-purple-dark: #370060;
+            --royal-purple-light: #6920a5;
+            --royal-lavender: #c7a4e5;
+            --royal-gold: #e7bd45;
+            --royal-cream: #f7f3e8;
+            --royal-black: #1a0033;
+            --royal-success: #448853;
+            --royal-danger: #a23645;
+        }
+        
         body {
-            background-color: #f8f2ff; /* Soft purple background */
-            font-family: Arial, sans-serif;
+            background-color: #f2edf8;
+            font-family: 'Raleway', sans-serif;
+            color: #333;
+            background-image: linear-gradient(135deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%),
+                              linear-gradient(225deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%),
+                              linear-gradient(315deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%),
+                              linear-gradient(45deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%);
+            background-size: 25px 25px;
         }
-
-        .container {
-            max-width: 750px;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        
+        h1, h2, h3, h4, h5, .card-title, .navbar-brand {
+            font-family: 'Playfair Display', serif;
         }
-
+        
         .navbar {
-            background: linear-gradient(90deg, #6a0dad, #a155b9);
-            padding: 10px 15px;
+            background: linear-gradient(to right, var(--royal-purple), var(--royal-purple-light));
+            border-bottom: 3px solid var(--royal-gold);
+            padding: 0.75rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
-
-        .navbar a {
-            color: white !important;
-        }
-
-        .user-info {
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white;
+            font-size: 1.75rem;
             display: flex;
             align-items: center;
-            background-color: #e9d7ff; /* Light purple */
-            padding: 15px;
-            border-radius: 8px;
+            gap: 12px;
+            letter-spacing: 0.5px;
         }
-
-        .profile-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-right: 15px;
-            object-fit: cover;
-            border: 2px solid #6a0dad;
+        
+        .navbar-brand i {
+            color: var(--royal-gold);
+            font-size: 1.75rem;
         }
-
-        .user-details h3 {
-            margin: 0;
-            color: #6a0dad;
+        
+        .royal-crown {
+            display: inline-block;
+            margin-right: 5px;
+            color: var(--royal-gold);
         }
-
-        .user-details p {
-            margin: 5px 0;
-            color: #555;
+        
+        .navbar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+            padding: 8px 16px;
+            position: relative;
         }
-
-        .btn {
-            background: #6a0dad;
+        
+        .navbar .nav-link::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -3px;
+            left: 50%;
+            background-color: var(--royal-gold);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .navbar .nav-link:hover::after, 
+        .navbar .nav-link.active::after {
+            width: 80%;
+        }
+        
+        .navbar .nav-link:hover, 
+        .navbar .nav-link.active {
             color: white;
-            padding: 10px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: 0.3s ease-in-out;
+        }
+        
+        .navbar .nav-link.logout {
+            color: white;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        
+        .navbar .nav-link.logout:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: var(--royal-gold);
+        }
+        
+        .navbar .nav-link.logout::after {
+            display: none;
+        }
+        
+        .container {
+            max-width: 1000px;
+            padding: 30px 20px;
+        }
+        
+        .page-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--royal-purple);
+        }
+        
+        .page-title::after {
+            content: "";
+            display: block;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(to right, var(--royal-gold), transparent);
+            margin-top: 8px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background-color: white;
+            position: relative;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--royal-purple), var(--royal-purple-light));
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            margin-bottom: 0;
+            color: var(--royal-purple);
+            font-weight: 700;
+            font-size: 1.75rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        
+        .btn-royal {
+            background-color: var(--royal-purple);
+            border-color: var(--royal-purple);
+            color: white;
+        }
+        
+        .btn-royal:hover {
+            background-color: var(--royal-purple-dark);
+            border-color: var(--royal-purple-dark);
+            color: white;
+            box-shadow: 0 4px 8px rgba(74, 0, 128, 0.3);
+        }
+        
+        .btn-gold {
+            background-color: var(--royal-gold);
+            border-color: var(--royal-gold);
+            color: var(--royal-black);
+        }
+        
+        .btn-gold:hover {
+            background-color: #d3aa3a;
+            border-color: #d3aa3a;
+            color: var(--royal-black);
+            box-shadow: 0 4px 8px rgba(231, 189, 69, 0.3);
+        }
+        
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .profile-image-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-image-container::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(135deg, var(--royal-purple), var(--royal-purple-light));
+            border-radius: 50%;
+            z-index: 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+        
+        .profile-name {
+            font-size: 2.5rem;
+            color: var(--royal-purple);
+            margin-bottom: 0.5rem;
+            position: relative;
             display: inline-block;
         }
-
-        .btn:hover {
-            background: #4e087b;
+        
+        .profile-name::after {
+            content: "";
+            display: block;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(to right, var(--royal-gold), transparent);
+            margin: 8px auto 0;
+        }
+        
+        .profile-email {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background-color: #f8f5fd;
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-width: 150px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--royal-purple);
+            margin-bottom: 0.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Profile avatar fallback */
+        .profile-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--royal-purple-light), var(--royal-purple));
+            color: white;
+            font-size: 4rem;
+            font-weight: 600;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Animation for the whole card */
+        .reveal-card {
+            animation: revealCard 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes revealCard {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Shine effect */
+        .card::after {
+            content: "";
+            position: absolute;
+            top: -110%;
+            left: -210%;
+            width: 200%;
+            height: 200%;
+            opacity: 0;
+            transform: rotate(30deg);
+            background: rgba(255, 255, 255, 0.13);
+            background: linear-gradient(
+                to right, 
+                rgba(255, 255, 255, 0.13) 0%,
+                rgba(255, 255, 255, 0.13) 77%,
+                rgba(255, 255, 255, 0.5) 92%,
+                rgba(255, 255, 255, 0.0) 100%
+            );
+            animation: shine 3s ease-in-out 1s;
+        }
+        
+        @keyframes shine {
+            to {
+                opacity: 1;
+                top: -30%;
+                left: -30%;
+                transition-property: left, top, opacity;
+                transition-duration: 0.7s, 0.7s, 0.15s;
+                transition-timing-function: ease;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
+        <div class="container">
+            <a class="navbar-brand" href="/contacts">
+                <i class="bi bi-gem"></i>
+                Contacts
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/contacts">Contacts</a>
+                        <a class="nav-link" href="/contacts">
+                            <i class="bi bi-journals"></i> Contacts
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/user-info">Profile</a>
+                        <a class="nav-link active" href="/user-info">
+                            <i class="bi bi-person-badge"></i> Profile
+                        </a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
+                        <a class="nav-link logout" href="/logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
-    <div class="container mt-4">
-        <h1 class="text-center text-purple">User Information</h1>
-
-        <div class="user-info">
-            <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
-            <div class="user-details">
-                <h3>Welcome, <span th:text="${name}">User</span>!</h3>
-                <p>Email: <span th:text="${email}">email@example.com</span></p>
+    
+    <div class="container">
+        <h1 class="page-title">Your Profile</h1>
+        
+        <div class="card reveal-card">
+            <div class="card-body">
+                <div class="profile-section">
+                    <div class="profile-image-container">
+                        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+                        <div th:unless="${pictureUrl}" class="profile-placeholder">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 class="profile-name" th:text="${name}">Royal User</h2>
+                    <p class="profile-email" th:text="${email}">royaluser@example.com</p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="stat-label">Connected Accounts</div>
+                            <div class="mt-2">Google</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="stat-label">Account Status</div>
+                            <div class="mt-2">Active</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="stat-label">Login Status</div>
+                            <div class="mt-2">Authenticated</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="/contacts" class="btn btn-royal btn-icon">
+                            <i class="bi bi-journal-text"></i> View Contacts
+                        </a>
+                        <a href="/logout" class="btn btn-gold btn-icon">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="text-center mt-4">
-            <a href="/contacts" class="btn">View My Contacts</a>
-            <a href="/logout" class="btn">Logout</a>
-        </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script>
+        // Animation timing
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                // Add any additional animations here if needed
+            }, 800);
+        });
+    </script>
 </body>
 </html>
