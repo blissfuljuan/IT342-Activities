@@ -62,7 +62,6 @@ public class GoogleContactsController {
                     .setEmailAddresses(List.of(new EmailAddress().setValue(email)))
                     .setPhoneNumbers(List.of(new PhoneNumber().setValue(phone)));
 
-           
             Person createdContact = googleContactsService.createContact(authentication, contact);
             model.addAttribute("message", "Contact created successfully: " + createdContact.getResourceName());
         } catch (GeneralSecurityException | IOException e) {
@@ -70,7 +69,30 @@ public class GoogleContactsController {
         }
         return "redirect:/dashboard";
     }
-    
+
+    @PostMapping("/contacts/update")
+    public String updateContact(OAuth2AuthenticationToken authentication,
+                                @RequestParam String resourceName,
+                                @RequestParam String firstName,
+                                @RequestParam String lastName,
+                                @RequestParam String email,
+                                @RequestParam String phone,
+                                Model model) {
+
+        try {
+            Person contact = new Person()
+                    .setNames(List.of(new Name().setGivenName(firstName).setFamilyName(lastName)))
+                    .setEmailAddresses(List.of(new EmailAddress().setValue(email)))
+                    .setPhoneNumbers(List.of(new PhoneNumber().setValue(phone)));
+
+
+            Person updatedContact = googleContactsService.updateContact(authentication, resourceName, contact);
+            model.addAttribute("message", "Contact updated successfully: " + updatedContact.getResourceName());
+        } catch (GeneralSecurityException | IOException e) {
+            model.addAttribute("error", "Failed to update contact: " + e.getMessage());
+        }
+        return "redirect:/dashboard";
+    }
     @PostMapping("/contacts/delete")
     public String deleteContact(OAuth2AuthenticationToken authentication,
                                 @RequestParam String resourceName,

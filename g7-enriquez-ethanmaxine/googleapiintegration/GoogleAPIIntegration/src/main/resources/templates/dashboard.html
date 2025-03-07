@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Google Contacts</title>
+    <title>Google Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
-<body>
-  <h1>Google Contacts</h1>
-    <!-- Form to Create a New Contact -->
 
-    <h2>Create New Contact</h2>
-    <form th:action="@{/create-contact}" method="post">
+<body>
+<h1 class="Title">Google Contacts</h1>
+
+<h2 class="Header">Create New Contact</h2>
+    <form class="CreateContactForms" th:action="@{/create-contact}" method="post">
       <label for="firstName">First Name:</label>
       <input type="text" id="firstName" name="firstName" required><br><br>
     
@@ -25,7 +28,7 @@
     </form>
     
 
-  <table border="1">
+  <table class="Table">
       <thead>
           <tr>
               <th>Name</th>
@@ -40,11 +43,41 @@
               <td th:text="${contact['names'] != null ? contact['names'][0]['displayName'] : 'N/A'}">Name</td>
               <td th:text="${contact['emailAddresses'] != null ? contact['emailAddresses'][0]['value'] : 'N/A'}">Email</td>
               <td th:text="${contact['phoneNumbers'] != null ? contact['phoneNumbers'][0]['value'] : 'N/A'}">Phone</td>
-              <td></td>
+              <td>
+                  <form th:action="@{/contacts/update}" method="post" style="display:inline;">
+                          <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+
+                          <label for="firstName">First Name:</label>
+                          <br>
+                          <input type="text" id="firstName" name="firstName"
+                                 th:value="${contact.names != null and contact.names.size() > 0 ? contact.names[0].givenName : ''}" required>
+                          <br>
+
+                          <label for="lastName">Last Name:</label>
+                          <br>
+                          <input type="text" id="lastName" name="lastName"
+                                 th:value="${contact.names != null and contact.names.size() > 0 ? contact.names[0].familyName : ''}" required>
+                          <br>
+
+                          <label for="email">Email:</label>
+                          <br>
+                          <input type="email" id="email" name="email"
+                                 th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}" required>
+                          <br>
+
+                          <label for="phone">Phone:</label>
+                          <br>
+                          <input type="text" id="phone" name="phone"
+                                 th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}" required>
+                          <br>
+
+                          <button class="create-contact" type="submit">Update Contact</button>
+                      </form>
+              </td>
               <td>
                 <form th:action="@{/contacts/delete}" method="post" style="display:inline;">
                   <input type="hidden" name="resourceName" th:value="${contact['resourceName'] != null ? contact['resourceName'] : ''}">
-                  <button type="submit">Delete</button>
+                  <button type="submit" class="DeleteButton">Delete</button>
               </form>
               </td>
           </tr>

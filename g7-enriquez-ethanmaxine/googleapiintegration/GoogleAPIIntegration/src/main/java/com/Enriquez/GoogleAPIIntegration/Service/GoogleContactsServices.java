@@ -11,20 +11,18 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.services.people.v1.model.*;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
 import com.google.api.services.people.v1.model.Person;
 
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import com.Enriquez.GoogleAPIIntegration.DTO.Contact;
 
-import org.springframework.http.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @Service
 public class GoogleContactsServices {
@@ -93,7 +91,43 @@ public class GoogleContactsServices {
 
         return createdContact;
     }
-    
+
+    public Person updateContact(OAuth2AuthenticationToken authentication, String resourceName, Person updatedContact) throws GeneralSecurityException, IOException {
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                authentication.getAuthorizedClientRegistrationId(),
+                authentication.getName()
+        );
+        if (authorizedClient == null) {
+            throw new IllegalStateException("OAuth2AuthorizedClient not found for user: " + authentication.getName());
+        }
+
+        String accessToken = authorizedClient.getAccessToken().getTokenValue();
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new IllegalStateException("Access token is missing or invalid.");
+        }
+
+        PeopleService peopleService = new PeopleService.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                JSON_FACTORY,
+                request -> request.getHeaders().setAuthorization("Bearer " + accessToken)
+        ).setApplicationName(APPLICATION_NAME).build();
+
+        Person existingContact = peopleService.people().get(resourceName)
+                .setPersonFields("names,emailAddresses,phoneNumbers")
+                .execute();
+
+        // Set the fields to be updated from the updatedContact
+        existingContact.setNames(updatedContact.getNames());
+        existingContact.setEmailAddresses(updatedContact.getEmailAddresses());
+        existingContact.setPhoneNumbers(updatedContact.getPhoneNumbers());
+
+        Person result = peopleService.people().updateContact(resourceName, existingContact)
+                .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
+                .execute();
+
+        return result;
+    }
+
     public void deleteContact(OAuth2AuthenticationToken authentication, String resourceName) throws GeneralSecurityException, IOException {
         OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
             authentication.getAuthorizedClientRegistrationId(),

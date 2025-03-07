@@ -1,0 +1,172 @@
+/*Title and Banner*/
+/* Full-page centering */
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  background-color: #f4f4f4;
+}
+
+/* Styling for main title */
+.Title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #007bff;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Styling for section header */
+.Header {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 2px;
+  width: fit-content;
+}
+
+
+
+/*My Create Account Forms*/
+/* Centering the form */
+.CreateContactForms {
+  width: 50%;
+  max-width: 380px;
+  margin: 50px auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling labels */
+.CreateContactForms label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+/* Styling input fields */
+.CreateContactForms input {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* Input focus effect */
+.CreateContactForms input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Styling the button */
+.CreateContactForms button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+/* Button hover effect */
+.CreateContactForms button:hover {
+  background: #0056b3;
+}
+
+/** Table styling */
+
+.Table {
+  width: 200vh;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Header row */
+thead {
+  background-color: #007bff;
+  color: white;
+  font-size: 18px;
+  text-align: left;
+}
+
+/* Table headers */
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Table rows */
+tbody tr:hover {
+  background-color: #f4f4f4;
+}
+
+/* Update & Delete buttons */
+button {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"] {
+  margin-top: 10px;
+}
+
+/* Update button */
+.create-contact {
+  background-color: #28a745;
+}
+
+.create-contact:hover {
+  background-color: #218838;
+}
+
+/* Delete button */
+.DeleteButton {
+  background-color: #dc3545;
+  margin-left: 25%;
+}
+
+form[th\\:action="@{/contacts/delete}"] button:hover {
+  background-color:#e63b15;
+
+}
+
+/* Input fields in form */
+input[type="text"], input[type="email"] {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Forms inside table cells */
+td form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
