@@ -4,6 +4,8 @@ import com.example.gadiane.johnkarl.demolition.model.ContactForm;
 import com.example.gadiane.johnkarl.demolition.service.GoogleContactsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -115,38 +117,43 @@ public class ContactController {
         }
     }
 
-    @PostMapping("/edit")
-    public String updateContact(@ModelAttribute ContactForm contactForm, RedirectAttributes redirectAttributes) {
+    @PutMapping("/edit/{resourceId}")
+    @ResponseBody
+    public ResponseEntity<ContactForm> updateContact(
+            @PathVariable String resourceId,
+            @RequestBody ContactForm contactForm) {
         try {
-            logger.info("Attempting to update contact with resource name: {}", contactForm.getResourceName());
+            logger.info("Attempting to update contact with resource name: {}", resourceId);
             logger.info("Contact form data: firstName={}, lastName={}, email={}, phone={}", 
                       contactForm.getFirstName(), contactForm.getLastName(), 
                       contactForm.getEmail(), contactForm.getPhoneNumber());
             
-            Map<String, Object> result = contactsService.updateContact(contactForm);
-            redirectAttributes.addFlashAttribute("successMessage", "Contact updated successfully!");
-            return "redirect:/contacts";
-        } catch (IOException e) {
-            logger.error("Error updating contact", e);
-            logger.error("Exception class: {}", e.getClass().getName());
-            logger.error("Exception message: {}", e.getMessage());
+            // Ensure resourceName is properly formatted
+            String decodedResourceId = URLDecoder.decode(resourceId, StandardCharsets.UTF_8.toString());
             
-            // Get stack trace as string for detailed logging
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            logger.error("Stack trace: {}", sw.toString());
+            // Fix potential duplicate "people/" prefix
+            decodedResourceId = decodedResourceId.replace("people/people/", "people/");
             
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update contact: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("contactForm", contactForm);
-            
-            // Ensure resourceName doesn't have 'people/' prefix when redirecting
-            String resourceName = contactForm.getResourceName();
-            if (resourceName != null && resourceName.startsWith("people/")) {
-                resourceName = resourceName.substring(7);
+            if (!decodedResourceId.startsWith("people/")) {
+                decodedResourceId = "people/" + decodedResourceId;
             }
             
-            return "redirect:/contacts/edit/" + resourceName;
+            logger.info("Formatted resource ID for update: {}", decodedResourceId);
+            
+            // Set the resource name in the contactForm
+            contactForm.setResourceName(decodedResourceId);
+            
+            // Update contact
+            Map<String, Object> result = contactsService.updateContact(contactForm);
+            
+            // Log successful update
+            logger.info("Contact updated successfully: {}", result);
+            
+            return ResponseEntity.ok(contactForm);
+        } catch (IOException e) {
+            logger.error("Error updating contact: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
     }
 

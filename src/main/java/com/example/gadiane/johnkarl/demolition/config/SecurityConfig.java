@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -17,6 +18,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/").permitAll()
                                 .requestMatchers("/webjars/**", "/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/contacts/**").authenticated()
                                 .requestMatchers("/api/contacts/**").authenticated()
                                 .requestMatchers("/contacts/**").authenticated()
                                 .anyRequest().authenticated())

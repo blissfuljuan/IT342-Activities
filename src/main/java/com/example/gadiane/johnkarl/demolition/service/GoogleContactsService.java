@@ -157,23 +157,45 @@ public class GoogleContactsService {
                 resourceName = "people/" + resourceName;
             }
             
+            // Fix potential duplicate "people/" prefix
+            resourceName = resourceName.replace("people/people/", "people/");
+            
             // Get OAuth2 access token
             String accessToken = googleCredentialService.getCredential().getAccessToken();
             logger.info("Access token obtained for update operation");
             
-            // Create headers with OAuth2 token
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(accessToken);
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            // First, get the existing contact to retrieve its etag
+            HttpRequestFactory getRequestFactory = httpTransport.createRequestFactory(request -> 
+                request.setParser(jsonFactory.createJsonObjectParser())
+                      .setHeaders(request.getHeaders().setAuthorization(
+                          "Bearer " + accessToken)));
+            
+            String getUrl = PEOPLE_API_BASE_URL + "/" + resourceName + "?personFields=names,emailAddresses,phoneNumbers";
+            logger.info("Fetching existing contact data from URL: {}", getUrl);
+            
+            HttpRequest getRequest = getRequestFactory.buildGetRequest(new GenericUrl(getUrl));
+            HttpResponse getResponse = getRequest.execute();
+            
+            // Parse the response to get the etag
+            Map<String, Object> existingContact = getResponse.parseAs(Map.class);
+            String etag = (String) existingContact.get("etag");
+            
+            logger.info("Retrieved etag for contact: {}", etag);
             
             // Create the contact data payload
             Map<String, Object> contactData = new HashMap<>();
+            
+            // Add etag field with the exact value from the existing contact
+            contactData.put("etag", etag);
+            contactData.put("resourceName", resourceName);
             
             // Add names
             List<Map<String, Object>> names = new ArrayList<>();
             Map<String, Object> name = new HashMap<>();
             name.put("givenName", contactForm.getFirstName());
             name.put("familyName", contactForm.getLastName());
+            name.put("displayName", contactForm.getFirstName() + " " + contactForm.getLastName());
+            name.put("unstructuredName", contactForm.getFirstName() + " " + contactForm.getLastName());
             
             // Add metadata for names
             Map<String, Object> metadata = new HashMap<>();
@@ -189,6 +211,7 @@ public class GoogleContactsService {
             if (contactForm.getEmail() != null && !contactForm.getEmail().isEmpty()) {
                 Map<String, Object> email = new HashMap<>();
                 email.put("value", contactForm.getEmail());
+                email.put("type", "home");
                 
                 // Add metadata for email
                 Map<String, Object> emailMetadata = new HashMap<>();
@@ -205,6 +228,7 @@ public class GoogleContactsService {
             if (contactForm.getPhoneNumber() != null && !contactForm.getPhoneNumber().isEmpty()) {
                 Map<String, Object> phone = new HashMap<>();
                 phone.put("value", contactForm.getPhoneNumber());
+                phone.put("type", "mobile");
                 
                 // Add metadata for phone
                 Map<String, Object> phoneMetadata = new HashMap<>();
@@ -217,45 +241,32 @@ public class GoogleContactsService {
             }
             
             // Construct the correct URL according to the API documentation
-            // Format: PATCH https://people.googleapis.com/v1/{resourceName}:updateContact
+            // Format: https://people.googleapis.com/v1/{resourceName}:updateContact
             String updateUrl = PEOPLE_API_BASE_URL + "/" + resourceName + ":updateContact?updatePersonFields=names,emailAddresses,phoneNumbers";
             logger.info("Update URL: {}", updateUrl);
             
             // Log the request payload for debugging
             logger.info("Update payload: {}", new GsonFactory().toString(contactData));
             
-            // Create the HTTP request with proper headers
-            HttpEntity<Map<String, Object>> requestEntity = 
-                new HttpEntity<>(contactData, headers);
+            // Use Google's HTTP client directly for PATCH requests instead of PUT
+            HttpRequestFactory requestFactory = httpTransport.createRequestFactory(request -> 
+                request.setParser(jsonFactory.createJsonObjectParser())
+                      .setHeaders(request.getHeaders().setAuthorization(
+                          "Bearer " + accessToken)));
             
-            // Use Google's HTTP client directly for PATCH requests
-            com.google.api.client.http.HttpRequestFactory requestFactory = 
-                new com.google.api.client.http.javanet.NetHttpTransport().createRequestFactory();
-            
-            com.google.api.client.http.GenericUrl genericUrl = new com.google.api.client.http.GenericUrl(updateUrl);
-            
-            // Convert the Map to JSON string
-            String jsonPayload = new GsonFactory().toPrettyString(contactData);
+            JsonHttpContent content = new JsonHttpContent(jsonFactory, contactData);
             
             // Create and execute the PATCH request
-            com.google.api.client.http.HttpRequest request = requestFactory.buildPatchRequest(
-                genericUrl, 
-                new com.google.api.client.http.json.JsonHttpContent(
-                    new GsonFactory(), 
-                    contactData
-                )
+            HttpRequest request = requestFactory.buildPatchRequest(
+                new GenericUrl(updateUrl), 
+                content
             );
             
-            // Add authorization header
-            request.getHeaders().setAuthorization("Bearer " + accessToken);
-            
             // Execute the request
-            com.google.api.client.http.HttpResponse httpResponse = request.execute();
+            HttpResponse httpResponse = request.execute();
             
             // Parse the response
-            InputStream content = httpResponse.getContent();
-            Map<String, Object> response = new GsonFactory().fromInputStream(content, Map.class);
-            content.close();
+            Map<String, Object> response = httpResponse.parseAs(Map.class);
             
             logger.info("Contact updated successfully: {}", response);
             return response;

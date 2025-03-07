@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Google Contacts Manager</title>
+</head>
+<body>
+    <div th:replace="~{main :: body(content=~{::content})}">
+        <div th:fragment="content">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h3><i class="bi bi-box-arrow-in-right me-2"></i>Login</h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="lead mb-4">Please sign in with your Google account to access Google Contacts</p>
+                            
+                            <div class="d-grid gap-3 col-8 mx-auto">
+                                <a href="/oauth2/authorization/google" class="btn btn-lg btn-primary">
+                                    <i class="bi bi-google me-2"></i>Sign in with Google
+                                </a>
+                                <a href="/" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to Home
+                                </a>
+                            </div>
+                            
+                            <div class="alert alert-info mt-4">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                You will need to grant permission to access your Google Contacts.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
