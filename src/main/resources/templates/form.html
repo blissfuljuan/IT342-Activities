@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Form - Google Contacts Manager</title>
+</head>
+<body>
+    <div th:replace="~{main :: body(content=~{::content})}">
+        <div th:fragment="content">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h3 th:text="${contactForm.resourceName != null ? 'Edit Contact' : 'Create New Contact'}">
+                                Contact Form
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="${contactForm.resourceName != null ? '/contacts/edit' : '/contacts/new'}" 
+                                  th:object="${contactForm}" method="post">
+                                
+                                <!-- Add CSRF token -->
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                
+                                <!-- Make sure resourceName is included for edit operations -->
+                                <input type="hidden" th:if="${contactForm.resourceName != null}" 
+                                       th:field="*{resourceName}" />
+                                
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text" class="form-control" id="firstName" 
+                                               th:field="*{firstName}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text" class="form-control" id="lastName" 
+                                               th:field="*{lastName}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" 
+                                               th:field="*{email}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input type="tel" class="form-control" id="phoneNumber" 
+                                               th:field="*{phoneNumber}">
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a th:href="@{/contacts}" class="btn btn-secondary me-md-2">
+                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <span th:text="${contactForm.resourceName != null ? 'Update' : 'Create'}">Submit</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
