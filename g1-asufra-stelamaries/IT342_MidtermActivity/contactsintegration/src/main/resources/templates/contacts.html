@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <!-- Removed intl-tel-input CSS -->
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -164,7 +164,7 @@
         }
         .modal-body {
             margin-bottom: 20px;
-            text-align: center; /* Added to center the text */
+            text-align: center;
         }
         .field-group {
             margin-bottom: 15px;
@@ -317,7 +317,7 @@
                         <label>First Name:</label>
                         <input type="text" id="firstName" name="firstName">
                     </div>
-                    <div class="name-field">
+                    <div name-field>
                         <label>Last Name:</label>
                         <input type="text" id="lastName" name="lastName">
                     </div>
@@ -342,7 +342,7 @@
                     <div class="field-row">
                         <div id="phoneFields" class="field-list">
                             <div class="phone-item">
-                                <input type="tel" name="phones" class="phone-input">
+                                <input type="tel" name="phones" placeholder="Phone Number">
                             </div>
                         </div>
                         <button type="button" class="add-btn" onclick="addField('phoneFields', 'tel')">
@@ -372,7 +372,6 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
     <script>
         let phoneInputs = [];
         let pendingDeleteForm = null;
@@ -400,13 +399,10 @@
                 const newField = document.createElement('div');
                 newField.className = 'phone-item';
                 newField.innerHTML = `
-                    <input type="tel" name="phones" class="phone-input">
+                    <input type="tel" name="phones" placeholder="Phone Number">
                     ${fieldCount > 1 ? '<button type="button" class="remove-btn" onclick="removeField(this)">×</button>' : ''}
                 `;
                 container.appendChild(newField);
-                const input = newField.querySelector('.phone-input');
-                const iti = initializePhoneInput(input);
-                phoneInputs.push(iti);
             }
         }
 
@@ -416,14 +412,6 @@
             if (container.children.length > 1 || (container.id === 'phoneFields' && container.children.length > 0)) {
                 field.remove();
             }
-        }
-
-        function initializePhoneInput(input) {
-            return intlTelInput(input, {
-                initialCountry: "us",
-                separateDialCode: true,
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-            });
         }
 
         function openAddModal() {
@@ -441,14 +429,11 @@
             `;
             document.getElementById("phoneFields").innerHTML = `
                 <div class="phone-item">
-                    <input type="tel" name="phones" class="phone-input">
+                    <input type="tel" name="phones" placeholder="Phone Number">
                 </div>
             `;
-            phoneInputs.forEach(iti => iti.destroy());
+            phoneInputs.forEach(iti => iti.destroy()); // Kept for compatibility, but no effect now
             phoneInputs = [];
-            document.querySelectorAll('.phone-input').forEach(input => {
-                phoneInputs.push(initializePhoneInput(input));
-            });
             document.getElementById("contactModal").style.display = "flex";
         }
 
@@ -492,14 +477,14 @@
             const phones = button.dataset.phones ? button.dataset.phones.split('\n').filter(phone => phone.trim() !== '') : [];
             const phoneFields = document.getElementById("phoneFields");
             phoneFields.innerHTML = '';
-            phoneInputs.forEach(iti => iti.destroy());
+            phoneInputs.forEach(iti => iti.destroy()); // Kept for compatibility, but no effect now
             phoneInputs = [];
             if (phones.length > 0) {
                 phones.forEach((phone, index) => {
                     const field = document.createElement('div');
                     field.className = 'phone-item';
                     field.innerHTML = `
-                        <input type="tel" name="phones" value="${phone}" class="phone-input">
+                        <input type="tel" name="phones" value="${phone}" placeholder="Phone Number">
                         ${index > 0 || phones.length > 1 ? '<button type="button" class="remove-btn" onclick="removeField(this)">×</button>' : ''}
                     `;
                     phoneFields.appendChild(field);
@@ -507,20 +492,16 @@
             } else {
                 phoneFields.innerHTML = `
                     <div class="phone-item">
-                        <input type="tel" name="phones" class="phone-input">
+                        <input type="tel" name="phones" placeholder="Phone Number">
                     </div>
                 `;
             }
-
-            document.querySelectorAll('.phone-input').forEach(input => {
-                phoneInputs.push(initializePhoneInput(input));
-            });
             document.getElementById("contactModal").style.display = "flex";
         }
 
         function closeModal() {
             document.getElementById("contactModal").style.display = "none";
-            phoneInputs.forEach(iti => iti.destroy());
+            phoneInputs.forEach(iti => iti.destroy()); // Kept for compatibility, but no effect now
             phoneInputs = [];
         }
 
