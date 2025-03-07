@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,11 +36,25 @@ public class ContactsViewController {
     @GetMapping("/contacts")
     public String listContacts(Model model, OAuth2AuthenticationToken authentication) {
         try {
-            List<Map<String, Object>> contacts = googlePeopleService.listContacts(authentication);
+            if (authentication == null) {
+                logger.warn("Authentication is null, redirecting to login");
+                return "redirect:/login";
+            }
+            
+            List<Map<String, Object>> contacts = new ArrayList<>();
+            try {
+                contacts = googlePeopleService.listContacts(authentication);
+                logger.info("Retrieved {} contacts", contacts.size());
+            } catch (Exception e) {
+                logger.error("Error retrieving contacts: {}", e.getMessage(), e);
+                model.addAttribute("error", "Failed to retrieve contacts: " + e.getMessage());
+            }
+            
             model.addAttribute("contacts", contacts);
             return "list";
         } catch (Exception e) {
             logger.error("Error listing contacts: {}", e.getMessage(), e);
+            model.addAttribute("error", "An unexpected error occurred: " + e.getMessage());
             return "error";
         }
     }

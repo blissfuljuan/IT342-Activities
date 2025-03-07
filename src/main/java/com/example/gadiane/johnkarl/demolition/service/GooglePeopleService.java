@@ -31,7 +31,13 @@ public class GooglePeopleService {
 
     public List<Map<String, Object>> listContacts(OAuth2AuthenticationToken authentication) {
         try {
+            if (authentication == null) {
+                logger.error("Authentication token is null");
+                throw new RuntimeException("Authentication token is null");
+            }
+            
             if (!authentication.getAuthorizedClientRegistrationId().equals("google")) {
+                logger.error("Not a Google account: {}", authentication.getAuthorizedClientRegistrationId());
                 throw new RuntimeException("Not a Google account");
             }
 
@@ -41,6 +47,7 @@ public class GooglePeopleService {
             );
 
             if (client == null) {
+                logger.error("No authorized client found for user: {}", authentication.getName());
                 throw new RuntimeException("No authorized client found");
             }
 
@@ -65,11 +72,28 @@ public class GooglePeopleService {
                     Map.class
             );
 
+            logger.info("Response status: {}", response.getStatusCode());
+            
             Map<String, Object> responseBody = response.getBody();
             List<Map<String, Object>> connections = new ArrayList<>();
             
-            if (responseBody != null && responseBody.containsKey("connections")) {
-                connections = (List<Map<String, Object>>) responseBody.get("connections");
+            if (responseBody != null) {
+                logger.info("Response body keys: {}", responseBody.keySet());
+                
+                if (responseBody.containsKey("connections")) {
+                    connections = (List<Map<String, Object>>) responseBody.get("connections");
+                    logger.info("Found {} connections", connections.size());
+                    
+                    // Debug first contact structure if available
+                    if (!connections.isEmpty()) {
+                        Map<String, Object> firstContact = connections.get(0);
+                        logger.info("First contact keys: {}", firstContact.keySet());
+                    }
+                } else {
+                    logger.warn("No 'connections' key found in response");
+                }
+            } else {
+                logger.warn("Response body is null");
             }
             
             return connections;
