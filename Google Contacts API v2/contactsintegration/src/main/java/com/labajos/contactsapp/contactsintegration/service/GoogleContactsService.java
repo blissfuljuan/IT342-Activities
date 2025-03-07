@@ -3,8 +3,8 @@ package com.labajos.contactsapp.contactsintegration.service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,7 +28,6 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.people.v1.PeopleService;
-import com.google.api.services.people.v1.PeopleService.Builder;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
@@ -52,11 +51,9 @@ public class GoogleContactsService {
                 authentication.getAuthorizedClientRegistrationId(),
                 authentication.getName()
         );
-
         if (client == null || client.getAccessToken() == null) {
             throw new IllegalStateException("OAuth2AuthorizedClient or AccessToken is null");
         }
-
         return client.getAccessToken().getTokenValue();
     }
 
@@ -75,7 +72,6 @@ public class GoogleContactsService {
                 logger.error("Failed to fetch contacts: {}", response.getStatusCode());
                 return "Error fetching contacts. Status: " + response.getStatusCode();
             }
-            
             return response.getBody();
         } catch (Exception e) {
             logger.error("Error fetching contacts", e);
@@ -83,51 +79,58 @@ public class GoogleContactsService {
         }
     }
 
-    public String createContact(OAuth2AuthenticationToken authentication, String fullName, String email, List<String> phoneNumbers) {
+    public String createContact(OAuth2AuthenticationToken authentication, String fullName, List<String> emails, List<String> phoneNumbers) {
         try {
             String accessToken = getAccessToken(authentication);
             String url = "https://people.googleapis.com/v1/people:createContact";
-    
+
+            // Build JSON body with multiple emails
+            StringBuilder emailJson = new StringBuilder();
+            for (String email : emails) {
+                if (!email.trim().isEmpty()) {
+                    emailJson.append("{\"value\": \"").append(email).append("\"},");
+                }
+            }
+            String emailsString = emailJson.length() > 0 ? emailJson.substring(0, emailJson.length() - 1) : "";
+
             // Build JSON body with multiple phone numbers
             StringBuilder phoneJson = new StringBuilder();
             for (String phone : phoneNumbers) {
-                if (!phone.trim().isEmpty()) { // Skip empty phone numbers
+                if (!phone.trim().isEmpty()) {
                     phoneJson.append("{\"value\": \"").append(phone).append("\"},");
                 }
             }
             String phonesString = phoneJson.length() > 0 ? phoneJson.substring(0, phoneJson.length() - 1) : "";
-    
+
             String jsonBody = "{"
                     + "\"names\": [{\"givenName\": \"" + fullName + "\"}],"
-                    + "\"emailAddresses\": [{\"value\": \"" + email + "\"}],"
+                    + "\"emailAddresses\": [" + emailsString + "],"
                     + "\"phoneNumbers\": [" + phonesString + "]"
                     + "}";
-    
+
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
-    
+
             HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-    
+
             if (response.getStatusCode() != HttpStatus.OK) {
                 logger.error("Failed to create contact: {}", response.getStatusCode());
                 return "Error creating contact. Status: " + response.getStatusCode();
             }
-    
             return response.getBody();
         } catch (Exception e) {
             logger.error("Error creating contact", e);
             return "Error creating contact: " + e.getMessage();
         }
     }
-    
+
     public Contact updateContact(OAuth2AuthorizedClient client, String resourceName, Contact contact) 
             throws IOException, GeneralSecurityException {
         PeopleService service = createPeopleService(client);
-    
+
         try {
-            // Delete the old contact
             try {
                 service.people().deleteContact(resourceName).execute();
             } catch (GoogleJsonResponseException e) {
@@ -139,30 +142,31 @@ public class GoogleContactsService {
                     throw e;
                 }
             }
-            
+
             String[] nameParts = contact.getName().split(" ", 2);
             String givenName = nameParts[0];
             String familyName = nameParts.length > 1 ? nameParts[1] : "";
-    
+
             Person person = new Person()
                     .setNames(Collections.singletonList(new Name()
                             .setGivenName(givenName)
                             .setFamilyName(familyName)))
                     .setEmailAddresses(contact.getEmail().stream()
+                            .filter(email -> !email.trim().isEmpty())
                             .map(email -> new EmailAddress().setValue(email))
                             .collect(Collectors.toList()))
                     .setPhoneNumbers(contact.getPhone().stream()
-                            .filter(phone -> !phone.trim().isEmpty()) // Filter out empty strings
+                            .filter(phone -> !phone.trim().isEmpty())
                             .map(phone -> new PhoneNumber().setValue(phone))
                             .collect(Collectors.toList()));
-    
+
             Person created = Optional.ofNullable(service.people().createContact(person).execute())
                     .orElseThrow(() -> new IOException("Failed to create contact"));
-            
+
             Person retrievedContact = service.people().get(created.getResourceName())
                     .setPersonFields("names,emailAddresses,phoneNumbers")
                     .execute();
-    
+
             return new Contact(
                     (retrievedContact.getNames() != null && !retrievedContact.getNames().isEmpty()) ?
                             retrievedContact.getNames().get(0).getGivenName() + 
@@ -193,7 +197,6 @@ public class GoogleContactsService {
             service.people().deleteContact(resourceName).execute();
         } catch (GoogleJsonResponseException e) {
             if (e.getStatusCode() == 404) {
-                // Try with and without "people/" prefix
                 String altResourceName = resourceName.startsWith("people/") ? 
                     resourceName.substring(7) : "people/" + resourceName;
                 service.people().deleteContact(altResourceName).execute();
@@ -212,7 +215,7 @@ public class GoogleContactsService {
             credential.initialize(request);
         };
 
-        return new Builder(httpTransport, jsonFactory, requestInitializer)
+        return new PeopleService.Builder(httpTransport, jsonFactory, requestInitializer)
                 .setApplicationName("midterm")
                 .build();
     }

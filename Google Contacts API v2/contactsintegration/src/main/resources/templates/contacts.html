@@ -213,19 +213,16 @@
                 <div class="contact-photo" th:text="${#strings.substring(contact.name, 0, 1)}"></div>
                 <div class="contact-details">
                     <div class="contact-name" th:text="${contact.name}"></div>
-                    <div class="contact-email" th:text="${contact.email}"></div>
+                    <div class="contact-email" th:each="email : ${contact.email}" th:text="${email}"></div>
                     <div class="contact-phone" th:each="phone : ${contact.phone}" th:text="${phone}"></div>
                 </div>
                 <div class="action-buttons">
-                    <!-- Edit Button -->
                     <button class="btn btn-edit" 
                             th:attr="data-resource=${contact.resourceName}, 
                                      data-name=${contact.name}, 
-                                     data-email=${contact.email}, 
+                                     data-emails=${#strings.listJoin(contact.email, ',')}, 
                                      data-phones=${#strings.listJoin(contact.phone, ',')}" 
                             onclick="openEditModal(this)">Edit</button>
-        
-                    <!-- Delete Button -->
                     <form th:action="@{/contacts/delete}" method="post" style="display:inline;" onsubmit="return showDeleteConfirmation(event, this)">
                         <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
                         <button type="submit" class="btn btn-delete">Delete</button>
@@ -236,10 +233,8 @@
 
         <p th:if="${contacts == null or #lists.isEmpty(contacts)}">No contacts found.</p>
 
-        <!-- Add Contact Button -->
         <button class="btn-add" onclick="openAddModal()">+</button>
 
-        <!-- Logout Form -->
         <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="return showLogoutConfirmation(event, this)">
             <button type="submit" class="logout">Logout</button>
         </form>
@@ -265,8 +260,11 @@
                 <input type="hidden" id="resourceName" name="resourceName">
                 <label>Name:</label>
                 <input type="text" id="contactName" name="name" required>
-                <label>Email:</label>
-                <input type="email" id="contactEmail" name="email" required>
+                <label>Email Addresses:</label>
+                <div id="emailAddressesContainer">
+                    <input type="email" name="email" class="email-input" required>
+                </div>
+                <button type="button" class="btn btn-add" onclick="addEmailField()">+</button>
                 <label>Phone Numbers:</label>
                 <div id="phoneNumbersContainer">
                     <input type="text" name="phone" class="phone-input" required>
@@ -294,45 +292,42 @@
 
     <script>
         let deleteFormToSubmit = null;
+        let logoutFormToSubmit = null;
 
         function showDeleteConfirmation(event, form) {
-            event.preventDefault(); // Prevent form submission until confirmed
-            deleteFormToSubmit = form; // Store the form to submit later
+            event.preventDefault();
+            deleteFormToSubmit = form;
             document.getElementById("deleteConfirmModal").style.display = "block";
         }
 
         function closeDeleteModal() {
             document.getElementById("deleteConfirmModal").style.display = "none";
-            deleteFormToSubmit = null; // Clear the stored form
+            deleteFormToSubmit = null;
         }
 
-        // Add this to handle the "Yes" button click
         document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
             if (deleteFormToSubmit) {
-                deleteFormToSubmit.submit(); // Submit the form if "Yes" is clicked
+                deleteFormToSubmit.submit();
             }
         });
 
-        let logoutFormToSubmit = null;
-
         function showLogoutConfirmation(event, form) {
-            event.preventDefault(); // Prevent form submission until confirmed
-            logoutFormToSubmit = form; // Store the form to submit later
+            event.preventDefault();
+            logoutFormToSubmit = form;
             document.getElementById("logoutConfirmModal").style.display = "block";
         }
 
         function closeLogoutModal() {
             document.getElementById("logoutConfirmModal").style.display = "none";
-            logoutFormToSubmit = null; // Clear the stored form
+            logoutFormToSubmit = null;
         }
 
-        // Ensure the DOM is loaded before attaching the event listener
         document.addEventListener("DOMContentLoaded", function() {
             const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
             if (confirmLogoutBtn) {
                 confirmLogoutBtn.addEventListener("click", function() {
                     if (logoutFormToSubmit) {
-                        logoutFormToSubmit.submit(); // Submit the form if "Yes" is clicked
+                        logoutFormToSubmit.submit();
                     }
                 });
             } else {
@@ -340,55 +335,88 @@
             }
         });
 
-        function addPhoneField() {
-        const container = document.getElementById("phoneNumbersContainer");
-        const newInput = document.createElement("input");
-        newInput.type = "text";
-        newInput.name = "phone";
-        newInput.className = "phone-input";
-        container.appendChild(newInput);
-    }
-
-    function openAddModal() {
-        document.getElementById("modalTitle").innerText = "Add Contact";
-        document.getElementById("contactForm").action = "/contacts/add";
-        document.getElementById("contactName").value = "";
-        document.getElementById("contactEmail").value = "";
-        const container = document.getElementById("phoneNumbersContainer");
-        container.innerHTML = '<input type="text" name="phone" class="phone-input" required>';
-        document.getElementById("contactModal").style.display = "block";
-    }
-
-    function openEditModal(button) {
-        document.getElementById("modalTitle").innerText = "Edit Contact";
-        document.getElementById("contactForm").action = "/contacts/edit";
-        document.getElementById("resourceName").value = button.getAttribute("data-resource");
-        document.getElementById("contactName").value = button.getAttribute("data-name");
-        document.getElementById("contactEmail").value = button.getAttribute("data-email");
-        const phones = button.getAttribute("data-phones").split(",");
-        const container = document.getElementById("phoneNumbersContainer");
-        container.innerHTML = "";
-        phones.forEach(phone => {
-            if (phone.trim() !== "No phone") { // Skip "No phone" placeholder
-                const input = document.createElement("input");
-                input.type = "text";
-                input.name = "phone";
-                input.className = "phone-input";
-                input.value = phone.trim();
-                container.appendChild(input);
-            }
-        });
-        // Ensure at least one phone field exists
-        if (container.children.length === 0) {
-            addPhoneField();
+        function addEmailField() {
+            const container = document.getElementById("emailAddressesContainer");
+            const newInput = document.createElement("input");
+            newInput.type = "email";
+            newInput.name = "email";
+            newInput.className = "email-input";
+            container.appendChild(newInput);
         }
-        document.getElementById("contactModal").style.display = "block";
-    }
 
-    function closeModal() {
-        document.getElementById("contactModal").style.display = "none";
-    }
-        </script>
+        function addPhoneField() {
+            const container = document.getElementById("phoneNumbersContainer");
+            const newInput = document.createElement("input");
+            newInput.type = "text";
+            newInput.name = "phone";
+            newInput.className = "phone-input";
+            container.appendChild(newInput);
+        }
 
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Add Contact";
+            document.getElementById("contactForm").action = "/contacts/add";
+            document.getElementById("contactName").value = "";
+            
+            // Reset email fields
+            const emailContainer = document.getElementById("emailAddressesContainer");
+            emailContainer.innerHTML = '<input type="email" name="email" class="email-input" required>';
+            
+            // Reset phone fields
+            const phoneContainer = document.getElementById("phoneNumbersContainer");
+            phoneContainer.innerHTML = '<input type="text" name="phone" class="phone-input" required>';
+            
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function openEditModal(button) {
+            document.getElementById("modalTitle").innerText = "Edit Contact";
+            document.getElementById("contactForm").action = "/contacts/edit";
+            document.getElementById("resourceName").value = button.getAttribute("data-resource");
+            document.getElementById("contactName").value = button.getAttribute("data-name");
+
+            // Populate emails
+            const emails = button.getAttribute("data-emails").split(",");
+            const emailContainer = document.getElementById("emailAddressesContainer");
+            emailContainer.innerHTML = "";
+            emails.forEach(email => {
+                if (email.trim() !== "No email") {
+                    const input = document.createElement("input");
+                    input.type = "email";
+                    input.name = "email";
+                    input.className = "email-input";
+                    input.value = email.trim();
+                    emailContainer.appendChild(input);
+                }
+            });
+            if (emailContainer.children.length === 0) {
+                addEmailField();
+            }
+
+            // Populate phones
+            const phones = button.getAttribute("data-phones").split(",");
+            const phoneContainer = document.getElementById("phoneNumbersContainer");
+            phoneContainer.innerHTML = "";
+            phones.forEach(phone => {
+                if (phone.trim() !== "No phone") {
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.name = "phone";
+                    input.className = "phone-input";
+                    input.value = phone.trim();
+                    phoneContainer.appendChild(input);
+                }
+            });
+            if (phoneContainer.children.length === 0) {
+                addPhoneField();
+            }
+
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("contactModal").style.display = "none";
+        }
+    </script>
 </body>
 </html>
