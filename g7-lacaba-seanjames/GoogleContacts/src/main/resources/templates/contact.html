@@ -10,203 +10,277 @@
   <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <style>
     :root {
-      --primary-color: #4285F4;
-      --secondary-color: #34A853;
-      --accent-color: #EA4335;
-      --light-gray: #f8f9fa;
-      --dark-gray: #343a40;
-      --border-radius: 12px;
-      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --netflix-red: #E50914;
+      --netflix-red-hover: #B81D24;
+      --netflix-black: #141414;
+      --netflix-dark: #181818;
+      --netflix-grey: #222222;
+      --netflix-light-grey: #303030;
+      --netflix-text: #FFFFFF;
+      --netflix-text-secondary: #B3B3B3B3B3B3;
+      --netflix-highlight: #6D6D6D;
+      --border-radius: 4px;
+      --transition: all 0.2s ease;
     }
-    
+
+    @font-face {
+      font-family: 'Netflix Sans';
+      src: url('https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/fonts/bootstrap-icons.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     body {
-      font-family: 'Google Sans', 'Segoe UI', Roboto, Arial, sans-serif;
-      background-color: #fafafa;
-      color: #333;
+      font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: var(--netflix-black);
+      color: var(--netflix-text);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
     }
-    
+
     .navbar {
-      background-color: white !important;
-      box-shadow: var(--box-shadow);
-      border-radius: 0 0 var(--border-radius) var(--border-radius);
-      padding: 0.8rem 1rem;
+      background-color: var(--netflix-black) !important;
+      padding: 0.5rem 4%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .navbar-brand {
-      font-weight: 600;
-      color: var(--primary-color);
-      display: flex;
-      align-items: center;
+      font-weight: 700;
+      color: var(--netflix-red) !important;
+      font-size: 1.8rem;
+      letter-spacing: -1px;
+      padding: 0;
     }
-    
-    .navbar-brand::before {
-      content: '';
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      margin-right: 8px;
-      background-color: var(--primary-color);
-      border-radius: 50%;
-    }
-    
+
     .nav-link {
       font-weight: 500;
-      color: var(--dark-gray) !important;
+      color: var(--netflix-text) !important;
       padding: 0.5rem 1rem;
-      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
     }
-    
+
     .nav-link.active, .nav-link:hover {
-      color: var(--primary-color) !important;
+      color: var(--netflix-text-secondary) !important;
     }
-    
-    .card {
-      border: none;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      overflow: hidden;
+
+    .logout-link {
+      color: var(--netflix-text-secondary) !important;
     }
-    
+
+    .logout-link:hover {
+      color: var(--netflix-red) !important;
+    }
+
     .page-container {
-      max-width: 1200px;
+      max-width: 92%;
       margin: 2rem auto;
-      padding: 0 1rem;
+      padding: 0;
     }
-    
+
     .header-section {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    
+
     h1 {
-      font-weight: 600;
-      color: var(--dark-gray);
-      font-size: 2rem;
+      font-weight: 700;
+      color: var(--netflix-text);
+      font-size: 2.5rem;
+      margin: 0;
     }
-    
+
     .btn-add {
-      background-color: var(--secondary-color);
+      background-color: var(--netflix-red);
       color: white;
       border: none;
-      padding: 0.5rem 1.2rem;
+      padding: 0.6rem 1.4rem;
       border-radius: var(--border-radius);
       font-weight: 500;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(52, 168, 83, 0.3);
+      transition: var(--transition);
+      letter-spacing: 0.5px;
     }
-    
+
     .btn-add:hover {
-      background-color: #2d8e48;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(52, 168, 83, 0.4);
+      background-color: var(--netflix-red-hover);
+      transform: scale(1.05);
     }
-    
-    .alert {
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      border: none;
-      box-shadow: var(--box-shadow);
-    }
-    
+
     .table-card {
-      background: white;
+      background: var(--netflix-dark);
       border-radius: var(--border-radius);
       overflow: hidden;
-      box-shadow: var(--box-shadow);
+      margin-bottom: 3rem;
     }
-    
+
     .table {
       margin-bottom: 0;
+      color: var(--netflix-text);
     }
-    
+
     .table th {
-      background-color: var(--light-gray);
-      font-weight: 600;
-      padding: 1rem;
-      border-bottom: 2px solid #e9ecef;
-    }
-    
-    .table td {
-      padding: 1rem;
-      vertical-align: middle;
-      border-bottom: 1px solid #f1f1f1;
-    }
-    
-    .table tr:hover {
-      background-color: rgba(66, 133, 244, 0.04);
-    }
-    
-    .btn-edit {
-      background-color: var(--primary-color);
-      color: white;
+      background-color: var(--netflix-grey);
+      color: var(--netflix-text);
+      font-weight: 500;
+      padding: 1rem 1.5rem;
       border: none;
-      border-radius: 6px;
-      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
-    
+
+    .table td {
+      padding: 1.2rem 1.5rem;
+      border: none;
+      border-top: 8px solid var(--netflix-black);
+      color:white;
+      background-color: var(--netflix-dark);
+      font-weight: 400;
+      font-size: 1rem;
+    }
+
+    .table tr {
+      transition: var(--transition);
+    }
+
+    .table tr:hover td {
+      background-color: var(--netflix-grey);
+    }
+
+    .btn-edit {
+      background-color: transparent;
+      color: var(--netflix-text);
+      border: 1px solid var(--netflix-text);
+      padding: 0.4rem 1rem;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+
     .btn-edit:hover {
-      background-color: #3367d6;
-      color: white;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--netflix-text);
     }
-    
+
     .btn-delete {
-      background-color: white;
-      color: var(--accent-color);
-      border: 1px solid var(--accent-color);
-      border-radius: 6px;
-      transition: all 0.2s ease;
+      background-color: transparent;
+      color: var(--netflix-red);
+      border: 1px solid var(--netflix-red);
+      padding: 0.4rem 1rem;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      letter-spacing: 0.5px;
+      font-weight: 500;
     }
-    
+
     .btn-delete:hover {
-      background-color: var(--accent-color);
-      color: white;
+      background-color: rgba(229, 9, 20, 0.1);
+      color: var(--netflix-red);
     }
-    
+
     .btn-icon {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 0.4rem 0.8rem;
     }
-    
+
+    .btn-icon i {
+      font-size: 0.8rem;
+    }
+
     .empty-state {
       text-align: center;
-      padding: 3rem;
-      background-color: white;
+      padding: 6rem 2rem;
+      background-color: rgba(20, 20, 20, 0.4);
       border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
+      margin: 2rem 0;
     }
-    
+
     .empty-state-icon {
       font-size: 3rem;
-      color: #ccc;
-      margin-bottom: 1rem;
+      color: var(--netflix-red);
+      margin-bottom: 1.5rem;
     }
-    
+
+    .empty-state h4 {
+      font-weight: 700;
+      color: var(--netflix-text);
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .empty-state p {
+      color: var(--netflix-text-secondary);
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .text-muted {
+      color: var(--netflix-text-secondary) !important;
+    }
+
+    .btn-group-sm {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-column {
+      width: 180px;
+    }
+
+    /* Animation effects */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .table-card, .empty-state {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
     @media (max-width: 768px) {
-      .action-column {
-        width: 100px;
-      }
-      
       .btn-group-sm {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+      }
+
+      .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .page-container {
+        max-width: 96%;
+      }
+
+      h1 {
+        font-size: 1.8rem;
       }
     }
   </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="/">Google Contacts App</a>
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">CONTACTS</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" href="/contacts">Contacts</a>
+          <a class="nav-link active" href="/contacts">My Contacts</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/user-info">Profile</a>
@@ -214,8 +288,8 @@
       </ul>
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="/logout">
-            <i class="bi bi-box-arrow-right"></i> Logout
+          <a class="nav-link logout-link" href="/logout">
+            <i class="bi bi-box-arrow-right"></i> Sign Out
           </a>
         </li>
       </ul>
@@ -224,10 +298,10 @@
 </nav>
 
 <div class="page-container">
-  <div class="header-section d-flex justify-content-between align-items-center">
+  <div class="header-section">
     <h1>My Contacts</h1>
     <a href="/contact/add-form" class="btn btn-add">
-      <i class="bi bi-plus-lg"></i> Add Contact
+      <i class="bi bi-plus-lg"></i> Add New Contact
     </a>
   </div>
 
@@ -235,9 +309,9 @@
     <div class="empty-state-icon">
       <i class="bi bi-person-lines-fill"></i>
     </div>
-    <h4>No contacts yet</h4>
-    <p class="text-muted">Your contacts list is empty. Start by adding your first contact.</p>
-    <a href="/contact/add-form" class="btn btn-add mt-3">
+    <h4>No Contacts Found</h4>
+    <p>Your contacts list is currently empty. Add your first contact to get started.</p>
+    <a href="/contact/add-form" class="btn btn-add">
       <i class="bi bi-plus-lg"></i> Add Your First Contact
     </a>
   </div>
@@ -256,18 +330,18 @@
       <tr th:each="contact : ${contacts}">
         <td>
           <span th:if="${not #lists.isEmpty(contact.names)}" th:text="${contact.names[0].displayName}">Name</span>
-          <span th:unless="${not #lists.isEmpty(contact.names)}" class="text-muted fst-italic">No name</span>
+          <span th:unless="${not #lists.isEmpty(contact.names)}" class="text-muted">No name</span>
         </td>
         <td>
           <span th:if="${not #lists.isEmpty(contact.emailAddresses)}" th:text="${contact.emailAddresses[0].value}">Email</span>
-          <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}" class="text-muted fst-italic">No email</span>
+          <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}" class="text-muted">No email</span>
         </td>
         <td>
           <span th:if="${not #lists.isEmpty(contact.phoneNumbers)}" th:text="${contact.phoneNumbers[0].value}">Phone</span>
-          <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}" class="text-muted fst-italic">No phone</span>
+          <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}" class="text-muted">No phone</span>
         </td>
         <td>
-          <div class="btn-group btn-group-sm">
+          <div class="btn-group-sm">
             <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}" class="btn btn-edit btn-icon">
               <i class="bi bi-pencil-fill"></i> Edit
             </a>
