@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Information</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <link rel="stylesheet" href="/css/userinfo.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="six columns offset-by-three">
+            <h1>Google Information</h1>
+            <img th:if="${picture}" th:src="${picture}" alt="Profile Picture"/>
+            <h2 th:text="${name}">Name</h2>
+            <p th:text="${email}">Email</p>
+            <p th:text="${birthday}">Birthday</p>
+            <p th:text="${phone}">Phone</p>
+            <a href="/api/contacts/view" class="button button-primary">View Contacts</a>
+            <a href="/login" class="button">Logout</a>
+        </div>
+    </div>
+    <div th:if="${#authentication != null}" class="row">
+        <div class="six columns offset-by-three">
+            <h3>All Available Attributes:</h3>
+            <table class="u-full-width">
+                <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="attr : ${#authentication.principal.attributes}">
+                        <td th:text="${attr.key}">Key</td>
+                        <td th:text="${attr.value}">Value</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

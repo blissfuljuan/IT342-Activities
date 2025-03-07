@@ -1,48 +1,79 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Error - Google Contacts Manager</title>
+    <title>Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .error-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #d9534f;
+        }
+        .error-code {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .error-message {
+            color: #555;
+            margin: 20px 0;
+        }
+        .error-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .error-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #777;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #5bc0de;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background-color: #46b8da;
+        }
+    </style>
 </head>
 <body>
-    <div th:replace="~{main :: body(content=~{::content})}">
-        <div th:fragment="content">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card border-danger">
-                        <div class="card-header bg-danger text-white">
-                            <h3><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="text-center mb-4">
-                                <i class="bi bi-emoji-frown" style="font-size: 5rem;"></i>
-                                <h4 class="mt-3">Something went wrong</h4>
-                            </div>
-                            
-                            <div class="alert alert-danger" th:if="${errorMessage}">
-                                <p th:text="${errorMessage}">Error message details</p>
-                            </div>
-                            
-                            <div class="alert alert-danger" th:unless="${errorMessage}">
-                                <p>An unexpected error occurred. Please try again later or contact support.</p>
-                            </div>
-                            
-                            <div class="d-grid gap-2 col-md-6 mx-auto mt-4">
-                                <a href="/" class="btn btn-primary">
-                                    <i class="bi bi-house-door me-2"></i>Go to Home Page
-                                </a>
-                                <a href="/contacts" class="btn btn-secondary">
-                                    <i class="bi bi-person-rolodex me-2"></i>Go to Contacts
-                                </a>
-                                <a href="javascript:history.back()" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left me-2"></i>Go Back
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="error-container">
+    <div class="error-header">
+        <h1 class="error-code" th:text="${status}">500</h1>
+        <h2 th:text="${error}">Error</h2>
     </div>
+
+    <div class="error-message">
+        <p th:text="${message}">Error message</p>
+    </div>
+
+    <div class="error-details">
+        <p><strong>Path:</strong> <span th:text="${path}">Request path</span></p>
+        <p><strong>Time:</strong> <span th:text="${timestamp}">Timestamp</span></p>
+    </div>
+
+    <a href="/googleuser" class="back-button">Back to Home</a>
+</div>
 </body>
 </html>
