@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Google Contacts</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <div class="welcome" th:text="'Welcome, ' + ${username}"></div>
+            <a href="#" class="btn-add" id="createContactBtn">
+                <i class="fas fa-plus"></i> Create Contact
+            </a>
+        </div>
+        <form class="logout-form" th:action="@{/logout}" method="post">
+            <button type="submit" class="logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </form>
+    </div>
+
+    <div class="main-content">
+        <h1>Your Google Contacts</h1>
+
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <ul class="contact-list" th:if="${contacts}">
+            <li class="contact-item" th:each="contact : ${contacts}">
+                <div class="contact-summary">
+                    <div class="contact-photo">
+                        <img class="profile-img"
+                             th:data-src="${contact.profilePicture}"
+                             src="/default-profile.png"
+                             alt="Profile Picture"
+                             onload="loadProfileImage(this)"
+                             onerror="this.src='/default-profile.png'; this.style.opacity='1'" />
+                    </div>
+                    <div class="contact-name" th:text="${contact.displayName}"></div>
+                </div>
+                <div class="contact-details">
+                    <div class="detail-item" th:each="email : ${contact.emails}">
+                        <span class="detail-label">Email:</span>
+                        <span th:text="${email}"></span>
+                    </div>
+                    <div class="detail-item phone-detail" th:each="phone : ${contact.phones}">
+                        <span class="detail-label">Phone:</span>
+                        <span class="phone-number" th:text="${phone}"></span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-edit"
+                                th:data-resource="${contact.resourceName}"
+                                th:data-firstname="${contact.firstName}"
+                                th:data-lastname="${contact.lastName}"
+                                th:data-emails="${#strings.listJoin(contact.emails, '\n')}"
+                                th:data-phones="${#strings.listJoin(contact.phones, '\n')}"
+                                onclick="openEditModal(this)">Edit</button>
+                        <form th:action="@{/contacts/delete}" method="post" onsubmit="return confirmDelete(event, this)">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <p th:if="${contacts == null or #lists.isEmpty(contacts)}" class="no-contacts">No contacts found.</p>
+    </div>
+
+    <!-- Add/Edit Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Add Contact</div>
+            <form id="contactForm" th:action="@{${formAction}}" method="post" onsubmit="handleSubmit(event)">
+                <input type="hidden" id="resourceName" name="resourceName">
+                <div class="field-group">
+                    <label>First Name:</label>
+                    <input type="text" id="firstName" name="firstName">
+                </div>
+                <div class="field-group">
+                    <label>Last Name:</label>
+                    <input type="text" id="lastName" name="lastName">
+                </div>
+                <div class="field-group">
+                    <label>Email:</label>
+                    <div id="emailFields" class="field-list">
+                        <div class="email-field">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" name="emails" placeholder="Email">
+                            <button type="button" class="remove-btn" onclick="removeField(this)">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addField('emailFields', 'email')">Add Email</button>
+                </div>
+                <div class="field-group">
+                    <label>Phone:</label>
+                    <div id="phoneFields" class="field-list">
+                        <div class="phone-item">
+                            <input type="tel" name="phones" class="phone-input">
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addField('phoneFields', 'tel')">Add Phone</button>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn save-btn">Save</button>
+                    <button type="button" class="btn modal-close" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Confirm Delete</div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this contact?</p>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-delete" onclick="confirmDeleteAction()">Delete</button>
+                <button type="button" class="btn modal-close" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script>
+        let phoneInputs = [];
+        let pendingDeleteForm = null;
+        let debounceTimeout;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.contact-summary').forEach(summary => {
+                summary.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    clearTimeout(debounceTimeout);
+                    debounceTimeout = setTimeout(() => {
+                        const detailsElement = summary.nextElementSibling;
+                        const isActive = detailsElement.style.display === 'block';
+                        document.querySelectorAll('.contact-details').forEach(detail => {
+                            if (detail !== detailsElement) {
+                                detail.style.display = 'none';
+                            }
+                        });
+                        detailsElement.style.display = isActive ? 'none' : 'block';
+                    }, 100);
+                });
+            });
+
+            document.querySelectorAll('.phone-input').forEach(input => {
+                const iti = initializePhoneInput(input);
+                if (iti) phoneInputs.push(iti);
+            });
+
+            document.getElementById('createContactBtn').addEventListener('click', (event) => {
+                event.preventDefault();
+                openAddModal();
+            });
+
+            // Preload profile images
+            document.querySelectorAll('.profile-img').forEach(img => loadProfileImage(img));
+        });
+
+        function loadProfileImage(img) {
+            const src = img.dataset.src;
+            if (src && src.trim() !== '') {
+                console.log(`Loading profile image: ${src}`);
+                const tempImg = new Image();
+                tempImg.src = src;
+                tempImg.onload = () => {
+                    img.src = src;
+                    img.style.opacity = '1';
+                    console.log(`Successfully loaded: ${src}`);
+                };
+                tempImg.onerror = () => {
+                    img.src = '/default-profile.png';
+                    img.style.opacity = '1';
+                    console.log(`Failed to load: ${src}, using default`);
+                };
+            } else {
+                img.src = '/default-profile.png';
+                img.style.opacity = '1';
+                console.log('No profile picture provided, using default');
+            }
+        }
+
+        function addField(containerId, type) {
+            const container = document.getElementById(containerId);
+            const fieldCount = container.getElementsByClassName(type === 'tel' ? 'phone-item' : 'email-field').length + 1;
+            if (type === 'email') {
+                const newField = document.createElement('div');
+                newField.className = 'email-field';
+                newField.innerHTML = `
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="emails" placeholder="Email">
+                    <button type="button" class="remove-btn" onclick="removeField(this)">×</button>
+                `;
+                container.appendChild(newField);
+            } else if (type === 'tel') {
+                const newField = document.createElement('div');
+                newField.className = 'phone-item';
+                newField.innerHTML = `
+                    <input type="tel" name="phones" class="phone-input">
+                    ${fieldCount > 1 ? '<button type="button" class="remove-btn" onclick="removeField(this)">×</button>' : ''}
+                `;
+                container.appendChild(newField);
+                const input = newField.querySelector('.phone-input');
+                const iti = initializePhoneInput(input);
+                if (iti) phoneInputs.push(iti);
+            }
+        }
+
+        function removeField(button) {
+            const container = button.parentElement.parentElement;
+            const field = button.parentElement;
+            if (container.children.length > 1 || (container.id === 'phoneFields' && container.children.length > 0)) {
+                field.remove();
+            }
+        }
+
+        function initializePhoneInput(input) {
+            if (!input.dataset.intlTelInputId) {
+                const iti = intlTelInput(input, {
+                    initialCountry: "us",
+                    separateDialCode: true,
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                });
+                input.dataset.intlTelInputId = phoneInputs.length;
+                return iti;
+            }
+            return null;
+        }
+
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Add Contact";
+            document.getElementById("contactForm").action = "/contacts/add";
+            document.getElementById("firstName").value = "";
+            document.getElementById("lastName").value = "";
+            document.getElementById("emailFields").innerHTML = `
+                <div class="email-field">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="emails" placeholder="Email">
+                    <button type="button" class="remove-btn" onclick="removeField(this)">×</button>
+                </div>
+            `;
+            document.getElementById("phoneFields").innerHTML = `
+                <div class="phone-item">
+                    <input type="tel" name="phones" class="phone-input">
+                </div>
+            `;
+            phoneInputs.forEach(iti => iti.destroy());
+            phoneInputs = [];
+            document.querySelectorAll('.phone-input').forEach(input => {
+                const iti = initializePhoneInput(input);
+                if (iti) phoneInputs.push(iti);
+            });
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function openEditModal(button) {
+            document.getElementById("modalTitle").innerText = "Edit Contact";
+            document.getElementById("contactForm").action = "/contacts/edit";
+            document.getElementById("resourceName").value = button.dataset.resource || "";
+            document.getElementById("firstName").value = button.dataset.firstname || "";
+            document.getElementById("lastName").value = button.dataset.lastname || "";
+
+            const emails = button.dataset.emails ? button.dataset.emails.split('\n').filter(email => email.trim() !== '') : [];
+            const emailFields = document.getElementById("emailFields");
+            emailFields.innerHTML = '';
+            if (emails.length > 0) {
+                emails.forEach((email, index) => {
+                    const field = document.createElement('div');
+                    field.className = 'email-field';
+                    field.innerHTML = `
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="emails" value="${email}" placeholder="Email">
+                        ${index > 0 || emails.length > 1 ? '<button type="button" class="remove-btn" onclick="removeField(this)">×</button>' : ''}
+                    `;
+                    emailFields.appendChild(field);
+                });
+            } else {
+                emailFields.innerHTML = `
+                    <div class="email-field">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="emails" placeholder="Email">
+                        <button type="button" class="remove-btn" onclick="removeField(this)">×</button>
+                    </div>
+                `;
+            }
+
+            const phones = button.dataset.phones ? button.dataset.phones.split('\n').filter(phone => phone.trim() !== '') : [];
+            const phoneFields = document.getElementById("phoneFields");
+            phoneFields.innerHTML = '';
+            phoneInputs.forEach(iti => iti.destroy());
+            phoneInputs = [];
+            if (phones.length > 0) {
+                phones.forEach((phone, index) => {
+                    const field = document.createElement('div');
+                    field.className = 'phone-item';
+                    field.innerHTML = `
+                        <input type="tel" name="phones" value="${phone}" class="phone-input">
+                        ${index > 0 || phones.length > 1 ? '<button type="button" class="remove-btn" onclick="removeField(this)">×</button>' : ''}
+                    `;
+                    phoneFields.appendChild(field);
+                });
+            } else {
+                phoneFields.innerHTML = `
+                    <div class="phone-item">
+                        <input type="tel" name="phones" class="phone-input">
+                    </div>
+                `;
+            }
+
+            document.querySelectorAll('.phone-input').forEach(input => {
+                const iti = initializePhoneInput(input);
+                if (iti) phoneInputs.push(iti);
+            });
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("contactModal").style.display = "none";
+            phoneInputs.forEach(iti => iti.destroy());
+            phoneInputs = [];
+        }
+
+        function confirmDelete(event, form) {
+            event.preventDefault();
+            pendingDeleteForm = form;
+            document.getElementById("deleteModal").style.display = "block";
+            return false;
+        }
+
+        function confirmDeleteAction() {
+            if (pendingDeleteForm) {
+                pendingDeleteForm.submit();
+            }
+            closeDeleteModal();
+        }
+
+        function closeDeleteModal() {
+            document.getElementById("deleteModal").style.display = "none";
+            pendingDeleteForm = null;
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const saveBtn = document.querySelector('.save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            const form = event.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/contacts';
+                } else {
+                    throw new Error('Failed to save contact');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+                alert('An error occurred while saving the contact.');
+            });
+        }
+    </script>
+</body>
+</html>
