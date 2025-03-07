@@ -16,7 +16,7 @@
                             </h3>
                         </div>
                         <div class="card-body">
-                            <form id="contactForm" th:action="${contactForm.resourceName != null ? '/contacts/edit/' + contactForm.resourceName : '/contacts/new'}" 
+                            <form id="contactForm" th:action="${contactForm.resourceName != null ? '/api/contacts/edit/' + contactForm.resourceName : '/api/contacts/new'}" 
                                   th:object="${contactForm}" method="post">
                                 
                                 <!-- Add CSRF token -->

@@ -2,6 +2,7 @@ package com.example.gadiane.johnkarl.demolition.controller;
 
 import com.example.gadiane.johnkarl.demolition.model.ContactForm;
 import com.example.gadiane.johnkarl.demolition.service.GooglePeopleService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +38,103 @@ public class GoogleContactController {
         return "contacts";
     }
 
+    @GetMapping("/contacts")
+    public String listContacts(Model model, OAuth2AuthenticationToken authentication) {
+        try {
+            // In a real implementation, you would fetch contacts here
+            // and add them to the model
+            return "list";
+        } catch (Exception e) {
+            logger.error("Error listing contacts: {}", e.getMessage(), e);
+            return "error";
+        }
+    }
+
+    @GetMapping("/new")
+    public String newContactForm(Model model) {
+        model.addAttribute("contactForm", new ContactForm());
+        model.addAttribute("title", "Add New Contact");
+        return "form";
+    }
+
+    @PostMapping("/new")
+    public String createNewContact(
+            OAuth2AuthenticationToken authentication,
+            @ModelAttribute ContactForm contactForm,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Map<String, Object> newContact = googlePeopleService.createContact(authentication, contactForm);
+            redirectAttributes.addFlashAttribute("message", "Contact created successfully!");
+            return "redirect:/contacts";
+        } catch (Exception e) {
+            logger.error("Error creating contact: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Error creating contact: " + e.getMessage());
+            return "redirect:/contacts";
+        }
+    }
+
     @GetMapping("/{resourceId}")
+    public String viewContact(
+            OAuth2AuthenticationToken authentication,
+            @PathVariable String resourceId,
+            Model model) {
+        try {
+            String decodedResourceId = URLDecoder.decode(resourceId, StandardCharsets.UTF_8.toString());
+            
+            Map<String, Object> contact = googlePeopleService.getContact(authentication, decodedResourceId);
+            model.addAttribute("contact", contact);
+            return "view";
+        } catch (Exception e) {
+            logger.error("Error viewing contact: {}", e.getMessage(), e);
+            return "error";
+        }
+    }
+
+    @GetMapping("/edit/{resourceId}")
+    public String editContactForm(
+            OAuth2AuthenticationToken authentication,
+            @PathVariable String resourceId,
+            Model model) {
+        try {
+            String decodedResourceId = URLDecoder.decode(resourceId, StandardCharsets.UTF_8.toString());
+            
+            Map<String, Object> contact = googlePeopleService.getContact(authentication, decodedResourceId);
+            
+            // Convert the contact map to a ContactForm object
+            ContactForm contactForm = new ContactForm();
+            contactForm.setResourceName(decodedResourceId);
+            
+            // Extract name, email, and phone from the contact map
+            // This would need to be implemented based on the structure of the contact map
+            
+            model.addAttribute("contactForm", contactForm);
+            model.addAttribute("title", "Edit Contact");
+            return "form";
+        } catch (Exception e) {
+            logger.error("Error editing contact: {}", e.getMessage(), e);
+            return "error";
+        }
+    }
+
+    @GetMapping("/delete/{resourceId}")
+    public String deleteContact(
+            OAuth2AuthenticationToken authentication,
+            @PathVariable String resourceId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            String decodedResourceId = URLDecoder.decode(resourceId, StandardCharsets.UTF_8.toString());
+            
+            googlePeopleService.deleteContact(authentication, decodedResourceId);
+            redirectAttributes.addFlashAttribute("message", "Contact deleted successfully!");
+            return "redirect:/contacts";
+        } catch (Exception e) {
+            logger.error("Error deleting contact: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Error deleting contact: " + e.getMessage());
+            return "redirect:/contacts";
+        }
+    }
+
+    @GetMapping("/data/{resourceId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getContact(
             OAuth2AuthenticationToken authentication,

@@ -9,7 +9,7 @@
         <div th:fragment="content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="bi bi-person-rolodex me-2"></i>My Contacts</h2>
-                <a href="/contacts/new" class="btn btn-success">
+                <a href="/api/contacts/new" class="btn btn-success">
                     <i class="bi bi-person-plus me-2"></i>Add New Contact
                 </a>
             </div>
@@ -43,15 +43,15 @@
                                 <span th:text="${contact.phoneNumber}">+1234567890</span>
                             </td>
                             <td class="text-center">
-                                <a th:href="@{/contacts/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
+                                <a th:href="@{/api/contacts/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
                                    class="btn btn-sm btn-primary m-1">
                                     <i class="bi bi-eye me-1"></i>View
                                 </a>
-                                <a th:href="@{/contacts/edit/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
+                                <a th:href="@{/api/contacts/edit/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
                                    class="btn btn-sm btn-warning m-1">
                                     <i class="bi bi-pencil me-1"></i>Edit
                                 </a>
-                                <a th:href="@{/contacts/delete/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
+                                <a th:href="@{/api/contacts/delete/{resourceName}(resourceName=${#strings.replace(contact.resourceName, 'people/', '')})}" 
                                    class="btn btn-sm btn-danger m-1" 
                                    onclick="return confirm('Are you sure you want to delete this contact?')">
                                     <i class="bi bi-trash me-1"></i>Delete
