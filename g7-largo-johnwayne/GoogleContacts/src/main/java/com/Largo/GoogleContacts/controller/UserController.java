@@ -34,40 +34,30 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 @RequestMapping
 @Controller
 public class UserController {
     @Autowired
     private GoogleContactsService googleContactsService;
-    
+
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
-    
+
     @GetMapping("")
     public String index() {
         return "home";  // Return home view
     }
-    
+
     @GetMapping("/user-info")
-    public String getUserInfo(@AuthenticationPrincipal Object principal, Model model) {
-        if (principal instanceof OidcUser) {
-            OidcUser oidcUser = (OidcUser) principal;
-            // Extract OIDC user info
-            String name = oidcUser.getFullName();
-            String email = oidcUser.getEmail();
-            String pictureUrl = oidcUser.getPicture();
-            
-            // Add attributes to model
-            model.addAttribute("name", name);
-            model.addAttribute("email", email);
-            model.addAttribute("pictureUrl", pictureUrl);
-        } else if (principal instanceof OAuth2User) {
-            OAuth2User oauth2User = (OAuth2User) principal;
+    public String getUserInfo(@AuthenticationPrincipal OAuth2User principal, Model model) {
+        if(principal != null){
+
             // Extract OAuth2 user info
-            String name = oauth2User.getAttribute("name");
-            String email = oauth2User.getAttribute("email");
-            String pictureUrl = oauth2User.getAttribute("picture");
-            
+            String name = principal.getAttribute("name");
+            String email = principal.getAttribute("email");
+            String pictureUrl = principal.getAttribute("picture");
+
             // Add attributes to model
             model.addAttribute("name", name);
             model.addAttribute("email", email);
@@ -78,33 +68,33 @@ public class UserController {
 
         return "user-info"; // Return the view name
     }
-    
+
     @GetMapping("/contacts")
     public String fetchContactsFromGoogle(Model model, @AuthenticationPrincipal OAuth2User principal) throws IOException {
         if (principal == null) {
             return "redirect:/";
         }
-        
+
         List<Person> connections = googleContactsService.getConnectionsAsPeople(principal);
         model.addAttribute("contacts", connections);
         return "contact";
     }
-    
+
     @GetMapping("/contact/add-form")
     public String showAddContactForm(Model model) {
         return "addContact";
     }
-    
+
     @PostMapping("/contact/add")
     public String addContact(
-            @RequestParam("displayName") String name, 
+            @RequestParam("displayName") String name,
             @RequestParam String email,
             @RequestParam(required = false) String phoneNumber,
             @AuthenticationPrincipal OAuth2User principal,
             Model model) {
-        
+
         System.out.println("Adding contact: " + name + ", " + email + ", " + phoneNumber);
-        
+
         try {
             googleContactsService.addContact(principal, name, email, phoneNumber);
             return "redirect:/contacts";
@@ -113,7 +103,7 @@ public class UserController {
             return "addContact";
         }
     }
-    
+
     @GetMapping("/contacts/edit/people/{contactId}")
     public String editContactForm(
             @PathVariable String contactId,

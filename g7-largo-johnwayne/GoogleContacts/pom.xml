@@ -41,6 +41,11 @@
     <version>4.0.1</version>
     <scope>provided</scope>
 </dependency>
+   
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
         <!-- Google API Client (Compatible Version) -->
         <dependency>
             <groupId>com.google.api-client</groupId>

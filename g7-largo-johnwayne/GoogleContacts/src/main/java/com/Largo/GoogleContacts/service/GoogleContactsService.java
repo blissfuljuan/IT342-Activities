@@ -22,6 +22,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,36 +33,36 @@ public class GoogleContactsService {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String APPLICATION_NAME = "Google Contacts Integration";
     private static final List<String> PERSON_FIELDS = Arrays.asList("names", "emailAddresses", "phoneNumbers");
-    
+
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
-    
+
     private PeopleService getPeopleService(OAuth2User principal) {
         // Get the client registration ID (should be "google" based on your configuration)
         String clientRegistrationId = "google";
-        
+
         // Get the name/identifier from principal
         String name = principal.getName();
-        
+
         // Load the authorized client
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
                 clientRegistrationId,
                 name
         );
-        
+
         if (client == null) {
             throw new RuntimeException("OAuth2 client is null. User may not be properly authenticated.");
         }
 
         String accessToken = client.getAccessToken().getTokenValue();
-        
+
         if (accessToken == null) {
             throw new RuntimeException("Access token is null");
         }
 
         // For debugging
         System.out.println("Access Token: " + accessToken);
-        
+
         // Build and return the PeopleService
         return new PeopleService.Builder(
                 new NetHttpTransport(),
@@ -72,7 +74,7 @@ public class GoogleContactsService {
 
     public List<Contacts> getContacts(OAuth2User principal) {
         List<Contacts> contactsList = new ArrayList<>();
-        
+
         if (principal == null) {
             throw new RuntimeException("User is not authenticated");
         }
@@ -80,7 +82,7 @@ public class GoogleContactsService {
         try {
             PeopleService peopleService = getPeopleService(principal);
             List<Person> connections = getConnections(peopleService);
-            
+
             for (Person person : connections) {
                 Contacts contact = new Contacts();
                 contact.setResourceName(person.getResourceName());
@@ -95,12 +97,12 @@ public class GoogleContactsService {
 
         return contactsList;
     }
-    
+
     public List<Person> getConnectionsAsPeople(OAuth2User principal) {
         if (principal == null) {
             throw new RuntimeException("User is not authenticated");
         }
-        
+
         try {
             PeopleService peopleService = getPeopleService(principal);
             return getConnections(peopleService);
@@ -108,23 +110,23 @@ public class GoogleContactsService {
             throw new RuntimeException("Error fetching contacts: " + e.getMessage(), e);
         }
     }
-    
+
     private List<Person> getConnections(PeopleService peopleService) throws IOException {
         ListConnectionsResponse response = peopleService.people().connections()
                 .list("people/me")
                 .setPersonFields(String.join(",", PERSON_FIELDS))
                 .execute();
-                
+
         return response.getConnections() != null ? response.getConnections() : new ArrayList<>();
     }
-    
+
     public void addContact(OAuth2User principal, String name, String email, String phoneNumber) {
         try {
             PeopleService peopleService = getPeopleService(principal);
 
             // Create a new person
             Person newPerson = new Person();
-            
+
             // Add name
             Name personName = new Name();
             personName.setDisplayName(name);
@@ -153,7 +155,7 @@ public class GoogleContactsService {
             throw new RuntimeException("Failed to add contact: " + e.getMessage(), e);
         }
     }
-    
+
     public void updateContact(OAuth2User principal, String resourceName, Person updatePerson, List<String> updatePersonFields) {
         try {
             PeopleService peopleService = getPeopleService(principal);
@@ -179,7 +181,7 @@ public class GoogleContactsService {
             throw new RuntimeException("Failed to delete contact: " + e.getMessage(), e);
         }
     }
-    
+
     public Person getPersonById(OAuth2User principal, String resourceName) {
         try {
             PeopleService peopleService = getPeopleService(principal);
@@ -190,23 +192,23 @@ public class GoogleContactsService {
             throw new RuntimeException("Failed to fetch contact: " + e.getMessage(), e);
         }
     }
-    
+
     public Contacts getContactById(OAuth2User principal, String resourceName) {
         try {
             Person person = getPersonById(principal, resourceName);
-            
+
             Contacts contact = new Contacts();
             contact.setResourceName(resourceName);
             contact.setName(getPersonName(person));
             contact.setEmail(getPersonEmail(person));
             contact.setPhoneNumber(getPersonPhoneNumber(person));
-            
+
             return contact;
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch contact: " + e.getMessage(), e);
         }
     }
-    
+
     private String getPersonName(Person person) {
         List<Name> names = person.getNames();
         if (names != null && !names.isEmpty()) {
@@ -214,7 +216,7 @@ public class GoogleContactsService {
         }
         return "";
     }
-    
+
     private String getPersonEmail(Person person) {
         List<EmailAddress> emailAddresses = person.getEmailAddresses();
         if (emailAddresses != null && !emailAddresses.isEmpty()) {
@@ -222,7 +224,7 @@ public class GoogleContactsService {
         }
         return "";
     }
-    
+
     private String getPersonPhoneNumber(Person person) {
         List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
         if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
