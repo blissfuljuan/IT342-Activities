@@ -25,32 +25,53 @@
             background-color: #333 !important;
         }
 
-/* Contact Card Styling */
-.contact-card {
-    background: white;
-    width: 250px;
-    height: 350px;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 15px;
+        /* Contact Card Styling */
+        .contact-card {
+            background: white;
+            width: 250px;
+            height: auto;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+        }
 
-    /* Flexbox for centering content */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers content horizontally */
-    justify-content: center; /* Centers content vertically */
-    text-align: center;
-}
-
-
+        /* Contact Info Styling */
         .contact-info {
-            font-size: 16px;
+            font-size: 14px;
             color: #333;
+            margin: 2px 0;
+        }
+
+        .contact-email {
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .contact-phone {
+            font-size: 14px;
+            color: #28a745;
+        }
+
+        /* Action Buttons Styling */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         .action-buttons button {
-            margin-right: 5px;
+            margin: 0 5px;
+        }
+
+        /* Modal Content Styling */
+        .modal-body input {
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -75,40 +96,49 @@
     </div>
 </div>
 
-    <!-- Contact Cards Display -->
-    <div class="container">
-        <div class="row justify-content-center" id="contactsContainer">
-            <div class="col-md-3 p-1 m-3 d-flex justify-content-center" th:each="contact : ${contacts}" th:if="${contact.names != null and contact.names.size() > 0}">
-                <div class="contact-card text-center w-100">
-                    <!-- Contact Image -->
-                    <img th:if="${contact.photos != null and contact.photos.size() > 0}"
-                         th:src="${contact.photos[0].url}"
-                         alt="Contact Image"
-                         class="contact-img rounded-circle">
-                    <img th:unless="${contact.photos != null and contact.photos.size() > 0}"
-                         src="/static/default-profile.jpg"
-                         alt="Default Image"
-                         class="contact-img rounded-circle">
+<!-- Contact Cards Display -->
+<div class="container">
+    <div class="row justify-content-center" id="contactsContainer">
+        <div class="col-md-3 p-1 m-3 d-flex justify-content-center" th:each="contact : ${contacts}" th:if="${contact.names != null and contact.names.size() > 0}">
+            <div class="contact-card text-center w-100">
+                <!-- Contact Image -->
+                <img th:if="${contact.photos != null and contact.photos.size() > 0}"
+                     th:src="${contact.photos[0].url}"
+                     alt="Contact Image"
+                     class="contact-img rounded-circle">
+                <img th:unless="${contact.photos != null and contact.photos.size() > 0}"
+                     src="/static/default-profile.jpg"
+                     alt="Default Image"
+                     class="contact-img rounded-circle">
 
-                    <h5 class="mt-2" th:text="${contact.names[0].displayName}"></h5>
-                    <p th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></p>
-                    <p th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Number'}"></p>
+                <h5 class="mt-2" th:text="${contact.names[0].displayName}"></h5>
 
-                    <!-- Edit & Delete Buttons -->
-                    <div class="action-buttons">
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
-                            Edit
-                        </button>
-                        <form action="/api/contacts/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
-                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </div>
+                <!-- Display Multiple Emails -->
+                <div class="contact-info">
+                    <p th:each="email : ${contact.emailAddresses}" th:text="${email.value}" class="contact-email"></p>
                 </div>
+
+                <!-- Display Multiple Phone Numbers -->
+                <div class="contact-info">
+                    <p th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}" class="contact-phone"></p>
+                </div>
+
+                <!-- Edit & Delete Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                            th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                        Edit
+                    </button>
+                    <form action="/api/contacts/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
+</div>
 
 <!-- Add Contact Modal -->
 <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
@@ -126,16 +156,22 @@
                     </div>
                     <div class="mb-3">
                         <label for="familyName" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="familyName" name="familyName" required>
+                        <input type="text" class="form-control" id="familyName" name="familyName">
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email">
+                    <!-- Multiple Emails -->
+                    <div class="mb-3" id="emailFields">
+                        <label class="form-label">Email(s)</label>
+                        <input type="email" class="form-control" name="emails[]" placeholder="Email 1">
                     </div>
-                    <div class="mb-3">
-                        <label for="phoneNumber" class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                    <button type="button" class="btn btn-secondary btn-sm" id="addEmailBtn">Add another email</button>
+
+                    <!-- Multiple Phone Numbers -->
+                    <div class="mb-3" id="phoneFields">
+                        <label class="form-label">Phone Number(s)</label>
+                        <input type="tel" class="form-control" name="phoneNumbers[]" placeholder="Phone 1">
                     </div>
+                    <button type="button" class="btn btn-secondary btn-sm" id="addPhoneBtn">Add another phone</button>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save Contact</button>
@@ -147,51 +183,117 @@
 </div>
 
 
-
 <!-- Edit Contact Modals -->
-    <div th:each="contact : ${contacts}">
-        <div class="modal fade" th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Contact</h5>
-                    </div>
-                    <div class="modal-body">
-                        <form th:action="@{/api/contacts/update}" method="POST">
-                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
-                            <div class="mb-3">
-                                <label class="form-label">First Name</label>
-                                <input type="text" class="form-control" name="givenName" th:value="${contact.names[0].givenName}" required>
+<div th:each="contact : ${contacts}">
+    <div class="modal fade" th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}" tabindex="-1" aria-labelledby="editContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editContactModalLabel">Edit Contact</h5>
+                </div>
+                <div class="modal-body">
+                    <!-- Separate Edit Contact Form -->
+                    <form th:action="@{/api/contacts/update}" method="POST">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+
+                        <!-- First Name and Last Name -->
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="givenName" th:value="${contact.names[0].givenName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="familyName" th:value="${contact.names[0].familyName}" required>
+                        </div>
+
+                        <!-- Emails Section -->
+                        <div class="mb-3" th:id="'emailsSection-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                            <label class="form-label">Email(s)</label>
+                            <div th:each="email, iterStat : ${contact.emailAddresses}" class="email-field">
+                                <input type="email" class="form-control mb-2" name="emails[]" th:value="${email.value}" placeholder="Email">
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Last Name</label>
-                                <input type="text" class="form-control" name="familyName" th:value="${contact.names[0].familyName}" required>
+                            <button type="button" class="btn btn-secondary btn-sm" th:attr="data-contact-id=${#strings.replace(contact.resourceName, '/', '_')}" id="addEmailBtnEdit">Add Another Email</button>
+                        </div>
+
+                        <!-- Phone Numbers Section -->
+                        <div class="mb-3" th:id="'phoneNumbersSection-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                            <label class="form-label">Phone Number(s)</label>
+                            <div th:each="phone, iterStat : ${contact.phoneNumbers}" class="phone-field">
+                                <input type="tel" class="form-control mb-2" name="phoneNumbers[]" th:value="${phone.value}" placeholder="Phone">
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" name="email" th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" name="phoneNumber" th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}">
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
+                            <button type="button" class="btn btn-secondary btn-sm" th:attr="data-contact-id=${#strings.replace(contact.resourceName, '/', '_')}" id="addPhoneBtnEdit">Add Another Phone</button>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- JavaScript Functions -->
 <script>
+    // Add New Email Field in Add Contact Modal
+document.getElementById('addEmailBtn').addEventListener('click', function() {
+    const emailFields = document.getElementById('emailFields');
+    const newEmailField = document.createElement('input');
+    newEmailField.type = 'email';
+    newEmailField.classList.add('form-control', 'mt-2');
+    newEmailField.name = 'emails[]';
+    newEmailField.placeholder = 'Email ' + (emailFields.querySelectorAll('input').length + 1);
+    emailFields.appendChild(newEmailField);
+});
+
+// Add New Phone Field in Add Contact Modal
+document.getElementById('addPhoneBtn').addEventListener('click', function() {
+    const phoneFields = document.getElementById('phoneFields');
+    const newPhoneField = document.createElement('input');
+    newPhoneField.type = 'tel';
+    newPhoneField.classList.add('form-control', 'mt-2');
+    newPhoneField.name = 'phoneNumbers[]';
+    newPhoneField.placeholder = 'Phone ' + (phoneFields.querySelectorAll('input').length + 1);
+    phoneFields.appendChild(newPhoneField);
+});
+
+// Add New Email Field in Edit Contact Modal
+document.querySelectorAll('#addEmailBtnEdit').forEach(button => {
+    button.addEventListener('click', function() {
+        const contactId = this.getAttribute('data-contact-id');
+        const emailFields = document.getElementById('emailsSection-' + contactId);
+        const newEmailField = document.createElement('input');
+        newEmailField.type = 'email';
+        newEmailField.classList.add('form-control', 'mb-2');
+        newEmailField.name = 'emails[]';
+        newEmailField.placeholder = 'Email ' + (emailFields.querySelectorAll('input').length + 1);
+        emailFields.appendChild(newEmailField);
+    });
+});
+
+// Add New Phone Field in Edit Contact Modal
+document.querySelectorAll('#addPhoneBtnEdit').forEach(button => {
+    button.addEventListener('click', function() {
+        const contactId = this.getAttribute('data-contact-id');
+        const phoneFields = document.getElementById('phoneNumbersSection-' + contactId);
+        const newPhoneField = document.createElement('input');
+        newPhoneField.type = 'tel';
+        newPhoneField.classList.add('form-control', 'mb-2');
+        newPhoneField.name = 'phoneNumbers[]';
+        newPhoneField.placeholder = 'Phone ' + (phoneFields.querySelectorAll('input').length + 1);
+        phoneFields.appendChild(newPhoneField);
+    });
+});
+
+
+
     function confirmDelete() {
         return confirm("Are you sure you want to delete this contact?");
     }
@@ -203,10 +305,12 @@
         contactColumns.forEach(column => {
             const card = column.querySelector('.contact-card');
             const name = card.querySelector('h5').textContent.toUpperCase();
-            const email = card.querySelector('p:nth-of-type(1)').textContent.toUpperCase();
-            const phone = card.querySelector('p:nth-of-type(2)').textContent.toUpperCase();
 
-            if (name.includes(input) || email.includes(input) || phone.includes(input)) {
+            // Check all emails and phone numbers
+            const emails = Array.from(card.querySelectorAll('p:nth-of-type(1) span')).map(span => span.textContent.toUpperCase());
+            const phones = Array.from(card.querySelectorAll('p:nth-of-type(2) span')).map(span => span.textContent.toUpperCase());
+
+            if (name.includes(input) || emails.some(email => email.includes(input)) || phones.some(phone => phone.includes(input))) {
                 column.classList.remove("d-none");
             } else {
                 column.classList.add("d-none");

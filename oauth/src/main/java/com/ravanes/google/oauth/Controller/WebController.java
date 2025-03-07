@@ -32,7 +32,7 @@ public class WebController {
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("error", "Failed to fetch contacts.");
-            return "error";// Refers to error.html in /templates
+            return "error"; // Refers to error.html in /templates
         }
     }
 
@@ -41,11 +41,11 @@ public class WebController {
     public String createContact(
             @RequestParam String givenName,
             @RequestParam String familyName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber) throws IOException {
+            @RequestParam(required = false) List<String> emails,  // Changed to List<String> for multiple emails
+            @RequestParam(required = false) List<String> phoneNumbers) throws IOException {  // Changed to List<String> for multiple phone numbers
 
         // Create contact using service method
-        Person newContact = googleContactsService.createContact(givenName, familyName, email, phoneNumber);
+        Person newContact = googleContactsService.createContact(givenName, familyName, emails, phoneNumbers);
         System.out.println("Contact created: " + newContact.getResourceName());
 
         // Redirect to contacts page after creation
@@ -58,12 +58,12 @@ public class WebController {
             @RequestParam String resourceName,
             @RequestParam String givenName,
             @RequestParam String familyName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber) {
+            @RequestParam(required = false) List<String> emails,  // Changed to List<String> for multiple emails
+            @RequestParam(required = false) List<String> phoneNumbers) {  // Changed to List<String> for multiple phone numbers
 
         try {
             // Update contact using service method
-            googleContactsService.updateContact(resourceName, givenName, familyName, email, phoneNumber);
+            googleContactsService.updateContact(resourceName, givenName, familyName, emails, phoneNumbers);
             System.out.println("Contact updated: " + resourceName);
             return "redirect:/contacts";
         } catch (IOException e) {

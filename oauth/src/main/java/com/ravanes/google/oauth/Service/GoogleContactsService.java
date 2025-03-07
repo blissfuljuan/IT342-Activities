@@ -59,23 +59,35 @@ public class GoogleContactsService {
     }
 
     // Create a new contact
-    public Person createContact(String givenName, String familyName, String email, String phoneNumber) throws IOException {
+    public Person createContact(String givenName, String familyName, List<String> emails, List<String> phoneNumbers) throws IOException {
         PeopleService peopleService = createPeopleService();
         Person newPerson = new Person();
 
         newPerson.setNames(List.of(new Name().setGivenName(givenName).setFamilyName(familyName)));
-        if (email != null && !email.isEmpty()) {
-            newPerson.setEmailAddresses(List.of(new EmailAddress().setValue(email)));
+
+        // Handle multiple emails
+        if (emails != null && !emails.isEmpty()) {
+            List<EmailAddress> emailList = new ArrayList<>();
+            for (String email : emails) {
+                emailList.add(new EmailAddress().setValue(email));
+            }
+            newPerson.setEmailAddresses(emailList);
         }
-        if (phoneNumber != null && !phoneNumber.isEmpty()) {
-            newPerson.setPhoneNumbers(List.of(new PhoneNumber().setValue(phoneNumber)));
+
+        // Handle multiple phone numbers
+        if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
+            List<PhoneNumber> phoneList = new ArrayList<>();
+            for (String phoneNumber : phoneNumbers) {
+                phoneList.add(new PhoneNumber().setValue(phoneNumber));
+            }
+            newPerson.setPhoneNumbers(phoneList);
         }
 
         return peopleService.people().createContact(newPerson).execute();
     }
 
     // Update an existing contact
-    public void updateContact(String resourceName, String givenName, String familyName, String email, String phoneNumber) throws IOException {
+    public void updateContact(String resourceName, String givenName, String familyName, List<String> emails, List<String> phoneNumbers) throws IOException {
         PeopleService peopleService = createPeopleService();
         Person existingContact = peopleService.people().get(resourceName)
                 .setPersonFields("names,emailAddresses,phoneNumbers")
@@ -83,9 +95,25 @@ public class GoogleContactsService {
 
         Person updatedContact = new Person()
                 .setEtag(existingContact.getEtag())
-                .setNames(List.of(new Name().setGivenName(givenName).setFamilyName(familyName)))
-                .setEmailAddresses(email != null && !email.isEmpty() ? List.of(new EmailAddress().setValue(email)) : null)
-                .setPhoneNumbers(phoneNumber != null && !phoneNumber.isEmpty() ? List.of(new PhoneNumber().setValue(phoneNumber)) : null);
+                .setNames(List.of(new Name().setGivenName(givenName).setFamilyName(familyName)));
+
+        // Handle multiple emails
+        if (emails != null && !emails.isEmpty()) {
+            List<EmailAddress> emailList = new ArrayList<>();
+            for (String email : emails) {
+                emailList.add(new EmailAddress().setValue(email));
+            }
+            updatedContact.setEmailAddresses(emailList);
+        }
+
+        // Handle multiple phone numbers
+        if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
+            List<PhoneNumber> phoneList = new ArrayList<>();
+            for (String phoneNumber : phoneNumbers) {
+                phoneList.add(new PhoneNumber().setValue(phoneNumber));
+            }
+            updatedContact.setPhoneNumbers(phoneList);
+        }
 
         peopleService.people().updateContact(resourceName, updatedContact)
                 .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
@@ -98,4 +126,3 @@ public class GoogleContactsService {
         peopleService.people().deleteContact(resourceName).execute();
     }
 }
-
