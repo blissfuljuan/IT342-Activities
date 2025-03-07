@@ -6,6 +6,7 @@ public class ContactForm {
     private String email;
     private String phoneNumber;
     private String resourceName;
+    private String name; // Added for full name
 
     // Getters and setters
     public String getFirstName() { return firstName; }
@@ -22,4 +23,8 @@ public class ContactForm {
     
     public String getResourceName() { return resourceName; }
     public void setResourceName(String resourceName) { this.resourceName = resourceName; }
+    
+    // Added for full name
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 }

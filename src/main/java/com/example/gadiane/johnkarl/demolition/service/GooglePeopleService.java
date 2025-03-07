@@ -29,6 +29,56 @@ public class GooglePeopleService {
         this.authorizedClientService = authorizedClientService;
     }
 
+    public List<Map<String, Object>> listContacts(OAuth2AuthenticationToken authentication) {
+        try {
+            if (!authentication.getAuthorizedClientRegistrationId().equals("google")) {
+                throw new RuntimeException("Not a Google account");
+            }
+
+            OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
+                    authentication.getAuthorizedClientRegistrationId(),
+                    authentication.getName()
+            );
+
+            if (client == null) {
+                throw new RuntimeException("No authorized client found");
+            }
+
+            String accessToken = client.getAccessToken().getTokenValue();
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            String listUrl = UriComponentsBuilder.fromHttpUrl(PEOPLE_API_BASE_URL + "/people/me/connections")
+                    .queryParam("personFields", "names,emailAddresses,phoneNumbers")
+                    .queryParam("pageSize", "100")
+                    .build()
+                    .toUriString();
+            
+            logger.info("Fetching contacts from URL: {}", listUrl);
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    listUrl,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Map.class
+            );
+
+            Map<String, Object> responseBody = response.getBody();
+            List<Map<String, Object>> connections = new ArrayList<>();
+            
+            if (responseBody != null && responseBody.containsKey("connections")) {
+                connections = (List<Map<String, Object>>) responseBody.get("connections");
+            }
+            
+            return connections;
+        } catch (Exception e) {
+            logger.error("Error listing contacts: {}", e.getMessage(), e);
+            throw new RuntimeException("Error listing contacts: " + e.getMessage(), e);
+        }
+    }
+
     public Map<String, Object> getContact(OAuth2AuthenticationToken authentication, String resourceId) {
         try {
             if (!authentication.getAuthorizedClientRegistrationId().equals("google")) {
