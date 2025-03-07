@@ -1,4 +1,4 @@
-package com.cabana.GoogleAPIIntegration.config;
+package com.cabana.oauth2.oauth2.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +11,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/user-info", true))
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth -> oauth
+                        .defaultSuccessUrl("/dashboard", true)
+                )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
-                .formLogin(form -> form.defaultSuccessUrl("/secured", true))
-                .csrf(AbstractHttpConfigurer::disable)
-                .build();
+                .formLogin(form -> form.defaultSuccessUrl("/user-info", true));
+
+        return http.build();
     }
 }

@@ -1,10 +1,10 @@
-package com.cabana.GoogleAPIIntegration;
+package com.cabana.oauth2.oauth2;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GoogleApiIntegrationApplicationTests {
+class Oauth2ApplicationTests {
 
 	@Test
 	void contextLoads() {
