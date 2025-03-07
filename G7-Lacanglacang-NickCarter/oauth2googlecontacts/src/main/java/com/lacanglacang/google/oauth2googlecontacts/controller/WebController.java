@@ -55,9 +55,9 @@ public class WebController {
             @RequestParam String givenName,
             @RequestParam String familyName,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber) throws IOException {
+            @RequestParam(required = false) List<String> phoneNumbers) throws IOException {
 
-        Person newContact = googleContactsService.createContact(givenName, familyName, email, phoneNumber);
+        Person newContact = googleContactsService.createContact(givenName, familyName, email, phoneNumbers);
         System.out.println("Contact created: " + newContact.getResourceName());
         return "redirect:/contacts";
     }
@@ -69,11 +69,11 @@ public class WebController {
             @RequestParam String givenName,
             @RequestParam String familyName,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phoneNumber) {
+            @RequestParam(required = false) List<String> phoneNumbers) {
 
         try {
             // Update contact using service method
-            googleContactsService.updateContact(resourceName, givenName, familyName, email, phoneNumber);
+            googleContactsService.updateContact(resourceName, givenName, familyName, email, phoneNumbers);
             System.out.println("Contact updated: " + resourceName);
             return "redirect:/contacts";
         } catch (IOException e) {

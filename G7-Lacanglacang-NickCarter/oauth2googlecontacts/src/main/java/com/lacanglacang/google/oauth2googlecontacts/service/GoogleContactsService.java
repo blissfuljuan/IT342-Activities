@@ -57,7 +57,8 @@ public class GoogleContactsService {
     }
 
     // Create a new contact
-    public Person createContact(String givenName, String familyName, String email, String phoneNumber)
+    public Person createContact(String givenName, String familyName, String email,
+            List<String> phoneNumbers)
             throws IOException {
         PeopleService peopleService = createPeopleService();
         Person newPerson = new Person();
@@ -66,29 +67,45 @@ public class GoogleContactsService {
         if (email != null && !email.isEmpty()) {
             newPerson.setEmailAddresses(List.of(new EmailAddress().setValue(email)));
         }
-        if (phoneNumber != null && !phoneNumber.isEmpty()) {
-            newPerson.setPhoneNumbers(List.of(new PhoneNumber().setValue(phoneNumber)));
+
+        if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
+            List<PhoneNumber> phoneNumberList = new ArrayList<>();
+            for (String phone : phoneNumbers) {
+                if (phone != null && !phone.isEmpty()) {
+                    phoneNumberList.add(new PhoneNumber().setValue(phone));
+                }
+            }
+            newPerson.setPhoneNumbers(phoneNumberList);
         }
 
         return peopleService.people().createContact(newPerson).execute();
     }
 
-    // Update an existing contact
     public void updateContact(String resourceName, String givenName, String familyName, String email,
-            String phoneNumber) throws IOException {
+            List<String> phoneNumbers) throws IOException {
         PeopleService peopleService = createPeopleService();
+
         Person existingContact = peopleService.people().get(resourceName)
                 .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
 
-        Person updatedContact = new Person()
-                .setEtag(existingContact.getEtag())
-                .setNames(List.of(new Name().setGivenName(givenName).setFamilyName(familyName)))
-                .setEmailAddresses(
-                        email != null && !email.isEmpty() ? List.of(new EmailAddress().setValue(email)) : null)
-                .setPhoneNumbers(
-                        phoneNumber != null && !phoneNumber.isEmpty() ? List.of(new PhoneNumber().setValue(phoneNumber))
-                                : null);
+        Person updatedContact = new Person().setEtag(existingContact.getEtag());
+
+        updatedContact.setNames(List.of(new Name().setGivenName(givenName).setFamilyName(familyName)));
+
+        if (email != null && !email.isEmpty()) {
+            updatedContact.setEmailAddresses(List.of(new EmailAddress().setValue(email)));
+        }
+
+        if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
+            List<PhoneNumber> phoneNumberList = new ArrayList<>();
+            for (String phone : phoneNumbers) {
+                if (phone != null && !phone.isEmpty()) {
+                    phoneNumberList.add(new PhoneNumber().setValue(phone));
+                }
+            }
+            updatedContact.setPhoneNumbers(phoneNumberList);
+        }
 
         peopleService.people().updateContact(resourceName, updatedContact)
                 .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
