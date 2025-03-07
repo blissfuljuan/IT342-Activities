@@ -5,7 +5,8 @@ import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 
-//import java.util.List;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ContactUtil {
 
@@ -50,8 +51,17 @@ public class ContactUtil {
             return "";
         }
         
-        EmailAddress email = person.getEmailAddresses().get(0);
-        return email.getValue() != null ? email.getValue() : "";
+        return person.getEmailAddresses().get(0).getValue();
+    }
+    
+    public static List<String> getEmails(Person person) {
+        if (person == null || person.getEmailAddresses() == null || person.getEmailAddresses().isEmpty()) {
+            return List.of();
+        }
+
+        return person.getEmailAddresses().stream()
+                .map(EmailAddress::getValue)
+                .collect(Collectors.toList());
     }
     
     public static String getPrimaryPhone(Person person) {
@@ -59,8 +69,17 @@ public class ContactUtil {
             return "";
         }
         
-        PhoneNumber phone = person.getPhoneNumbers().get(0);
-        return phone.getValue() != null ? phone.getValue() : "";
+        return person.getPhoneNumbers().get(0).getValue();
+    }
+    
+    public static List<String> getPhoneNumbers(Person person) {
+        if (person == null || person.getPhoneNumbers() == null || person.getPhoneNumbers().isEmpty()) {
+            return List.of();
+        }
+
+        return person.getPhoneNumbers().stream()
+                .map(PhoneNumber::getValue)
+                .collect(Collectors.toList());
     }
     
     public static String getPhotoUrl(Person person) {

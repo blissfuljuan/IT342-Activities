@@ -55,20 +55,25 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
+                                <th>Emails</th>
+                                <th>Phones</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="contact : ${contacts}">
+                                <td th:text="${utils.getDisplayName(contact)}">John Doe</td>
                                 <td>
-                                    <span th:text="${utils.getDisplayName(contact)}">John Doe</span>
+                                    <ul>
+                                        <li th:each="email : ${utils.getEmails(contact)}" th:text="${email}"></li>
+                                    </ul>
                                 </td>
-                                <td th:text="${utils.getPrimaryEmail(contact)}">john@example.com</td>
-                                <td th:text="${utils.getPrimaryPhone(contact)}">+1234567890</td>
                                 <td>
-                                    <!-- Extract the ID from resourceName (e.g., "people/c1234567") -->
+                                    <ul>
+                                        <li th:each="phone : ${utils.getPhoneNumbers(contact)}" th:text="${phone}"></li>
+                                    </ul>
+                                </td>
+                                <td>
                                     <a th:href="@{'/contacts/' + ${contact.resourceName.substring(7)} + '/edit'}" 
                                        class="btn btn-sm btn-primary me-1">
                                         <i class="bi bi-pencil"></i>

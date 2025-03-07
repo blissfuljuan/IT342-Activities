@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -42,64 +43,79 @@ public class ContactController {
     }
 
     @PostMapping("/contacts")
-public String createContact(
-        OAuth2AuthenticationToken authentication,
-        @RequestParam("firstName") String firstName,
-        @RequestParam("lastName") String lastName,
-        @RequestParam("email") String email,
-        @RequestParam("phoneNumber") String phoneNumber,
-        RedirectAttributes redirectAttributes) {
-
-    Person contact = googlePeopleService.createPersonObject(firstName, lastName, email, phoneNumber);
-
-    try {
-        Person createdContact = googlePeopleService.createContact(authentication, contact);
-
-        if (createdContact != null) {
-            redirectAttributes.addFlashAttribute("message", "Contact successfully created!");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Failed to create contact.");
+    public String createContact(
+            OAuth2AuthenticationToken authentication,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("emails") List<String> emails,
+            @RequestParam("phoneNumbers") List<String> phoneNumbers,
+            RedirectAttributes redirectAttributes) {
+    
+        Person contact = googlePeopleService.createPersonObject(firstName, lastName, emails, phoneNumbers);
+    
+        try {
+            Person createdContact = googlePeopleService.createContact(authentication, contact);
+    
+            if (createdContact != null) {
+                redirectAttributes.addFlashAttribute("message", "Contact successfully created!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Failed to create contact.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error creating contact: " + e.getMessage());
         }
-    } catch (Exception e) {
-        e.printStackTrace();  // Print full error stack trace to VSCode terminal
-        redirectAttributes.addFlashAttribute("error", "Error creating contact: " + e.getMessage());
+    
+        return "redirect:/contacts";
     }
-
-    return "redirect:/contacts";
-}
+    
 
 
     @GetMapping("/contacts/{resourceName}/edit")
     public String editContactForm(
-            @PathVariable String resourceName,
-            OAuth2AuthenticationToken authentication,
-            Model model) {
-        
-        // The resourceName comes from URL as "people/c1234567" format
-        // But we need to replace the slash for Thymeleaf to process it properly
-        String encodedResourceName = resourceName.replace("/", "_");
-        
-        Person contact = googlePeopleService.getContact(authentication, "people/" + resourceName);
-        
+        @PathVariable String resourceName,
+        OAuth2AuthenticationToken authentication,
+        Model model) {
+    
+    // Ensure the resourceName is properly formatted for the API request
+    String formattedResourceName = resourceName.startsWith("people/") ? resourceName : "people/" + resourceName;
+
+    try {
+        // Fetch the contact using the Google People API
+        Person contact = googlePeopleService.getContact(authentication, formattedResourceName);
+
         if (contact == null) {
-            return "redirect:/contacts";
+            System.out.println("Contact not found for resource: " + formattedResourceName);
+            return "redirect:/contacts?error=contact_not_found"; // Redirect if the contact doesn't exist
         }
-        
+
+        // Encode resource name for Thymeleaf processing
+        String encodedResourceName = resourceName.replace("/", "_");
+
+        // Add attributes to the model for Thymeleaf rendering
         model.addAttribute("contact", contact);
         model.addAttribute("resourceName", encodedResourceName);
         model.addAttribute("utils", new ContactUtil());
-        
+
         return "contacts/edit";
+
+    } catch (Exception e) {
+        System.err.println("Error fetching contact: " + e.getMessage());
+        e.printStackTrace(); // Print full error details in logs
+
+        return "redirect:/contacts?error=server_error"; // Redirect if an unexpected error occurs
     }
+}
+
 
     @PostMapping("/contacts/{resourceName}")
 public String updateContact(
         @PathVariable String resourceName,
         OAuth2AuthenticationToken authentication,
         @RequestParam("firstName") String firstName,
-        @RequestParam("lastName") String lastName,
-        @RequestParam("email") String email,
-        @RequestParam("phoneNumber") String phoneNumber,
+        @RequestParam(value = "lastName", required = false) String lastName,
+        @RequestParam(value = "emails", required = false) List<String> emails,
+        @RequestParam(value = "phoneNumbers", required = false) List<String> phoneNumbers,
         RedirectAttributes redirectAttributes) {
 
     // Decode resource name
@@ -112,8 +128,21 @@ public String updateContact(
         return "redirect:/contacts";
     }
 
+    // Ensure lastName is not null (prevent NullPointerException)
+    if (lastName == null) {
+        lastName = "";  // Set to empty string if not provided
+    }
+
+    // Ensure emails and phoneNumbers are not null
+    if (emails == null) {
+        emails = new ArrayList<>();  // Set to empty list if none provided
+    }
+    if (phoneNumbers == null) {
+        phoneNumbers = new ArrayList<>();  // Set to empty list if none provided
+    }
+
     // Create new contact object with updated fields
-    Person contact = googlePeopleService.createPersonObject(firstName, lastName, email, phoneNumber);
+    Person contact = googlePeopleService.createPersonObject(firstName, lastName, emails, phoneNumbers);
     contact.setEtag(existingContact.getEtag());  // Ensure etag is included
 
     // Update the contact
@@ -127,6 +156,7 @@ public String updateContact(
 
     return "redirect:/contacts";
 }
+
 
     @GetMapping("/contacts/{resourceName}/delete")
     public String deleteContact(

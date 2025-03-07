@@ -126,32 +126,43 @@ public class GoogleContactsService {
         }
     }
 
-    // Helper method to create a new Person object with basic details
-    public Person createPersonObject(String firstName, String lastName, String email, String phoneNumber) {
+    public Person createPersonObject(String firstName, String lastName, List<String> emails, List<String> phoneNumbers) {
         Person person = new Person();
-        
+    
         // Set name
         Name name = new Name();
         name.setGivenName(firstName);
         name.setFamilyName(lastName);
         person.setNames(Collections.singletonList(name));
-        
-        // Set email
-        if (email != null && !email.isEmpty()) {
-            EmailAddress emailAddress = new EmailAddress();
-            emailAddress.setValue(email);
-            emailAddress.setType("home");
-            person.setEmailAddresses(Collections.singletonList(emailAddress));
+    
+        // Set multiple emails
+        List<EmailAddress> emailAddresses = new ArrayList<>();
+        if (emails != null) {
+            for (String email : emails) {
+                if (!email.isEmpty()) {
+                    EmailAddress emailAddress = new EmailAddress();
+                    emailAddress.setValue(email);
+                    emailAddress.setType("home");
+                    emailAddresses.add(emailAddress);
+                }
+            }
+            person.setEmailAddresses(emailAddresses);
         }
-        
-        // Set phone number
-        if (phoneNumber != null && !phoneNumber.isEmpty()) {
-            PhoneNumber number = new PhoneNumber();
-            number.setValue(phoneNumber);
-            number.setType("home");
-            person.setPhoneNumbers(Collections.singletonList(number));
+    
+        // Set multiple phone numbers
+        List<PhoneNumber> phoneNumbersList = new ArrayList<>();
+        if (phoneNumbers != null) {
+            for (String phoneNumber : phoneNumbers) {
+                if (!phoneNumber.isEmpty()) {
+                    PhoneNumber number = new PhoneNumber();
+                    number.setValue(phoneNumber);
+                    number.setType("mobile");
+                    phoneNumbersList.add(number);
+                }
+            }
+            person.setPhoneNumbers(phoneNumbersList);
         }
-        
+    
         return person;
     }
-}
+}    
