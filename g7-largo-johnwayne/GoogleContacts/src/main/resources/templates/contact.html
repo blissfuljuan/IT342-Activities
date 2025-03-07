@@ -501,60 +501,68 @@
                         <i class="bi bi-plus-circle"></i> Add First Contact
                     </a>
                 </div>
-                
+
                 <div class="table-container" th:unless="${contacts == null || contacts.isEmpty()}">
                     <table class="table table-hover">
                         <thead>
-                            <tr>
-                                <th scope="col"><i class="bi bi-person me-2"></i>Name</th>
-                                <th scope="col"><i class="bi bi-envelope me-2"></i>Email</th>
-                                <th scope="col"><i class="bi bi-telephone me-2"></i>Phone</th>
-                                <th scope="col" class="text-end"><i class="bi bi-gear me-2"></i>Actions</th>
-                            </tr>
+                        <tr>
+                            <th scope="col"><i class="bi bi-person me-2"></i>Name</th>
+                            <th scope="col"><i class="bi bi-envelope me-2"></i>Email</th>
+                            <th scope="col"><i class="bi bi-telephone me-2"></i>Phone</th>
+                            <th scope="col" class="text-end"><i class="bi bi-gear me-2"></i>Actions</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="contact : ${contacts}">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div th:if="${not #lists.isEmpty(contact.names)}" 
-                                             class="avatar-circle me-3"
-                                             th:classappend="${not #lists.isEmpty(contact.names)} ? 'avatar-' + ${#strings.toLowerCase(#strings.substring(contact.names[0].displayName, 0, 1))} : 'avatar-default'">
-                                            <span th:text="${#strings.substring(contact.names[0].displayName, 0, 1)}"></span>
-                                        </div>
-                                        <div th:unless="${not #lists.isEmpty(contact.names)}" class="avatar-circle avatar-default me-3">
-                                            <span>?</span>
-                                        </div>
-                                        <div>
-                                            <span th:if="${not #lists.isEmpty(contact.names)}" 
-                                                  th:text="${contact.names[0].displayName}" class="contact-name">
-                                            </span>
-                                            <span th:unless="${not #lists.isEmpty(contact.names)}" class="text-muted">Unnamed Contact</span>
-                                        </div>
+                        <tr th:each="contact : ${contacts}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div th:class="${'avatar-circle avatar-' + (#strings.toLowerCase(#strings.substring(contact.names[0].displayName, 0, 1)))}">
+                                        <span th:text="${#strings.substring(contact.names[0].displayName, 0, 1)}">A</span>
                                     </div>
-                                </td>
-                                <td>
-                                    <span th:if="${not #lists.isEmpty(contact.emailAddresses)}" 
-                                          th:text="${contact.emailAddresses[0].value}">Email</span>
-                                    <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}" class="text-muted">No email</span>
-                                </td>
-                                <td>
-                                    <span th:if="${not #lists.isEmpty(contact.phoneNumbers)}" 
-                                          th:text="${contact.phoneNumbers[0].value}">Phone</span>
-                                    <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}" class="text-muted">No phone</span>
-                                </td>
-                                <td class="text-end">
-                                    <div class="d-flex justify-content-end">
-                                        <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}" class="btn action-btn edit-btn" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a th:href="@{'/contacts/delete/' + ${contact.resourceName}}" 
-                                           class="btn action-btn delete-btn"
-                                           onclick="return confirm('Are you sure you want to delete this contact?')" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                    <div class="ms-3">
+                                        <div class="contact-name" th:text="${contact.names[0].displayName}">Name</div>
                                     </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
+                            <td>
+                                <div th:if="${not #lists.isEmpty(contact.emailAddresses)}">
+                                    <div th:each="email, emailStat : ${contact.emailAddresses}" th:unless="${emailStat.index > 2}">
+                                        <span th:text="${email.value}">Email</span>
+                                        <small th:if="${email.type}" class="text-muted ms-1" th:text="'(' + ${email.type} + ')'"></small>
+                                        <br th:if="${!emailStat.last && emailStat.index < 2}"/>
+                                    </div>
+                                    <small th:if="${contact.emailAddresses.size() > 3}" class="text-muted">
+                                        +<span th:text="${contact.emailAddresses.size() - 3}"></span> more
+                                    </small>
+                                </div>
+                                <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}" class="text-muted">No email</span>
+                            </td>
+                            <td>
+                                <div th:if="${not #lists.isEmpty(contact.phoneNumbers)}">
+                                    <div th:each="phone, phoneStat : ${contact.phoneNumbers}" th:unless="${phoneStat.index > 2}">
+                                        <span th:text="${phone.value}">Phone</span>
+                                        <small th:if="${phone.type}" class="text-muted ms-1" th:text="'(' + ${phone.type} + ')'"></small>
+                                        <br th:if="${!phoneStat.last && phoneStat.index < 2}"/>
+                                    </div>
+                                    <small th:if="${contact.phoneNumbers.size() > 3}" class="text-muted">
+                                        +<span th:text="${contact.phoneNumbers.size() - 3}"></span> more
+                                    </small>
+                                </div>
+                                <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}" class="text-muted">No phone</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end">
+                                    <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}" class="btn action-btn edit-btn" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{'/contacts/delete/' + ${contact.resourceName}}"
+                                       class="btn action-btn delete-btn"
+                                       onclick="return confirm('Are you sure you want to delete this contact?')" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
