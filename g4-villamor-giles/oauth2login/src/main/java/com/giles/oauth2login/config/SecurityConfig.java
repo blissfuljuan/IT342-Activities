@@ -18,6 +18,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/contacts", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .formLogin(form -> form.defaultSuccessUrl("/secured", true))
+                .csrf(csrf -> csrf.disable())
                 .build();
     }
 }

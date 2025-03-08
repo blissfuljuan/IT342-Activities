@@ -28,7 +28,7 @@ public class GooglePeopleService {
 
         ListConnectionsResponse response = peopleService.people().connections()
                 .list("people/me")
-                .setPageSize(10)
+                .setPageSize(100)
                 .setPersonFields("names,emailAddresses,phoneNumbers")
                 .execute();
 
@@ -67,23 +67,55 @@ public class GooglePeopleService {
         return peopleService.people().createContact(contact).execute();
     }
 
-    public Person updateContact(OAuth2AuthorizedClient authorizedClient, String resourceName, Person contact) throws IOException {
+    public Person getContact(OAuth2AuthorizedClient authorizedClient, String resourceName) throws IOException {
         GoogleCredential credential = new GoogleCredential().setAccessToken(authorizedClient.getAccessToken().getTokenValue());
 
         PeopleService peopleService = new PeopleService.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("OAuth2Login")
                 .build();
 
-        return peopleService.people().updateContact(resourceName, contact).execute();
+        return peopleService.people().get(resourceName)
+                .setPersonFields("names,emailAddresses,phoneNumbers")
+                .execute();
+    }
+
+    public Person updateContact(OAuth2AuthorizedClient authorizedClient, String resourceName, Person contact) throws IOException {
+        log.info("Attempting to update contact: " + resourceName);
+        GoogleCredential credential = new GoogleCredential().setAccessToken(authorizedClient.getAccessToken().getTokenValue());
+
+        PeopleService peopleService = new PeopleService.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                .setApplicationName("OAuth2Login")
+                .build();
+
+        // Get the existing contact first to get the etag
+        Person contactToUpdate = peopleService.people().get(resourceName)
+                .setPersonFields("names,emailAddresses,phoneNumbers,metadata")
+                .execute();
+
+        // Set the updated fields while preserving the etag
+        contact.setMetadata(contactToUpdate.getMetadata());
+        
+        Person updatedContact = peopleService.people()
+                .updateContact(resourceName, contact)
+                .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
+                .execute();
+
+        log.info("Successfully updated contact: " + resourceName);
+        return updatedContact;
     }
 
     public void deleteContact(OAuth2AuthorizedClient authorizedClient, String resourceName) throws IOException {
+        log.info("Attempting to delete contact: " + resourceName);
         GoogleCredential credential = new GoogleCredential().setAccessToken(authorizedClient.getAccessToken().getTokenValue());
 
         PeopleService peopleService = new PeopleService.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("OAuth2Login")
                 .build();
 
-        peopleService.people().deleteContact(resourceName).execute();
+        peopleService.people()
+                .deleteContact(resourceName)
+                .execute();
+
+        log.info("Successfully deleted contact: " + resourceName);
     }
 }
