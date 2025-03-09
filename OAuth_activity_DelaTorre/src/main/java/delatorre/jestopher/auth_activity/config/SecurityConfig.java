@@ -10,14 +10,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:8080/user-info", true))
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/contacts", true))
                 .logout(logout -> logout.logoutSuccessUrl("/"))
-                .formLogin(form -> form.defaultSuccessUrl("/secured", true))
+                .formLogin(form -> form.defaultSuccessUrl("/", true))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
