@@ -1,5 +1,6 @@
 package com.catulong.oauth2login.Config;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 
 public class SecurityConfig {
+
     @Bean
     public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception{
         return http
@@ -19,5 +21,4 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.defaultSuccessUrl("/user-info", true))
                 .build();
     }
-
 }
