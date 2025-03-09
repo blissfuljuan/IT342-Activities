@@ -14,7 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.people.v1.PeopleService;
-import com.largoza.googlecontactsapi_midterm.token.TokenFetcher;
+import com.largoza.googlecontactsapi_midterm.util.TokenFetcher;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 
 @Configuration

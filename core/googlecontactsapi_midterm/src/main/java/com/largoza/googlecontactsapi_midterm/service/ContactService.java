@@ -1,6 +1,7 @@
 package com.largoza.googlecontactsapi_midterm.service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,17 @@ public class ContactService {
 
     public List<Person> listContacts() throws IOException {
         ListConnectionsResponse response = peopleService.people().connections()
-        .list("people/me").setPersonFields("names, emailAddresses, phoneNumbers").execute();
+            .list("people/me")
+            .setPersonFields("names,emailAddresses,phoneNumbers")
+            .execute();
 
-        return response.getConnections();
+        return response.getConnections() != null ? response.getConnections() : Collections.emptyList();
     }
 
     public Person getContact(String resourceName) throws IOException {
         return peopleService.people().get(resourceName)
-            .setPersonFields("names, emailAddresses, phoneNumber").execute();
+            .setPersonFields("names,emailAddresses,phoneNumbers")
+            .execute();
     }
 
     public Person createContact(Person contact) throws IOException {
@@ -34,9 +38,11 @@ public class ContactService {
 
     public Person updateContact(String resourceName, Person contact) throws IOException {
         Person existingContact = getContact(resourceName);
-        contact.setEtag(existingContact.getEtag());
+        contact.setEtag(existingContact.getEtag()); // Preserve ETag to prevent conflicts
 
-        return peopleService.people().updateContact(resourceName, contact).setUpdatePersonFields("names, emailaddresses, phoneNumbers").execute();
+        return peopleService.people().updateContact(resourceName, contact)
+            .setUpdatePersonFields("names,emailAddresses,phoneNumbers")
+            .execute();
     }
 
     public void deleteContact(String resourceName) throws IOException {

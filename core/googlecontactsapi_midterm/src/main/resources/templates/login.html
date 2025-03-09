@@ -5,43 +5,30 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <style>
         body {
-            background-color: #121212;
+            background-color: #0f0e17;
             color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        a {
-            color: #bb86fc;
-            text-decoration: none;
-        }
-
-        .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            padding: 20px;
-            background-color: #1e1e1e;
+            height: 100vh;
         }
 
-        h1 {
-            margin: 0;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            padding: 20px;
-        }
-
-        form {
-            background: #1e1e1e;
+        .card {
+            background: #fffffe;
             padding: 30px;
-            margin: 20px 0;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #0f0e17;
         }
 
         form div {
@@ -52,6 +39,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #0f0e17;
         }
 
         form input[type="text"],
@@ -60,6 +48,8 @@
             padding: 10px;
             box-sizing: border-box;
             border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
         }
 
         form input[type="submit"],
@@ -70,41 +60,72 @@
             padding: 10px 20px;
             cursor: pointer;
             font-size: 1em;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 10px;
         }
 
         form button {
-            margin-top: 10px;
-            display: inline-block;
+            background: #bb86fc;
+        }
+
+        .oauth-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .oauth-buttons a {
+            text-decoration: none;
+            flex: 1;
+        }
+        
+        .oauth-buttons button {
+            background: #ff8906;
+            color: #fff;
+            border: 0;
+            padding: 10px 0;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .container {
+            border: solid #ffff 3px;
+            padding-top: 120px;
+            padding-bottom: 120px;
+            padding-right: 50px;
+            padding-left: 50px;
+            justify-content: center;
+            border-radius: 15px;
         }
     </style>
 </head>
 <body>
-<header class="header">
     <div class="container">
         <h1>Google Contacts API</h1>
     </div>
-</header>
-<div class="container">
-    <h2>
-        Login
-    </h2>
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username"/>
+    <div class="card">
+        <h2>Login</h2>
+        <form th:action="@{/login}" method="post">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username"/>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password"/>
+            </div>
+            <div>
+                <input type="submit" value="Login"/>
+            </div>
+        </form>
+        <div class="oauth-buttons">
+            <a th:href="@{/oauth2/authorization/google}"><button>Login with Google</button></a>
+            <a th:href="@{/oauth2/authorization/github}"><button>Login with GitHub</button></a>
         </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password"/>
-        </div>
-        <div>
-            <input type="submit" value="Login"/>
-        </div>
-    </form>
-    <div>
-        <a th:href="@{/oauth2/authorization/google}"><button>Login with Google</button></a>
-        <a th:href="@{/oauth2/authorization/github}"><button>Login with GitHub</button></a>
     </div>
-</div>
 </body>
 </html>
