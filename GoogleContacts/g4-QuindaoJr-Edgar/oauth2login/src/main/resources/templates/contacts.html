@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e6f7ff; /* Light blue background */
+            padding: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        h1 {
+            color: #0073e6; /* Light blue for the heading */
+            text-align: center; /* Center the heading */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff; /* White background for the table */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.5s ease-in-out;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #0073e6; /* Light blue for table headers */
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        form {
+            display: inline;
+        }
+        input[type="text"], input[type="email"] {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+        button {
+            padding: 8px 12px;
+            background-color: #0073e6; /* Light blue for buttons */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #005bb5; /* Darker blue on hover */
+        }
+        a {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 10px 20px;
+            background-color: #0073e6; /* Light blue for links */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #005bb5; /* Darker blue on hover */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); }
+            to { transform: translateY(0); }
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Additional styles for delete confirmation modal */
+        .delete-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+    </style>
+    <script>
+        function openModal(button) {
+            document.getElementById('editModal').style.display = 'block';
+            document.getElementById('editResourceName').value = button.getAttribute('data-resource-name');
+            document.getElementById('editName').value = button.getAttribute('data-name');
+            document.getElementById('editEmail').value = button.getAttribute('data-email');
+            document.getElementById('editPhone').value = button.getAttribute('data-phone');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function openDeleteModal(button) {
+            document.getElementById('deleteModal').style.display = 'block';
+            document.getElementById('deleteResourceName').value = button.getAttribute('data-resource-name');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editModal')) {
+                closeModal();
+            }
+            if (event.target == document.getElementById('deleteModal')) {
+                closeDeleteModal();
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Your Google Contacts</h1>
+
+<!-- ✅ Form to Add a New Contact -->
+<form action="/contacts/add" method="post">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="phone">Phone:</label>
+    <input type="text" id="phone" name="phone" required>
+
+    <button type="submit">Add Contact</button>
+</form>
+<h2>Contacts</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${contacts.isEmpty()}">
+        <td colspan="4">No contacts found for this account.</td>
+    </tr>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names != null and !contact.names.isEmpty()} ? ${contact.names[0].displayName} : 'Unknown'"></td>
+        <td>
+            <span th:each="email : ${contact.emailAddresses}" th:text="${email.value} + ' '"></span>
+        </td>
+        <td>
+            <span th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value} + ' '"></span>
+        </td>
+        <td>
+            <!-- ✅ Edit Contact -->
+            <button type="button"
+                    th:data-resource-name="${contact.resourceName}"
+                    th:data-name="${contact.names[0].displayName}"
+                    th:data-email="${contact.emailAddresses[0].value}"
+                    th:data-phone="${contact.phoneNumbers[0].value}"
+                    onclick="openModal(this)">Edit</button>
+
+            <!-- ✅ Delete Contact -->
+            <button type="button"
+                    th:data-resource-name="${contact.resourceName}"
+                    onclick="openDeleteModal(this)">Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Edit Contact Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Edit Contact</h2>
+        <form action="/contacts/update" method="post">
+            <input type="hidden" id="editResourceName" name="resourceName">
+            <label for="editName">Name:</label>
+            <input type="text" id="editName" name="name" required>
+            <label for="editEmail">Email:</label>
+            <input type="email" id="editEmail" name="email" required>
+            <label for="editPhone">Phone:</label>
+            <input type="text" id="editPhone" name="phone" required>
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Contact Modal -->
+<div id="deleteModal" class="modal">
+    <div class="delete-modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>Confirm Delete</h2>
+        <p>Are you sure you want to delete this contact?</p>
+        <form action="/contacts/delete" method="post">
+            <input type="hidden" id="deleteResourceName" name="resourceName">
+            <button type="submit">Yes, Delete</button>
+            <button type="button" onclick="closeDeleteModal()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<a href="/profile">Back to Profile</a>
+</body>
+</html>
