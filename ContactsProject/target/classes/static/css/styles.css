@@ -1,0 +1,145 @@
+/* Custom styles for Google Contacts Integration */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+.btn {
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background-color: #4285F4;
+    border-color: #4285F4;
+}
+
+.btn-primary:hover {
+    background-color: #3367d6;
+    border-color: #3367d6;
+}
+
+.btn-success {
+    background-color: #34A853;
+    border-color: #34A853;
+}
+
+.btn-success:hover {
+    background-color: #2d9249;
+    border-color: #2d9249;
+}
+
+.btn-danger {
+    background-color: #EA4335;
+    border-color: #EA4335;
+}
+
+.btn-danger:hover {
+    background-color: #d33426;
+    border-color: #d33426;
+}
+
+.table th {
+    font-weight: 600;
+    border-top: none;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Form styles */
+.form-control, .form-select {
+    border-radius: 5px;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4285F4;
+    box-shadow: 0 0 0 0.25rem rgba(66, 133, 244, 0.25);
+}
+
+/* Google colors for badges */
+.badge.bg-secondary {
+    background-color: #5F6368 !important;
+}
+
+.badge.bg-info {
+    background-color: #4285F4 !important;
+}
+
+/* Animation for alerts */
+.alert {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Single sorting icon styles */
+.sort-icon {
+    cursor: pointer;
+    color: #6c5ce7;
+    opacity: 0.5;
+    transition: all 0.2s ease;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sort-icon:hover {
+    opacity: 1;
+}
+
+th {
+    position: relative;
+}
+
+/* Email toggle styles */
+.more-emails {
+    cursor: pointer;
+    color: #6c5ce7;
+}
+
+.all-emails a {
+    color: #6c5ce7;
+    text-decoration: none;
+}
+
+.all-emails a:hover {
+    text-decoration: underline;
+}
+
+/* Email expansion styles */
+.email-container {
+    position: relative;
+}
+
+.all-emails {
+    margin-top: 0.5rem;
+}
+
+.all-emails div {
+    margin: 0.25rem 0;
+}
