@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Contacts</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 40px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .contact-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .contact-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .contact-detail {
+            color: #666;
+            font-size: 14px;
+            margin-right: 15px;
+        }
+        .contact-detail i {
+            margin-right: 5px;
+            opacity: 0.7;
+        }
+        .btn {
+            border-radius: 6px;
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+        .btn-dark {
+            background-color: #222;
+            border: none;
+        }
+        .btn-light {
+            background-color: white;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+        .empty-list {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>My Contacts</h1>
+        <div>
+            <a href="/user-info" class="btn btn-light">
+                <i class="bi bi-person"></i> Profile
+            </a>
+            <a href="/contact/add-form" class="btn btn-dark">
+                <i class="bi bi-plus"></i> Add Contact
+            </a>
+        </div>
+    </div>
+
+    <div class="empty-list" th:if="${contacts == null || contacts.isEmpty()}">
+        <p>You don't have any contacts yet.</p>
+        <a href="/contact/add-form" class="btn btn-dark">Add Your First Contact</a>
+    </div>
+
+    <ul class="contact-list" th:unless="${contacts == null || contacts.isEmpty()}">
+        <li class="contact-item" th:each="contact : ${contacts}">
+            <div class="contact-info">
+                <div class="contact-name" th:text="${not #lists.isEmpty(contact.names) ? contact.names[0].displayName : 'Unnamed Contact'}">Name</div>
+                <div>
+                    <span class="contact-detail" th:if="${not #lists.isEmpty(contact.emailAddresses)}">
+                        <i class="bi bi-envelope"></i>
+                        <span th:text="${contact.emailAddresses[0].value}">email@example.com</span>
+                    </span>
+                    <span class="contact-detail" th:if="${not #lists.isEmpty(contact.phoneNumbers)}">
+                        <i class="bi bi-telephone"></i>
+                        <span th:text="${contact.phoneNumbers[0].value}">123-456-7890</span>
+                    </span>
+                </div>
+            </div>
+            <div>
+                <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}" class="btn btn-light">Edit</a>
+                <a th:href="@{'/contacts/delete/' + ${contact.resourceName}}" class="btn btn-light"
+                   onclick="return confirm('Delete this contact?')">Delete</a>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
