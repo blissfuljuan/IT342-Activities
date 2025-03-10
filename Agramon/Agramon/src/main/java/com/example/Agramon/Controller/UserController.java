@@ -1,4 +1,4 @@
-package Agramon.com.example.project.Controller;
+package com.example.Agramon.Controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.api.services.people.v1.model.Person;
 
-import Agramon.com.example.project.Service.ContactService;
+import com.example.Agramon.Service.ContactService;
 
 @Controller
 public class UserController {

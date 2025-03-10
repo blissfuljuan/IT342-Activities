@@ -1,4 +1,4 @@
-package Agramon.com.example.project.Auth;
+package com.example.Agramon.Auth;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.JsonFactory;

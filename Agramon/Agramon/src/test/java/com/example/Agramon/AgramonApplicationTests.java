@@ -1,10 +1,10 @@
-package Agramon.com.example.project;
+package com.example.Agramon;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProjectApplicationTests {
+class AgramonApplicationTests {
 
 	@Test
 	void contextLoads() {
