@@ -15,7 +15,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/", true))
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/homepage", true))
                 .logout(logout -> logout.logoutSuccessUrl("/")) 
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();

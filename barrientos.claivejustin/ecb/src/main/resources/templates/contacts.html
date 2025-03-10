@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        input {
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-update {
+            background: #28a745;
+            color: white;
+        }
+        .btn-update:hover {
+            background: #218838;
+        }
+        .btn-delete {
+            background: red;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: darkred;
+        }
+        .btn-add {
+            background: #007bff;
+            color: white;
+            width: 100%;
+        }
+        .btn-add:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📇 Your Google Contacts</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="contact : ${contacts}">
+                    <td th:if="${contact.names}" th:text="${contact.names[0].displayName}"></td>
+                    <td th:if="${contact.emailAddresses}" th:text="${contact.emailAddresses[0].value}"></td>
+                    <td th:if="${contact.phoneNumbers}" th:text="${contact.phoneNumbers[0].value}"></td>
+                    <td>
+                        <form action="/contacts/update" method="post">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+                            <div class="form-group">
+                                <input type="text" name="name" placeholder="New Name" required />
+                                <input type="email" name="email" placeholder="New Email" />
+                                <input type="text" name="phone" placeholder="New Phone" />
+                            </div>
+                            <button type="submit" class="btn-update">Update</button>
+                        </form>
+
+                        <form action="/contacts/delete" method="post" style="margin-top:5px;">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>➕ Add New Contact</h2>
+        <form action="/add" method="post">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Full Name" required />
+                <input type="email" name="email" placeholder="Email Address" />
+                <input type="text" name="phone" placeholder="Phone Number" />
+            </div>
+            <button type="submit" class="btn-add">Add Contact</button>
+        </form>
+    </div>
+</body>
+</html>
