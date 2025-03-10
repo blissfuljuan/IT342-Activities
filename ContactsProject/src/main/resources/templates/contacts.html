@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Contacts - Google Contacts Integration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">Google Contacts Integration</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/contacts}">
+                            <i class="bi bi-people-fill me-1"></i> My Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}" onclick="return confirm('Are you sure you want to logout?')">
+                            <i class="bi bi-box-arrow-right me-1"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Success and Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${errorMessage}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>My Contacts</h1>
+            <a th:href="@{/contacts/new}" class="btn btn-success">
+                <i class="bi bi-person-plus-fill me-2"></i>Add New Contact
+            </a>
+        </div>
+        
+            <!-- No Contacts Message -->
+            <div th:if="${contacts.empty}" class="card shadow">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+                    <h3 class="mt-3">No contacts found</h3>
+                    <p class="text-muted">You don't have any contacts in your Google account yet.</p>
+                    <a th:href="@{/contacts/new}" class="btn btn-primary mt-2">
+                        <i class="bi bi-person-plus-fill me-2"></i>Add Your First Contact
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Contacts Table -->
+            <div th:unless="${contacts.empty}" class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Name</span>
+                                            <i class="bi bi-sort-up sort-icon" data-column="1" onclick="toggleSort(1)"></i>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Email</span>
+                                            <i class="bi bi-sort-up sort-icon" data-column="2" onclick="toggleSort(2)"></i>
+                                        </div>
+                                    </th>
+                                    <th>Phone</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="contact : ${contacts}">
+                                    <td>
+                                        <span th:text="${contact.displayName ?: (contact.givenName + ' ' + contact.familyName)}">John Doe</span>
+                                    </td>
+                                    <td>
+                                        <div class="email-container">
+                                            <div th:if="${!contact.emailAddresses.empty}" th:each="email, stat : ${contact.emailAddresses}" th:unless="${stat.index > 0}">
+                                                <span th:text="${email.value}">john@example.com</span>
+                                                <span th:if="${email.type}" class="badge bg-secondary" th:text="${email.type}">HOME</span>
+                                            </div>
+                                            <a th:if="${contact.emailAddresses.size() > 1}" href="#" onclick="toggleEmails(this)" class="more-emails text-decoration-none ms-2">
+                                                +<span th:text="${contact.emailAddresses.size() - 1}"></span> more
+                                            </a>
+                                            <div class="all-emails" style="display: none;">
+                                                <div th:each="email, iter : ${contact.emailAddresses}" th:if="${iter.index > 0}">
+                                                    <span th:text="${email.value}"></span>
+                                                    <span th:if="${email.type}" class="badge bg-secondary" th:text="${email.type}">HOME</span>
+                                                </div>
+                                                <a href="#" onclick="toggleEmails(this)" class="text-decoration-none d-block mt-2">
+                                                    Show less
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:if="${!contact.phoneNumbers.empty}" th:each="phone, stat : ${contact.phoneNumbers}" th:unless="${stat.index > 0}">
+                                            <span th:text="${phone.value}">555-1234</span>
+                                            <span th:if="${phone.type}" class="badge bg-secondary" th:text="${phone.type}">MOBILE</span>
+                                        </div>
+                                        <span th:if="${contact.phoneNumbers.size() > 1}" class="badge bg-info" 
+                                              th:text="${'+' + (contact.phoneNumbers.size() - 1) + ' more'}">+2 more</span>
+                                        <span th:if="${contact.phoneNumbers.empty}" class="text-muted">No phone</span>
+                                    </td>
+                                    <td>
+                                        <!-- Replace / with _ in resourceName for URL safety -->
+                                        <a th:href="@{/contacts/{resourceName}/edit(resourceName=${#strings.replace(contact.resourceName, '/', '_')})}" 
+                                           class="btn btn-sm btn-primary me-1">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <a th:href="@{/contacts/{resourceName}/delete(resourceName=${#strings.replace(contact.resourceName, '/', '_')})}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to delete this contact?')">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script th:inline="javascript">
+        const sortStates = {1: null, 2: null};
+
+        function toggleSort(column) {
+            const currentDirection = sortStates[column];
+            const direction = currentDirection === 'asc' ? 'desc' : 'asc';
+            sortStates[column] = direction;
+            
+            // Update all icons
+            document.querySelectorAll('.sort-icon').forEach(icon => {
+                if (icon.dataset.column == column) {
+                    icon.className = `bi bi-sort-${direction === 'asc' ? 'up' : 'down'}`;
+                } else {
+                    icon.className = 'bi bi-sort-up';
+                    sortStates[icon.dataset.column] = null;
+                }
+            });
+            
+            sortTable(column, direction);
+        }
+
+        function sortTable(column, direction) {
+            const table = document.querySelector('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                const aVal = a.querySelector(`td:nth-child(${column})`).textContent.trim().toLowerCase();
+                const bVal = b.querySelector(`td:nth-child(${column})`).textContent.trim().toLowerCase();
+                return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            });
+
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function toggleEmails(button) {
+            const emailContainer = button.closest('.email-container');
+            const allEmails = emailContainer.querySelector('.all-emails');
+            const moreLink = emailContainer.querySelector('.more-emails');
+            
+            if (allEmails.style.display === 'none') {
+                allEmails.style.display = 'block';
+                moreLink.style.display = 'none';
+                button.textContent = 'Show less';
+            } else {
+                allEmails.style.display = 'none';
+                moreLink.style.display = 'inline';
+                button.textContent = '+ ' + (emailContainer.querySelectorAll('.all-emails div').length) + ' more';
+            }
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
