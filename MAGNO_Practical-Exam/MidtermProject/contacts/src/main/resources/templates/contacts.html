@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Contacts</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .contact-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-initial {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        .contact-info {
+            flex-grow: 1;
+        }
+        .contact-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .contact-details {
+            color: #666;
+            font-size: 14px;
+        }
+        .action-btn {
+            margin-left: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .edit-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .add-btn {
+            background-color: #5d8aa8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 16px;
+        }
+        .form-row {
+            margin-bottom: 12px;
+        }
+        .form-row label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        .form-row input, .form-row select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .phone-group {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .phone-group select {
+            width: 80px;
+            margin-right: 8px;
+        }
+        .phone-group input {
+            flex-grow: 1;
+            margin-right: 8px;
+        }
+        .add-field-btn {
+            background-color: #5d8aa8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .save-btn {
+            background-color: #5d8aa8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .cancel-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .error-text {
+            color: #dc3545;
+            font-size: 12px;
+            display: none;
+        }
+        .form-container {
+            border: 1px solid #ddd;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .logout-link {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <a href="/" class="logout-link">Logout</a>
+        <h2 style="text-align: center;">My Contacts</h2>
+        <button id="add-contact-btn" class="add-btn">Add New Contact</button>
+    </div>
+
+    <div id="contact-form" class="form-container">
+        <input type="hidden" id="contact-resourceName">
+        <h3 id="form-title">Add Contact</h3>
+
+        <div class="form-row">
+            <label for="contact-name">Name:</label>
+            <input type="text" id="contact-name" placeholder="Enter name">
+            <small id="name-error" class="error-text">Name is required</small>
+        </div>
+
+        <div class="form-row">
+            <label>Phone Numbers:</label>
+            <div id="phone-numbers"></div>
+            <button type="button" class="add-field-btn" onclick="addPhoneNumberField()">Add Phone Number</button>
+            <small id="phone-error" class="error-text">At least one valid phone number is required</small>
+        </div>
+
+        <div class="form-row">
+            <label>Email Addresses:</label>
+            <div id="emails"></div>
+            <button type="button" class="add-field-btn" onclick="addEmailField()">Add Email</button>
+            <small id="email-error" class="error-text">Invalid email format</small>
+        </div>
+
+        <div style="margin-top: 16px; text-align: right;">
+            <button type="button" class="cancel-btn" onclick="cancelForm()">Cancel</button>
+            <button type="button" class="save-btn" id="save-contact">Save</button>
+        </div>
+    </div>
+
+    <div id="loading" style="text-align: center; color: #666; margin-top: 20px;">Loading contacts...</div>
+    <div id="contacts-list"></div>
+</div>
+
+<script>
+    const COUNTRY_CODES = {
+        "PH": "+63", "US": "+1", "UK": "+44", "IN": "+91", "AU": "+61"
+    };
+    const EMAIL_REGEX = /^[A-Za-z0-9+_.-]+@(.+)$/;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchContacts();
+        document.getElementById("add-contact-btn").addEventListener("click", openAddForm);
+        document.getElementById("save-contact").addEventListener("click", saveContact);
+    });
+
+    function fetchContacts() {
+        fetch('/api/contacts')
+            .then(response => response.json())
+            .then(data => {
+                const contactsList = document.getElementById('contacts-list');
+                const loadingDiv = document.getElementById('loading');
+                contactsList.innerHTML = "";
+
+                if (data.connections && data.connections.length > 0) {
+                    loadingDiv.style.display = "none";
+                    data.connections.forEach(contact => {
+                        let name = contact.names ? contact.names[0].displayName : 'No Name';
+                        let phones = contact.phoneNumbers ? contact.phoneNumbers.map(p => ` ${p.value}`).join(' ') : 'No Phone';
+                        let emails = contact.emailAddresses ? contact.emailAddresses.map(e => ` ${e.value}`).join(' ') : 'No Email';
+                        let resourceName = contact.resourceName || '';
+
+                        // Simple color palette
+                        let colors = ["#5d8aa8", "#78909c", "#9e9e9e", "#607d8b", "#546e7a"];
+                        let colorIndex = name.charCodeAt(0) % colors.length;
+                        let bgColor = colors[colorIndex];
+
+                        let div = document.createElement('div');
+                        div.className = "contact-item";
+                        div.innerHTML = `
+                            <div style="display: flex; align-items: center;">
+                                <div class="contact-initial" style="background-color: ${bgColor};">
+                                    ${name.charAt(0).toUpperCase()}
+                                </div>
+                                <div class="contact-info">
+                                    <div class="contact-name">${name}</div>
+                                    <div class="contact-details">${phones} | ${emails}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="action-btn edit-btn" onclick="openEditForm('${resourceName}', '${name}', '${encodeURIComponent(JSON.stringify(contact.phoneNumbers || []))}', '${encodeURIComponent(JSON.stringify(contact.emailAddresses || []))}')">
+                                    Edit
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteContact('${resourceName}', '${name.replace(/'/g, "\\'")}')">
+                                    Delete
+                                </button>
+                            </div>
+                        `;
+                        contactsList.appendChild(div);
+                    });
+                } else {
+                    loadingDiv.textContent = "No contacts found.";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching contacts:', error);
+                document.getElementById('loading').textContent = "Failed to load contacts.";
+            });
+    }
+
+    function openAddForm() {
+        document.getElementById("form-title").textContent = "Add Contact";
+        document.getElementById("contact-resourceName").value = "";
+        document.getElementById("contact-name").value = "";
+        document.getElementById("phone-numbers").innerHTML = "";
+        document.getElementById("emails").innerHTML = "";
+        addPhoneNumberField();
+        addEmailField();
+        resetErrors();
+
+        document.getElementById("contact-form").style.display = "block";
+        document.getElementById("add-contact-btn").style.display = "none";
+    }
+
+    function openEditForm(resourceName, name, phoneNumbersJson, emailsJson) {
+        document.getElementById("form-title").textContent = "Edit Contact";
+        document.getElementById("contact-resourceName").value = resourceName;
+        document.getElementById("contact-name").value = name;
+
+        // Parse phone numbers and separate country code from number
+        const phoneNumbers = JSON.parse(decodeURIComponent(phoneNumbersJson)).map(p => {
+            const value = p.value;
+            for (let [country, code] of Object.entries(COUNTRY_CODES)) {
+                if (value.startsWith(code)) {
+                    return { code, number: value.slice(code.length) };
+                }
+            }
+            return { code: "+63", number: value }; // Default to +63 if no match
+        });
+
+        const emails = JSON.parse(decodeURIComponent(emailsJson)).map(e => e.value);
+
+        // Populate phone numbers
+        const phoneContainer = document.getElementById("phone-numbers");
+        phoneContainer.innerHTML = "";
+        if (phoneNumbers.length > 0) {
+            phoneNumbers.forEach(phone => addPhoneNumberField(phone.number, phone.code));
+        } else {
+            addPhoneNumberField();
+        }
+
+        // Populate emails
+        const emailContainer = document.getElementById("emails");
+        emailContainer.innerHTML = "";
+        if (emails.length > 0) {
+            emails.forEach(email => addEmailField(email));
+        } else {
+            addEmailField();
+        }
+
+        resetErrors();
+        document.getElementById("contact-form").style.display = "block";
+        document.getElementById("add-contact-btn").style.display = "none";
+    }
+
+    function cancelForm() {
+        document.getElementById("contact-form").style.display = "none";
+        document.getElementById("add-contact-btn").style.display = "block";
+    }
+
+    function addPhoneNumberField(value = "", selectedCode = "+63") {
+        const phoneContainer = document.getElementById("phone-numbers");
+        const div = document.createElement("div");
+        div.className = "phone-group";
+        div.innerHTML = `
+            <select class="phone-prefix">
+                ${Object.entries(COUNTRY_CODES).map(([code, prefix]) =>
+                    `<option value="${prefix}" ${prefix === selectedCode ? 'selected' : ''}>${prefix}</option>`
+                ).join('')}
+            </select>
+            <input type="text" placeholder="Enter phone number" value="${value}" maxlength="10"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+            <button class="remove-btn" type="button" onclick="this.parentElement.remove()">Remove</button>
+        `;
+        phoneContainer.appendChild(div);
+    }
+
+    function addEmailField(value = "") {
+        const emailContainer = document.getElementById("emails");
+        const div = document.createElement("div");
+        div.className = "phone-group";
+        div.innerHTML = `
+            <input type="email" placeholder="Enter email address" value="${value}">
+            <button class="remove-btn" type="button" onclick="this.parentElement.remove()">Remove</button>
+        `;
+        emailContainer.appendChild(div);
+    }
+
+    function resetErrors() {
+        document.getElementById("name-error").style.display = "none";
+        document.getElementById("phone-error").style.display = "none";
+        document.getElementById("email-error").style.display = "none";
+    }
+
+    function saveContact() {
+        const saveButton = document.getElementById("save-contact");
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+
+        const resourceName = document.getElementById("contact-resourceName").value;
+        const name = document.getElementById("contact-name").value.trim();
+        const phoneInputs = document.querySelectorAll("#phone-numbers .phone-group");
+        const phoneNumbers = Array.from(phoneInputs).map(group => {
+            const code = group.querySelector("select").value;
+            const number = group.querySelector("input").value.trim();
+            return number ? `${code}${number}` : "";
+        }).filter(value => value);
+        const emailInputs = document.querySelectorAll("#emails input");
+        const emails = Array.from(emailInputs).map(input => input.value.trim()).filter(value => value);
+
+        resetErrors();
+        let hasError = false;
+
+        if (!name) {
+            document.getElementById("name-error").style.display = "block";
+            hasError = true;
+        }
+        if (phoneNumbers.length === 0) {
+            document.getElementById("phone-error").style.display = "block";
+            hasError = true;
+        }
+        for (let email of emails) {
+            if (!EMAIL_REGEX.test(email)) {
+                document.getElementById("email-error").style.display = "block";
+                hasError = true;
+                break;
+            }
+        }
+
+        if (hasError) {
+            saveButton.disabled = false;
+            saveButton.textContent = "Save";
+            return;
+        }
+
+        const contactJson = {
+            names: [{ familyName: name }],
+            phoneNumbers: phoneNumbers.map(phone => ({ value: phone })),
+            emailAddresses: emails.map(email => ({ value: email }))
+        };
+
+        const url = resourceName ? "/api/contacts/update" : "/api/contacts";
+        const method = "POST";
+        const body = resourceName
+            ? new URLSearchParams({ resourceName, familyName: name, emails: emails.join(","), phoneNumbers: phoneNumbers.join(",") })
+            : JSON.stringify(contactJson);
+
+        fetch(url, {
+            method: method,
+            headers: { "Content-Type": resourceName ? "application/x-www-form-urlencoded" : "application/json" },
+            body: body
+        })
+        .then(response => response.text().then(text => ({ status: response.status, text })))
+        .then(({ status, text }) => {
+            if (status >= 400) throw new Error(text);
+            location.reload();
+        })
+        .catch(error => {
+            console.error("Error saving contact:", error);
+            saveButton.disabled = false;
+            saveButton.textContent = "Save";
+            alert("Error: " + (error.message.includes("error") ? JSON.parse(error.message).error : "Failed to save contact"));
+        });
+    }
+
+    function deleteContact(resourceName, name) {
+        if (confirm(`Are you sure you want to delete contact "${name}"?`)) {
+            fetch("/api/contacts/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ resourceName: resourceName })
+            })
+            .then(response => response.text())
+            .then(() => location.reload())
+            .catch(error => {
+                console.error("Error deleting contact:", error);
+                alert("Error deleting contact");
+            });
+        }
+    }
+</script>
+</body>
+</html>
