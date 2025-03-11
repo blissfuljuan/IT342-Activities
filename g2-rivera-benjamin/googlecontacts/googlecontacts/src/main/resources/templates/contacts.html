@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contacts</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #eef2f7;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cg fill="%23d9e2ec" fill-opacity="0.1"%3E%3Ccircle cx="50" cy="50" r="30" /%3E%3C/g%3E%3C/svg%3E');
+            background-size: 100px 100px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"%3E%3Cg fill="%23e9ecef" fill-opacity="0.05"%3E%3Crect width="1" height="20" /%3E%3Crect width="20" height="1" /%3E%3C/g%3E%3C/svg%3E');
+            pointer-events: none;
+        }
+        .header {
+            padding: 25px 40px;
+            border-bottom: 1px solid #e9ecef;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(245, 247, 250, 0.95));
+            position: relative;
+        }
+        .header-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+        }
+        .controls {
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(240, 242, 245, 0.9));
+        }
+        .add-btn {
+            background: #3498db;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+        }
+        .add-btn:hover {
+            background: #2980b9;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+        }
+        .table-container {
+            padding: 0 40px 40px;
+        }
+        .table {
+            width: 100%;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table thead th {
+            color: #7f8c8d;
+            font-weight: 600;
+            border: none;
+            padding: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to bottom, #f8f9fa, #eef2f7);
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+        }
+        .table tbody tr {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+            transition: background 0.2s ease, transform 0.1s ease;
+            border-bottom: 1px solid #000000;
+        }
+        .table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .table td {
+            border: none;
+            padding: 20px 15px;
+            vertical-align: middle;
+            color: #2c3e50;
+        }
+        .email-list, .phone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-right: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-edit {
+            background: #2ecc71;
+            border: none;
+            color: white;
+            box-shadow: 0 2px 4px rgba(46, 204, 113, 0.3);
+        }
+        .btn-edit:hover {
+            background: #27ae60;
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.4);
+        }
+        .btn-delete {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+        }
+        .btn-delete:hover {
+            background: #c0392b;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+        }
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"%3E%3Ccircle cx="5" cy="5" r="1" fill="%23e9ecef" fill-opacity="0.05"/%3E%3C/svg%3E');
+            pointer-events: none;
+        }
+        .modal-header {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98), rgba(245, 247, 250, 0.98));
+            color: #2c3e50;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 25px;
+        }
+        .modal-body {
+            padding: 25px;
+        }
+        .form-label {
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        .btn-primary {
+            background: #3498db;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .invalid-feedback {
+            display: none;
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .form-control:invalid + .invalid-feedback {
+            display: block;
+        }
+        .field-container {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 class="header-title">Contact Manager</h1>
+    </div>
+
+    <div class="controls">
+        <button class="add-btn" data-bs-toggle="modal" data-bs-target="#addContactModal">+ Add Contact</button>
+    </div>
+
+    <div class="table-container">
+        <table class="table" id="contactsTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="contact : ${contacts}"
+                th:if="${contact.names != null and contact.names.size() > 0}">
+                <td th:text="${contact.names[0].displayName}"></td>
+                <td>
+                    <div class="email-list">
+                        <span th:if="${contact.emailAddresses != null and contact.emailAddresses.size() > 0}"
+                              th:each="email : ${contact.emailAddresses}"
+                              th:text="${email.value}"></span>
+                        <span th:if="${contact.emailAddresses == null or contact.emailAddresses.size() == 0}">No Email</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="phone-list">
+                        <span th:if="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0}"
+                              th:each="phone : ${contact.phoneNumbers}"
+                              th:text="${phone.value}"></span>
+                        <span th:if="${contact.phoneNumbers == null or contact.phoneNumbers.size() == 0}">No Phone</span>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-action btn-edit"
+                            data-bs-toggle="modal"
+                            th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"><i class="bi bi-pencil-square"></i>
+                    </button>
+                    <form action="/api/contacts/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                        <button type="submit" class="btn btn-action btn-delete"><i class="bi bi-person-dash"></i></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/api/contacts/create" method="POST" onsubmit="return validateForm(this)">
+                    <div class="mb-3">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" name="givenName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="familyName" required>
+                    </div>
+                    <div id="emailFields" class="field-container">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="emails">
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addField('emailFields', 'emails', 'email')">Add Another Email</button>
+                    <div id="phoneFields" class="field-container">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phoneNumbers" pattern="[0-9]{11}" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter 11-digit phone number">
+                        <div class="invalid-feedback">Phone number must be exactly 11 digits</div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addField('phoneFields', 'phoneNumbers', 'tel')">Add Another Phone</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Create Contact</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<tr th:each="contact : ${contacts}">
+    <div class="modal fade"
+         th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"
+         tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/api/contacts/update}" method="POST" onsubmit="return validateForm(this)">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="givenName" th:value="${contact.names[0].givenName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="familyName" th:value="${contact.names[0].familyName}" required>
+                        </div>
+                        <div id="editEmailFields" class="field-container">
+                            <label class="form-label">Email</label>
+                            <input th:unless="${contact.emailAddresses != null and contact.emailAddresses.size() > 0}" type="email" class="form-control" name="emails">
+                            <div th:each="email : ${contact.emailAddresses}">
+                                <input type="email" class="form-control" name="emails" th:value="${email.value}">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addField('editEmailFields', 'emails', 'email')">Add Another Email</button>
+                        <div id="editPhoneFields" class="field-container">
+                            <label class="form-label">Phone</label>
+                            <input th:unless="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0}" type="tel" class="form-control" name="phoneNumbers" pattern="[0-9]{11}" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter 11-digit phone number">
+                            <div th:each="phone : ${contact.phoneNumbers}">
+                                <input type="tel" class="form-control" name="phoneNumbers" th:value="${phone.value}" pattern="[0-9]{11}" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter 11-digit phone number">
+                            </div>
+                            <div class="invalid-feedback">Phone number must be exactly 11 digits</div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addField('editPhoneFields', 'phoneNumbers', 'tel')">Add Another Phone</button>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</tr>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this contact?");
+    }
+
+    function addField(containerId, fieldName, inputType) {
+        const container = document.getElementById(containerId);
+        const newField = document.createElement('input');
+        newField.type = inputType;
+        newField.className = 'form-control mt-2';
+        newField.name = fieldName;
+        if (inputType === 'tel') {
+            newField.pattern = '[0-9]{11}';
+            newField.maxLength = 11;
+            newField.oninput = function() { this.value = this.value.replace(/[^0-9]/g, ''); };
+            newField.placeholder = 'Enter 11-digit phone number';
+        }
+        container.appendChild(newField);
+    }
+
+    function validateForm(form) {
+        const phoneInputs = form.querySelectorAll('input[name="phoneNumbers"]');
+        for (let phoneInput of phoneInputs) {
+            const phoneValue = phoneInput.value;
+            if (phoneValue && (phoneValue.length !== 11 || !/^\d{11}$/.test(phoneValue))) {
+                phoneInput.classList.add('is-invalid');
+                return false;
+            }
+            phoneInput.classList.remove('is-invalid');
+        }
+        return true;
+    }
+</script>
+</body>
+</html>
