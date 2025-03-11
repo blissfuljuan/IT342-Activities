@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>User Info - Google Contacts</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+  />
+  <style>
+      body {
+        transition: background-color 0.5s, color 0.5s;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .user-info {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 50px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: space-around;
+        align-items: stretch;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .user-info.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .profile-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: cover;
+      }
+      .user-details {
+        flex-grow: 1;
+        align-items: center;
+      }
+      .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        gap: 20px; /* Add space between stat elements */
+      }
+      .stat {
+        text-align: center;
+      }
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+      .nav-buttons {
+        margin-top: 20px;
+      }
+      .btn {
+        display: inline-block;
+        background-color: #4285f4;
+        color: white;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #ffffff;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+      }
+      .sidebar a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #000000;
+        display: block;
+        transition: 0.3s;
+      }
+      .sidebar a:hover {
+        color: #f1f1f1;
+      }
+      .sidebar .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+      }
+      .openbtn {
+        font-size: 20px;
+        cursor: pointer;
+        padding: 10px 15px;
+        border: none;
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+      }
+      .openbtn:hover {
+        background-color: #444;
+      }
+    </style>
+</head>
+<body>
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"
+  >&times;</a
+  >
+  <a href="/contacts">Contacts</a>
+  <a href="/user-info">Profile</a>
+  <a href="/logout">Logout</a>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
+  <div class="container-fluid">
+    <button class="openbtn" onclick="openNav()">&#9776;</button>
+    <a class="navbar-brand fw-bold ms-2" href="/contacts"
+    >Google Contacts</a
+    >
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-danger" href="/logout">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="user-info" id="userInfo">
+  <div class="user-details">
+    <img
+            th:if="${pictureUrl}"
+            th:src="${pictureUrl}"
+            class="profile-image"
+            alt="Profile picture"
+    />
+    <h3>Welcome, <span th:text="${name}">User</span>!</h3>
+    <p><span th:text="${email}">email@example.com</span></p>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-number" th:text="${totalContacts}    ">0</div>
+      <div>Contacts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" th:text="${totalEmails}    ">0</div>
+      <div>Email</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" th:text="${totalPhoneNumbers}    ">0</div>
+      <div>Phone</div>
+    </div>
+  </div>
+</div>
+
+<script>
+      function openNav() {
+        document.getElementById("mySidebar").style.width = "250px";
+        document.body.style.marginLeft = "250px";
+      }
+
+      function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.body.style.marginLeft = "0";
+      }
+
+      window.addEventListener("load", function () {
+        document.getElementById("userInfo").classList.add("visible");
+      });
+    </script>
+</body>
+</html>
