@@ -4,20 +4,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain defaultSecurityChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .oauth2Login(oauth -> oauth.defaultSuccessUrl("/user-info",true))
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                .formLogin(form -> form.defaultSuccessUrl("/secured",true))
-                .csrf(AbstractHttpConfigurer::disable)
-                .build();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) // Allow all requests
+                .csrf(csrf -> csrf.disable()) // Disable CSRF
+                .formLogin(form -> form.disable()) // Disable form login
+                .logout(logout -> logout.disable()) // Disable logout
+                .oauth2Login(oauth -> oauth.disable()); // Disable OAuth2
+
+        return http.build();
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
