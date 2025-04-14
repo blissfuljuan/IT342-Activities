@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            text-align: left;
+            margin-top: 15px;
+        }
+        .info p {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .raw-data {
+            background: #eaeaea;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 User Information</h1>
+        <div class="info">
+            <p><strong>Name:</strong> <span th:text="${user.name}"></span></p>
+            <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+            <p><strong>ID:</strong> <span th:text="${user.sub}"></span></p>
+        </div>
+
+        <h2>🗂 Raw User Data:</h2>
+        <pre class="raw-data" th:text="${user}"></pre>
+    </div>
+</body>
+</html>
