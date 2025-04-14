@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Contacts</title>
+</head>
+<body>
+
+<h1>Your Contacts</h1>
+
+<!-- Add New Contact Button -->
+<a href="/contacts/add-form">
+    <button>Add Contact</button>
+</a>
+
+<!-- Display Contacts -->
+<ul>
+    <li th:each="contact : ${contacts}">
+        <span th:text="${contact['names'][0]['givenName']} + ' ' + ${contact['names'][0]['familyName']}"></span>
+        - <span th:text="${contact['emailAddresses'][0]['value']}"></span>
+
+        <!-- Edit Contact Button -->
+        <a th:href="@{/contacts/edit-form(resourceName=${contact['resourceName']})}">
+            <button>Edit</button>
+        </a>
+
+        <!-- Delete Contact Form -->
+        <form action="/contacts/delete" method="post" style="display:inline;">
+            <input type="hidden" name="resourceName" th:value="${contact['resourceName']}">
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+</ul>
+
+</body>
+</html>
