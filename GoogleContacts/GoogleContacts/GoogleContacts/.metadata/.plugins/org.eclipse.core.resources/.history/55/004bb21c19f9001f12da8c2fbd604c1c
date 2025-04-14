@@ -1,0 +1,11 @@
+spring.application.name=GoogleContacts
+
+spring.security.user.name=user
+spring.security.user.password=123
+
+spring.security.oauth2.client.registration.google.client-id=820972127872-4fmf9i2pa7tcgnpf07mbf7sfcoq0bmh6.apps.googleusercontent.com
+spring.security.oauth2.client.registration.google.client-secret=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
+spring.security.oauth2.client.registration.google.scope=openid, email, profile, https://www.googleapis.com/auth/contacts
+
+
+logging.level.org.springframework.security=DEBUG

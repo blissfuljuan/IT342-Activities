@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+<system systemId="http://maven.apache.org/maven-v4_0_0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/maven-4.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/maven-4.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/maven-4.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/settings-1.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/settings-1.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/settings-1.1.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/settings-1.1.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/settings-1.2.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/settings-1.2.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/toolchains-1.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/toolchains-1.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/toolchains-1.1.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/toolchains-1.1.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/profiles-1.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/profiles-1.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/archetype-1.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/archetype-1.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/archetype-catalog-1.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/archetype-catalog-1.0.0.xsd"/>
+<system systemId="http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" uri="jar:file:/C:/Users/HP/.p2/pool/plugins/org.eclipse.m2e.model.edit_2.0.500.20240417-1957.jar!/xsd/archetype-descriptor-1.0.0.xsd"/>
+</catalog>
