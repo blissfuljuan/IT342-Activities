@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .error-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #d9534f;
+        }
+        .error-code {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .error-message {
+            color: #555;
+            margin: 20px 0;
+        }
+        .error-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .error-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #777;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #5bc0de;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background-color: #46b8da;
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <div class="error-header">
+        <h1 class="error-code" th:text="${status}">500</h1>
+        <h2 th:text="${error}">Error</h2>
+    </div>
+
+    <div class="error-message">
+        <p th:text="${message}">Error message</p>
+    </div>
+
+    <div class="error-details">
+        <p><strong>Path:</strong> <span th:text="${path}">Request path</span></p>
+        <p><strong>Time:</strong> <span th:text="${timestamp}">Timestamp</span></p>
+    </div>
+
+    <a href="/googleuser" class="back-button">Back to Home</a>
+</div>
+</body>
+</html>
