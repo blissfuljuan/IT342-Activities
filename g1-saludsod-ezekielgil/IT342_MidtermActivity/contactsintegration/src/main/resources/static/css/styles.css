@@ -1,0 +1,272 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    color: #333;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #f5f5f5;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.welcome {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.btn-add {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.logout-form {
+    display: block;
+}
+
+.logout {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 10px;
+    color: #dc3545;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.contact-summary {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+.contact-photo {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+}
+
+.contact-photo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    opacity: 10; /* Start hidden until loaded */
+}
+
+.contact-name {
+    font-size: 16px;
+    font-weight: 500;
+    flex-grow: 1;
+}
+
+.contact-details {
+    display: none;
+    padding: 15px;
+}
+
+.detail-item {
+    margin-bottom: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.detail-label {
+    font-weight: 500;
+    margin-right: 10px;
+    min-width: 50px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+}
+
+.btn {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.btn-edit {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.save-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: #ffe6e6;
+    border-radius: 4px;
+}
+
+.no-contacts {
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 4px;
+    width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.modal-body {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.modal label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.modal input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.email-field, .phone-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.email-field .fas {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.email-field input, .phone-item input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0 10px;
+}
+
+.field-group {
+    margin-bottom: 15px;
+}
+
+.field-list {
+    margin-bottom: 10px;
+}
+
+.add-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
