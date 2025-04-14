@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contacts</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Contact List</h1>
+
+<!-- Add Contact Form -->
+<form th:action="@{/contacts/add}" method="post">
+    <input type="text" name="names[0].givenName" placeholder="First Name" required />
+    <input type="text" name="names[0].familyName" placeholder="Last Name" required />
+    <input type="email" name="emailAddresses[0].value" placeholder="Email" required />
+    <input type="text" name="phoneNumbers[0].value" placeholder="Phone Number" required />
+    <button type="submit">Add New Contact</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone Number</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names != null and not #lists.isEmpty(contact.names) ? contact.names[0].displayName : 'Unknown'}"></td>
+        <td th:text="${contact.emailAddresses != null and not #lists.isEmpty(contact.emailAddresses) ? contact.emailAddresses[0].value : ''}"></td>
+        <td th:text="${contact.phoneNumbers != null and not #lists.isEmpty(contact.phoneNumbers) ? contact.phoneNumbers[0].value : ''}"></td>
+        <td>
+            <!-- Update Contact Form -->
+            <form th:action="@{'/contacts/update/' + ${contact.resourceName}}" method="post">
+                <input type="text" name="names[0].givenName"
+                       th:value="${contact.names != null and not #lists.isEmpty(contact.names) ? contact.names[0].givenName : ''}" required />
+                <input type="text" name="names[0].familyName"
+                       th:value="${contact.names != null and not #lists.isEmpty(contact.names) ? contact.names[0].familyName : ''}" required />
+                <input type="email" name="emailAddresses[0].value"
+                       th:value="${contact.emailAddresses != null and not #lists.isEmpty(contact.emailAddresses) ? contact.emailAddresses[0].value : ''}" required />
+                <input type="text" name="phoneNumbers[0].value"
+                       th:value="${contact.phoneNumbers != null and not #lists.isEmpty(contact.phoneNumbers) ? contact.phoneNumbers[0].value : ''}" required />
+                <button type="submit">Update</button>
+            </form>
+
+            <!-- Delete Contact Form -->
+            <form th:action="@{'/contacts/delete/' + ${contact.resourceName}}" method="post">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
