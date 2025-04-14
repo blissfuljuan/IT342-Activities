@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+          background: linear-gradient(to right, #eef2f3, #c8d8e4);
+          font-family: 'Poppins', sans-serif;
+          color: #333;
+      }
+
+      .header-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+      }
+      .header-title {
+          color: #333;
+          font-weight: 700;
+          font-size: 30px;
+      }
+      .user-info-btn {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+      }
+      .search-container {
+          display: flex;
+          gap: 10px;
+          width: 100%;
+          margin-bottom: 20px;
+      }
+      .search-bar {
+          flex-grow: 1;
+          padding: 10px;
+          border-radius: 8px;
+          border: 1px solid #ddd;
+      }
+      .sort-dropdown {
+          padding: 10px;
+          border-radius: 8px;
+          border: 1px solid #ddd;
+      }
+      .table {
+          background: #fff;
+          border-radius: 8px;
+          overflow: hidden;
+      }
+      .table th {
+          background: #007BFF;
+          color: white;
+          padding: 12px;
+      }
+      .table td {
+          padding: 10px;
+      }
+      .btn-primary, .btn-warning, .btn-danger {
+          border-radius: 6px;
+          padding: 6px 12px;
+      }
+      .btn-success {
+          background-color: #4CAF50;
+          border: none;
+          border-radius: 6px;
+      }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <h1 class="header-title">Google Contacts</h1>
+    </div>
+
+
+
+    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addContactModal">
+        Add Contact
+    </button>
+
+
+    <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="/api/contacts/create" method="POST">
+                        <div class="mb-3">
+                            <label for="givenName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="givenName" name="givenName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="familyName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="familyName" name="familyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Contact</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-hover" id="contactsTable">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact No</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}"
+            th:if="${contact.names != null and contact.names.size() > 0}">
+            <td th:text="${contact.names[0].displayName}"></td>
+            <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></td>
+            <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Number'}"></td>
+            <td class="action-buttons">
+
+                <button class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                    Edit
+                </button>
+
+
+                <form action="/api/contacts/delete" method="POST" class="d-inline" onsubmit="return confirmDelete()">
+                    <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+
+
+        <tr th:each="contact : ${contacts}">
+            <div class="modal fade"
+                 th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"
+                 tabindex="-1"
+                 aria-labelledby="editContactModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editContactModalLabel">Edit Contact</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <form th:action="@{/api/contacts/update}" method="POST">
+                                <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                                <div class="mb-3">
+                                    <label for="editGivenName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="editGivenName" name="givenName"
+                                           th:value="${contact.names[0].givenName}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editFamilyName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="editFamilyName" name="familyName"
+                                           th:value="${contact.names[0].familyName}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="editEmail" name="email"
+                                           th:value="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editPhoneNumber" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="editPhoneNumber" name="phoneNumber"
+                                           th:value="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    let originalTableData = [];
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.getElementById('contactsTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = tbody.getElementsByTagName('tr');
+
+
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].getElementsByTagName('td').length) {
+                originalTableData.push(rows[i].cloneNode(true));
+            }
+        }
+    });
+
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this contact?");
+    }
+
+    function searchContacts() {
+        const input = document.getElementById('searchBar');
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById('contactsTable');
+        const tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            if (!tr[i].getElementsByTagName('td').length) continue;
+
+            const tdName = tr[i].getElementsByTagName('td')[0];
+            const tdEmail = tr[i].getElementsByTagName('td')[1];
+            const tdPhone = tr[i].getElementsByTagName('td')[2];
+
+            if (tdName || tdEmail || tdPhone) {
+                const txtName = tdName.textContent || tdName.innerText;
+                const txtEmail = tdEmail.textContent || tdEmail.innerText;
+                const txtPhone = tdPhone.textContent || tdPhone.innerText;
+
+                if (
+                    txtName.toUpperCase().indexOf(filter) > -1 ||
+                    txtEmail.toUpperCase().indexOf(filter) > -1 ||
+                    txtPhone.toUpperCase().indexOf(filter) > -1
+                ) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function sortContacts() {
+        const sortOption = document.getElementById('sortOption').value;
+        const table = document.getElementById('contactsTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        let rows = Array.from(tbody.getElementsByTagName('tr')).filter(row => row.getElementsByTagName('td').length);
+
+
+        tbody.innerHTML = '';
+
+        if (sortOption === 'original') {
+
+            originalTableData.forEach(row => {
+                tbody.appendChild(row.cloneNode(true));
+            });
+        } else {
+
+            rows.sort((a, b) => {
+                const aValue = a.getElementsByTagName('td')[0].textContent.trim().toUpperCase();
+                const bValue = b.getElementsByTagName('td')[0].textContent.trim().toUpperCase();
+
+                if (sortOption === 'asc') {
+                    return aValue.localeCompare(bValue);
+                } else {
+                    return bValue.localeCompare(aValue);
+                }
+            });
+
+
+            rows.forEach(row => {
+                tbody.appendChild(row);
+            });
+        }
+    }
+</script>
+</body>
+</html>
