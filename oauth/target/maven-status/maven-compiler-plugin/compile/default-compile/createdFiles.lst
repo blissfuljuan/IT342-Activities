@@ -1,0 +1,6 @@
+com\ravanes\google\oauth\Controller\ContactsController.class
+com\ravanes\google\oauth\Controller\WebController.class
+com\ravanes\google\oauth\OAuthApplication.class
+com\ravanes\google\oauth\Controller\Controller.class
+com\ravanes\google\oauth\config\SecurityConfig.class
+com\ravanes\google\oauth\Service\GoogleContactsService.class
