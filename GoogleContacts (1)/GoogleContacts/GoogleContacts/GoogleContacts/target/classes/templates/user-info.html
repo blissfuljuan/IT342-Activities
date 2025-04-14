@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info</title>
+</head>
+<body>
+<h2>Google Account Details</h2>
+<div>
+    <img th:src="${picture}" alt="Profile Picture" width="100"/>
+    <p><strong>Name:</strong> <span th:text="${name}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+</div>
+<a href="/contacts">View Contacts</a> | <a href="/logout">Logout</a>
+</body>
+</html>
