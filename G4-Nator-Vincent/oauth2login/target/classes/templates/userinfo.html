@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Information</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: #ddd;
+        }
+
+        nav {
+            background: #222;
+            padding: 15px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: #0077b6;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            background: #005a8d;
+        }
+
+        .container {
+            max-width: 900px;
+            margin-top: 100px;
+            padding: 30px;
+            background: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        h2 {
+            color: #008ecc;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #333;
+        }
+
+        .custom-table th, .custom-table td {
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            color: #ddd;
+        }
+
+        .custom-table th {
+            background: #0077b6;
+            color: white;
+        }
+
+        .custom-table tr:nth-child(odd) {
+            background: #2a2a2a;
+        }
+
+        .custom-table tr:nth-child(even) {
+            background: #1e1e1e;
+        }
+
+        .user-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #008ecc;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .attributes-container {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            nav {
+                padding: 10px;
+            }
+
+            nav a {
+                font-size: 16px;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/api/contacts/view" class="btn">View Contacts</a>
+    <a href="/logout" class="btn">Logout</a>
+</nav>
+
+<div class="container">
+    <h2>Google User Information</h2>
+    <table class="custom-table">
+        <tr>
+            <th>Profile Picture</th>
+            <td>
+                <img th:if="${picture}" th:src="${picture}" class="user-picture" alt="Profile Picture"/>
+            </td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td th:text="${name}">-</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td th:text="${email}">-</td>
+        </tr>
+        <tr>
+            <th>Birthday</th>
+            <td th:text="${birthday}">-</td>
+        </tr>
+        <tr>
+            <th>Phone</th>
+            <td th:text="${phone}">-</td>
+        </tr>
+    </table>
+
+    <div th:if="${#authentication != null}" class="attributes-container">
+        <h3 style="color:#008ecc;">All Available Attributes:</h3>
+        <table class="custom-table">
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr th:each="attr : ${#authentication.principal.attributes}">
+                <td th:text="${attr.key}">Key</td>
+                <td th:text="${attr.value}">Value</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
