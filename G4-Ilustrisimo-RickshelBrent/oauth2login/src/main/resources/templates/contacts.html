@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .contact-list {
+            list-style: none;
+            padding: 0;
+        }
+        .contact-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .btn {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .btn-add { background-color: green; color: white; }
+        .btn-edit { background-color: orange; color: white; }
+        .btn-delete { background-color: red; color: white; }
+    </style>
+</head>
+<body>
+<h1>Your Google Contacts</h1>
+<button class="btn btn-add" onclick="window.location.href='/contacts/add'">Add Contact</button>
+
+<ul class="contact-list">
+    <li th:each="contact : ${contacts}" class="contact-item">
+        <strong th:text="${contact.name}"></strong>
+        <span th:text="${contact.email}"></span>
+        <span th:text="${contact.phone}"></span>
+
+        <button class="btn btn-edit" th:attr="onclick='editContact(\'' + ${contact.name} + '\')'">Edit</button>
+        <button class="btn btn-delete" th:attr="onclick='deleteContact(\'' + ${contact.name} + '\')'">Delete</button>
+    </li>
+</ul>
+
+<script>
+        function editContact(name) {
+            window.location.href = '/contacts/edit/' + encodeURIComponent(name);
+        }
+
+        function deleteContact(name) {
+            if (confirm('Are you sure you want to delete ' + name + '?')) {
+                fetch('/contacts/delete/' + encodeURIComponent(name), {
+                    method: 'DELETE'
+                }).then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting contact');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
