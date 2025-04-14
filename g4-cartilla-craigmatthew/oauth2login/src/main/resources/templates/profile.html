@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>User Profile</title>
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        /* Global Styles */
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --background: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 18px;
+            color: var(--text-light);
+            margin: 10px 0;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background-color: var(--card-background);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .profile-card img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .profile-card img:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-card h1 {
+            margin: 10px 0;
+            font-size: 28px;
+            color: var(--text-color);
+        }
+
+        .profile-card p {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        /* Button Styles */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .actions a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .actions a:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="profile-card">
+  <img th:src="${user.attributes['picture']}" alt="Profile Picture"/>
+  <h1>Welcome, <span th:text="${user.attributes['name']}"></span></h1>
+  <p>Email: <span th:text="${user.attributes['email']}"></span></p>
+  <div class="actions">
+    <a href="/contacts">View Contacts</a>
+    <a href="/logout">Logout</a>
+  </div>
+</div>
+</body>
+</html>
