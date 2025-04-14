@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arial:wght@300;400;600&display=swap">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            color: #2c3e50;
+        }
+        .container {
+            margin-top: 40px;
+            max-width: 900px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e6e9ed;
+        }
+        .header-title {
+            text-align: center;
+            color: #2980b9;
+            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 32px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .search-container {
+            max-width: 300px;
+        }
+        .pagination .page-link {
+            color: #2980b9;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        .page-info {
+            margin-top: 10px;
+            text-align: center;
+            color: #6c757d;
+        }
+        .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .btn-info {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #f39c12;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f1f4f7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="header-title">Google Contacts</h1>
+
+    <!-- Top Buttons and Search Form -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex gap-2">
+            <!-- Add Contact Button (Triggers Modal) -->
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                Add Contact
+            </button>
+            <!-- User-Info Button -->
+            <a href="/user-info" class="btn btn-info">User-Info</a>
+        </div>
+        <!-- Search Form -->
+        <div class="search-container">
+            <div class="input-group">
+                <input type="text" id="contactSearch" name="search" class="form-control" placeholder="Search contacts..."
+                       th:value="${search}">
+                <button type="button" class="btn btn-outline-primary">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Add Contact Form -->
+                    <form id="addContactForm" action="/api/contacts/create" method="POST">
+                        <div class="mb-3">
+                            <label for="givenName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="givenName" name="givenName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="familyName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="familyName" name="familyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Contact</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacts Table -->
+    <table class="table table-bordered table-hover" id="contactsTable">
+        <thead class="table-light">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact No</th>
+            <th class="text-center">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${(contact.names != null and !contact.names.isEmpty() and contact.names[0].displayName != null and !contact.names[0].displayName.isEmpty()) ? contact.names[0].displayName : 'N/A'}"
+                th:classappend="${(contact.names == null or contact.names.isEmpty() or contact.names[0].displayName == null or contact.names[0].displayName.isEmpty()) ? 'na-text' : ''}">
+            </td>
+            <td th:text="${(contact.emailAddresses != null and !contact.emailAddresses.isEmpty() and contact.emailAddresses[0].value != null and !contact.emailAddresses[0].value.isEmpty()) ? contact.emailAddresses[0].value : 'N/A'}"
+                th:classappend="${(contact.emailAddresses == null or contact.emailAddresses.isEmpty() or contact.emailAddresses[0].value == null or contact.emailAddresses[0].value.isEmpty()) ? 'na-text' : ''}">
+            </td>
+            <td th:text="${(contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty() and contact.phoneNumbers[0].value != null and !contact.phoneNumbers[0].value.isEmpty()) ? contact.phoneNumbers[0].value : 'N/A'}"
+                th:classappend="${(contact.phoneNumbers == null or contact.phoneNumbers.isEmpty() or contact.phoneNumbers[0].value == null or contact.phoneNumbers[0].value.isEmpty()) ? 'na-text' : ''}">
+            </td>
+            <td class="action-buttons">
+                <!-- Edit Button (Opens Modal) -->
+                <button class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                    Edit
+                </button>
+                <!-- Delete Button (Opens Confirmation Modal) -->
+                <button class="btn btn-danger btn-sm delete-contact-btn"
+                        th:attr="data-resource-name=${contact.resourceName},
+                                 data-contact-name=${contact.names[0].displayName != null
+                                                     ? contact.names[0].displayName
+                                                     : 'Unnamed Contact'}">
+                    Delete
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${!hasPreviousPage ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/contacts(page=${currentPage - 1}, search=${search})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Previous</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <span class="page-link" th:text="'Page ' + ${currentPage}"></span>
+                </li>
+                <li class="page-item" th:classappend="${!hasNextPage ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/contacts(page=${currentPage + 1}, search=${search})}" aria-label="Next">
+                        <span aria-hidden="true">Next &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Page Info -->
+    <div class="page-info">
+        <small>Showing <span th:text="${contacts.size()}"></span> contacts per page</small>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the contact
+                    <strong id="deleteContactName"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteContactForm" action="/api/contacts/delete" method="POST">
+                        <input type="hidden" name="resourceName" id="deleteResourceName">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Contact Modals -->
+    <div th:each="contact : ${contacts}" th:if="${contact.names != null and !contact.names.isEmpty()}">
+        <div class="modal fade"
+             th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"
+             tabindex="-1"
+             aria-labelledby="editContactModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="editContactModalLabel">Edit Contact</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Edit Contact Form -->
+                        <form th:action="@{/api/contacts/update}" method="POST">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                            <div class="mb-3">
+                                <label for="editGivenName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="editGivenName" name="givenName"
+                                       th:value="${(contact.names != null and !contact.names.isEmpty()) ? contact.names[0].givenName : ''}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editFamilyName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="editFamilyName" name="familyName"
+                                       th:value="${(contact.names != null and !contact.names.isEmpty()) ? contact.names[0].familyName : ''}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" name="email"
+                                       th:value="${(contact.emailAddresses != null and !contact.emailAddresses.isEmpty()) ? contact.emailAddresses[0].value : ''}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPhoneNumber" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="editPhoneNumber" name="phoneNumber"
+                                       th:value="${(contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty()) ? contact.phoneNumbers[0].value : ''}">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Custom Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dynamic Contact Addition
+        const addContactForm = document.getElementById('addContactForm');
+
+        addContactForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(addContactForm);
+
+            fetch('/api/contacts/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect to contacts page to refresh
+                    window.location.href = '/contacts';
+                    return;
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add contact. Please try again.');
+            });
+        });
+
+        // Dynamic Search
+        const searchInput = document.getElementById('contactSearch');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                const searchTerm = this.value;
+
+                fetch(/contacts?search=${encodeURIComponent(searchTerm)})
+                .then(response => response.text())
+                .then(html => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+
+                    const newTableBody = tempDiv.querySelector('#contactsTable tbody');
+                    const paginationContainer = tempDiv.querySelector('.pagination');
+                    const pageInfo = tempDiv.querySelector('.page-info');
+
+                    if (newTableBody) {
+                        document.querySelector('#contactsTable tbody').innerHTML = newTableBody.innerHTML;
+                    }
+
+                    document.querySelector('.pagination').innerHTML = paginationContainer.innerHTML;
+                    document.querySelector('.page-info').innerHTML = pageInfo.innerHTML;
+
+                    // Rebind delete and edit buttons
+                    setupDeleteButtons();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }, 300);
+        });
+
+        // Delete Confirmation Modal Setup
+        function setupDeleteButtons() {
+            const deleteButtons = document.querySelectorAll('.delete-contact-btn');
+            const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const deleteContactName = document.getElementById('deleteContactName');
+            const deleteResourceName = document.getElementById('deleteResourceName');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const contactName = this.getAttribute('data-contact-name');
+                    const resourceName = this.getAttribute('data-resource-name');
+
+                    deleteContactName.textContent = contactName;
+                    deleteResourceName.value = resourceName;
+
+                    deleteConfirmModal.show();
+                });
+            });
+        }
+
+        // Initial setup of delete buttons
+        setupDeleteButtons();
+    });
+</script>
+</body>
+</html>
