@@ -45,4 +45,26 @@ public class SecurityConfig {
             return oauthUser;
         };
     }
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService() {
+        return userRequest -> {
+            String registrationId = userRequest.getClientRegistration().getRegistrationId();
+            OAuth2User oauthUser;
+
+            if ("google".equals(registrationId)) {
+                OidcUserService oidcUserService = new OidcUserService();
+                OidcUser oidcUser = oidcUserService.loadUser((org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest) userRequest);
+                oauthUser = oidcUser; // Assign OidcUser to OAuth2User variable
+            } else {
+                DefaultOAuth2UserService defaultService = new DefaultOAuth2UserService();
+                oauthUser = defaultService.loadUser(userRequest);
+            }
+
+            // Extract and print access token for debugging
+            String accessToken = userRequest.getAccessToken().getTokenValue();
+            System.out.println("Access Token: " + accessToken);
+
+            return oauthUser; // Return the OAuth2User
+        };
+    }
 }

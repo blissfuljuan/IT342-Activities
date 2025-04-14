@@ -1,7 +1,13 @@
+
 package com.example.demo.Service;
 
 
 import com.example.demo.model.Contacts;
+package com.inion.kylenina.trial.Service;
+
+
+import com.inion.kylenina.trial.model.Contacts;
+
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.people.v1.PeopleService;
