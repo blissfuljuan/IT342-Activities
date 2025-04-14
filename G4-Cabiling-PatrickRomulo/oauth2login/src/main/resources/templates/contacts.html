@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        h1 {
+            font-size: 2.2em;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        /* Contact List Container */
+        .contact-list {
+            width: 95%;
+            max-width: 900px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1em;
+        }
+        td {
+            font-size: 1em;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .add-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .modal input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Google Contacts</h1>
+
+    <button class="button add-btn" onclick="openModal()">Add Contact</button>
+
+    <div class="contact-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email(s)</th>
+                    <th>Phone(s)</th>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="contacts-table">
+                <tr th:each="contact : ${contacts}" th:attr="data-resource=${contact.resourceName}">
+                    <td th:text="${contact.name}"></td>
+                    <td>
+                        <ul>
+                            <li th:each="email : ${contact.emails}" th:text="${email}"></li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li th:each="phone : ${contact.phones}" th:text="${phone}"></li>
+                        </ul>
+                    </td>
+                    <td th:text="${contact.jobTitle}"></td>
+                    <td th:text="${contact.company}"></td>
+                    <td>
+                        <button class="button edit-btn" onclick="editContact(this)">Edit</button>
+                        <button class="button delete-btn" onclick="deleteContact(this)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal for Adding/Editing Contact -->
+    <div id="contact-modal" class="modal">
+        <h2 id="modal-title">Add Contact</h2>
+        <input type="hidden" id="resourceName">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="email" placeholder="Email">
+        <input type="text" id="phone" placeholder="Phone">
+        <input type="text" id="jobTitle" placeholder="Job Title">
+        <input type="text" id="company" placeholder="Company">
+        <div class="modal-buttons">
+            <button class="button" onclick="closeModal()">Cancel</button>
+            <button class="button add-btn" onclick="saveContact()">Save</button>
+        </div>
+        <div id="error-message" style="color: red; display: none;"></div>
+    </div>
+
+    <script>
+        function openModal(contact = null) {
+            if (contact) {
+                $("#modal-title").text("Edit Contact");
+                $("#resourceName").val(contact.resourceName);
+                $("#name").val(contact.name);
+                // Get first email/phone if they exist
+                $("#email").val(contact.emails && contact.emails.length > 0 ? contact.emails[0] : "");
+                $("#phone").val(contact.phones && contact.phones.length > 0 ? contact.phones[0] : "");
+                $("#jobTitle").val(contact.jobTitle === "No Job Title" ? "" : contact.jobTitle);
+                $("#company").val(contact.company === "No Company" ? "" : contact.company);
+            } else {
+                $("#modal-title").text("Add Contact");
+                $("#resourceName").val("");
+                $("#name").val("");
+                $("#email").val("");
+                $("#phone").val("");
+                $("#jobTitle").val("");
+                $("#company").val("");
+            }
+            $("#error-message").hide();
+            $("#contact-modal").show();
+        }
+
+        function closeModal() {
+            $("#contact-modal").hide();
+        }
+
+        function saveContact() {
+            let contact = {
+                resourceName: $("#resourceName").val(),
+                name: $("#name").val() || undefined,
+                email: $("#email").val() || undefined,
+                phone: $("#phone").val() || undefined,
+                jobTitle: $("#jobTitle").val() || undefined,
+                company: $("#company").val() || undefined
+            };
+
+            let url = contact.resourceName ? "/contacts/edit" : "/contacts/add";
+            let method = contact.resourceName ? "PUT" : "POST";
+
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: "application/json",
+                data: JSON.stringify(contact),
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr) {
+                    let errorMsg = xhr.responseText || "An error occurred";
+                    try {
+                        let errorJson = JSON.parse(xhr.responseText);
+                        errorMsg = errorJson.message || errorMsg;
+                    } catch (e) {
+                        // If not JSON, use raw text
+                    }
+                    $("#error-message").text("Error: " + errorMsg).show();
+                }
+            });
+        }
+
+        function editContact(button) {
+            let row = $(button).closest("tr");
+            let emails = row.find("td:eq(1) ul li").map(function() { return $(this).text(); }).get();
+            let phones = row.find("td:eq(2) ul li").map(function() { return $(this).text(); }).get();
+            let contact = {
+                resourceName: row.attr("data-resource"),
+                name: row.find("td:eq(0)").text(),
+                emails: emails,
+                phones: phones,
+                jobTitle: row.find("td:eq(3)").text(),
+                company: row.find("td:eq(4)").text()
+            };
+            openModal(contact);
+        }
+
+        function deleteContact(button) {
+            if (confirm("Are you sure you want to delete this contact?")) {
+                let row = $(button).closest("tr");
+                let resourceName = row.attr("data-resource");
+
+                $.ajax({
+                    url: "/contacts/delete?resourceName=" + encodeURIComponent(resourceName),
+                    type: "DELETE",
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        alert("Error deleting contact: " + (xhr.responseText || "Unknown error"));
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
