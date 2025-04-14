@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Google Contacts</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #e0ffff;
+    }
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #343a40;
+      text-align: center;
+      font-weight: 600;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-radius: 6px;
+      font-size: 16px;
+      padding: 10px 20px;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .btn-danger {
+      background-color: #dc3545;
+      border-radius: 6px;
+      font-size: 14px;
+      padding: 5px 10px;
+    }
+    .btn-danger:hover {
+      background-color: #b02a37;
+    }
+    .table {
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .table th {
+      background: #007bff;
+      color: white;
+      font-weight: 600;
+      text-align: center;
+    }
+    .table tbody tr:hover {
+      background-color: #f1f3f5;
+    }
+    .modal-content {
+      border-radius: 10px;
+    }
+    .modal-header {
+      background: #007bff;
+      color: white;
+      border-radius: 10px 10px 0 0;
+    }
+    .form-control {
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .d-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Google Contacts</h1>
+  <div class="d-flex mb-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">Add Contact</button>
+    <form action="/logout" method="post">
+      <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+  </div>
+
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Contact No</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+      <td th:text="${contact.names[0].displayName ?: 'No Name'}"></td>
+      <td th:text="${contact.emailAddresses[0].value ?: 'No Email'}"></td>
+      <td th:text="${contact.phoneNumbers[0].value ?: 'No Number'}"></td>
+      <td>
+        <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+          Edit
+        </button>
+        <form action="/api/contacts/delete" method="POST" class="d-inline">
+          <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- Add Contact Modal -->
+  <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addContactModalLabel">Add Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form th:action="@{/api/contacts/create}" method="post">
+            <div class="mb-3">
+              <label for="givenName" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="givenName" name="givenName">
+            </div>
+            <div class="mb-3">
+              <label for="familyName" class="form-label">Family Name</label>
+              <input type="text" class="form-control" id="familyName" name="familyName">
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email">
+            </div>
+            <div class="mb-3">
+              <label for="phoneNumber" class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save Contact</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Contact Modals -->
+  <div th:each="contact : ${contacts}" th:if="${contact.names != null and !contact.names.isEmpty()}">
+    <div class="modal fade"
+         th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}"
+         tabindex="-1"
+         aria-labelledby="editContactModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editContactModalLabel">Edit Contact</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form th:action="@{/api/contacts/update}" method="POST">
+              <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+              <div class="mb-3">
+                <label for="editGivenName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="editGivenName" name="givenName"
+                       th:value="${contact.names[0].givenName}" required>
+              </div>
+              <div class="mb-3">
+                <label for="editFamilyName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="editFamilyName" name="familyName"
+                       th:value="${contact.names[0].familyName}" required>
+              </div>
+              <div class="mb-3">
+                <label for="editEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="editEmail" name="email"
+                       th:value="${contact.emailAddresses != null and !contact.emailAddresses.isEmpty() ? contact.emailAddresses[0].value : ''}">
+              </div>
+              <div class="mb-3">
+                <label for="editPhoneNumber" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="editPhoneNumber" name="phoneNumber"
+                       th:value="${contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty() ? contact.phoneNumbers[0].value : ''}">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
