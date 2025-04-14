@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/contacts.css}">
+    <link rel="stylesheet" href="contacts.css">
+</head>
+<body>
+    
+    <!-- Error Message Handling -->
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    
+    <!-- Create Form -->
+    <div class="contact-container">
+        <h1 class="h2-create"><span class="blue-text">Create</span> <span class="white-text">Contact</span></h1>
+        <br>
+        <form action="/contacts" method="post">
+            <label for="firstName">First Name:</label>
+            <br>
+            <input type="text" id="firstName" name="firstName" required>
+            <br>
+            
+            <label for="lastName">Last Name:</label>
+            <br>
+            <input type="text" id="lastName" name="lastName" required>
+            <br>
+            
+            <label for="email">Email:</label>
+            <br>
+            <input type="email" id="email" name="email" required>
+            <br>
+            
+            <label for="phone">Phone:</label>
+            <br>
+            <input type="text" id="phone" name="phone" required>
+            <br>
+            
+            <button class="create-contact" type="submit">Create Contact</button>
+            <br>
+            
+        </form>
+        
+        <a href="/contacts" class="back-button ">Back to Contacts</a>
+    </div>
+    
+</body>
+</html>
