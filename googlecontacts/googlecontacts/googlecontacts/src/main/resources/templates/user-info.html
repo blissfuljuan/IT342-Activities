@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Profile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('/pictures/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Patrick Hand', cursive;
+        }
+
+        .container {
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 20px;
+            background-color: rgba(255, 240, 245, 0.9);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 3px solid #ffb6c1;
+        }
+
+        .user-info {
+            padding: 20px;
+            background: linear-gradient(135deg, #ffb6c1, #ff85a2);
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.2);
+        }
+
+        .profile-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 3px solid white;
+        }
+
+        .user-details h3 {
+            margin: 0;
+            font-size: 1.7rem;
+        }
+
+        .user-details p {
+            margin: 5px 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            margin-top: 20px;
+        }
+
+        .btn-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #ff85a2;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 20px;
+            transition: background 0.3s ease, transform 0.2s;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 3px 5px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-custom:hover {
+            background-color: #ff6699;
+            transform: scale(1.05);
+        }
+
+        .btn-custom i {
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mb-3" style="color: #ff69b4;">🌸 My Sanrio Profile 🌸</h2>
+    <div class="user-info">
+        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+        <div class="user-details">
+            <h3>Welcome, <span th:text="${name}">User</span>! 🎀</h3>
+            <p>Email: <span th:text="${email}">email@example.com</span></p>
+        </div>
+    </div>
+    <div class="nav-buttons d-flex justify-content-between mt-4">
+        <a href="/contacts" class="btn-custom"><i class="bi bi-person-lines-fill"></i> My Contacts</a>
+        <a href="/logout" class="btn-custom"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+</div>
+</body>
+</html>
