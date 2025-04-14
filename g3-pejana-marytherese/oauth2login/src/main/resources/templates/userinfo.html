@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Information</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffeef8; /* Soft pastel pink */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 30px auto;
+        }
+
+        h2 {
+            color: #ff69b4;
+            font-weight: bold;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: #fff0f5; /* Soft pastel */
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Profile Image */
+        .profile-image-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .user-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 6px solid #ffb6c1;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        /* User Info */
+        .user-info {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .info-item {
+            background: #fffafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(255, 182, 193, 0.2);
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #ff69b4;
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #333;
+            flex-grow: 1;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        /* Button */
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .manage-contacts-btn {
+            padding: 14px 28px;
+            background-color: #fcbad3;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.4);
+            border: none;
+            cursor: pointer;
+        }
+
+        .manage-contacts-btn:hover {
+            background-color: #ff69b4;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.5);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Google User Information</h2>
+
+    <div class="profile-card">
+        <div class="profile-image-container">
+            <img th:src="${picture}" class="user-picture" alt="Profile Picture"/>
+        </div>
+
+        <div class="user-info">
+            <div class="info-item">
+                <div class="info-label">Name</div>
+                <div class="info-value" th:text="${name}">-</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value" th:text="${email}">-</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Phone</div>
+                <div class="info-value" th:text="${phone}">-</div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="/api/contacts/view" class="manage-contacts-btn">Manage Contacts</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

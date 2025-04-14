@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #ffeef8; /* Soft pastel pink */
+            text-align: center;
+        }
+
+        .error-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff0f5; /* Light pastel pink */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+            border: 2px solid #ffb6c1;
+        }
+
+        .error-header {
+            border-bottom: 2px dashed #ffb6c1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #ff69b4;
+        }
+
+        .error-code {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0;
+            color: #ff1493;
+            text-shadow: 2px 2px 6px rgba(255, 105, 180, 0.3);
+        }
+
+        .error-message {
+            color: #aa88cc; /* Soft lavender */
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        .error-details {
+            background-color: #fce4ec; /* Light pink */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.2);
+        }
+
+        .error-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #fcbad3; /* Soft pink */
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(255, 182, 193, 0.3);
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #ff69b4;
+            transform: scale(1.05);
+        }
+    </style>
+
+</head>
+<body>
+<div class="error-container">
+    <div class="error-header">
+        <h1 class="error-code" th:text="${status}">500</h1>
+        <h2 th:text="${error}">Error</h2>
+    </div>
+
+    <div class="error-message">
+        <p th:text="${message}">Error message</p>
+    </div>
+
+    <div class="error-details">
+        <p><strong>Path:</strong> <span th:text="${path}">Request path</span></p>
+        <p><strong>Time:</strong> <span th:text="${timestamp}">Timestamp</span></p>
+    </div>
+
+    <a href="/googleuser" class="back-button">Back to Home</a>
+</div>
+</body>
+</html>
