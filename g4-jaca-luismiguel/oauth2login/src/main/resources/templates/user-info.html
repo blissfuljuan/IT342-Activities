@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info - Google Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            background-color: #e9f0fd;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .profile-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 3px solid #4285F4;
+        }
+        .user-details h3 {
+            margin: 0;
+            color: #333;
+        }
+        .user-details p {
+            margin: 5px 0 0;
+            color: #555;
+            font-size: 14px;
+        }
+        .nav-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285F4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px;
+            transition: 0.3s;
+            font-size: 14px;
+            border: none;
+        }
+        .btn:hover {
+            background-color: #3071E8;
+        }
+        .navbar {
+            padding: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/contacts">Contacts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/user-info">Profile</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h2 class="text-center" style="color: #333;">User Information</h2>
+    <div class="user-info">
+        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+        <div class="user-details">
+            <h3>Welcome, <span th:text="${name}">User</span>!</h3>
+            <p>Email: <span th:text="${email}">email@example.com</span></p>
+        </div>
+    </div>
+    <div class="nav-buttons">
+        <a href="/contacts" class="btn">View My Contacts</a>
+        <a href="/logout" class="btn">Logout</a>
+    </div>
+</div>
+</body>
+</html>
