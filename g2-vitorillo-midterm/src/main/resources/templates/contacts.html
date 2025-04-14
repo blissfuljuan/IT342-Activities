@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Contacts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .contact-card {
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+            height: 100%; /* Make cards stretch to fill container */
+        }
+        .contact-card:hover {
+            transform: translateY(-5px);
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .contact-details {
+            margin-bottom: 0.5rem;
+        }
+        .avatar-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            min-height: 300px; /* Set a minimum height */
+        }
+        .card-container {
+            height: 100%; /* Ensure the column takes full height */
+        }
+        .actions {
+            margin-top: auto; /* Push actions to bottom */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Your Google Contacts</h1>
+        <a href="/contacts/add" class="btn btn-primary">Add New Contact</a>
+    </div>
+
+    <div class="alert alert-info" th:if="${contacts.empty}">
+        You don't have any contacts yet. Click "Add New Contact" to get started.
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 card-container" th:each="contact : ${contacts}">
+            <div class="card contact-card">
+                <div class="card-body">
+                    <!-- Display avatar if available -->
+                    <div class="text-center mb-3" th:if="${contact.photos != null && !contact.photos.isEmpty()}">
+                        <img th:src="${contact.photos[0].url}"
+                             class="rounded-circle avatar-img"
+                             alt="Contact Avatar"
+                             th:unless="${contact.photos[0].default}"
+                             onerror="this.src='/default-avatar.jpg'"/>
+                    </div>
+
+                    <h5 class="card-title"
+                        th:text="${contact.names != null && !contact.names.isEmpty() ? contact.names[0].displayName : 'Unnamed Contact'}">
+                        Contact Name
+                    </h5>
+
+                    <!-- Display all email addresses -->
+                    <div class="contact-details" th:if="${contact.emailAddresses != null && !contact.emailAddresses.isEmpty()}">
+                        <strong>Emails:</strong>
+                        <ul class="list-unstyled mt-1">
+                            <li th:each="email : ${contact.emailAddresses}"
+                                th:text="${email.value}">
+                                email@example.com
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Display all phone numbers -->
+                    <div class="contact-details" th:if="${contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty()}">
+                        <strong>Phones:</strong>
+                        <ul class="list-unstyled mt-1">
+                            <li th:each="phone : ${contact.phoneNumbers}"
+                                th:text="${phone.value}">
+                                123-456-7890
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="actions mt-3">
+                        <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}"
+                           class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a th:href="@{'/contacts/delete/' + ${contact.resourceName}}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Are you sure you want to delete this contact?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

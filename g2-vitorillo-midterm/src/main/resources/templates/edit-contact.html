@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Contact</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Edit Contact</h3>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{'/contacts/edit/' + ${resourceName}}" method="post">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name*</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required
+                                   placeholder="Enter first name"
+                                   th:value="${contact != null && contact.names != null && !contact.names.isEmpty()} ? ${contact.names[0].givenName} : ''">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name*</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required
+                                   placeholder="Enter last name"
+                                   th:value="${contact != null && contact.names != null && !contact.names.isEmpty()} ? ${contact.names[0].familyName} : ''">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="Enter email address"
+                                   th:value="${contact != null && contact.emailAddresses != null && !contact.emailAddresses.isEmpty()} ? ${contact.emailAddresses[0].value} : ''">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number (with Country Code):</label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                                   maxlength="15"
+                                   placeholder="+63-9123333321" required
+                                   th:value="${contact != null && contact.phoneNumbers != null && !contact.phoneNumbers.isEmpty()} ? ${contact.phoneNumbers[0].value} : ''">
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/contacts" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Contact</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript for phone number formatting -->
+<script>
+        document.getElementById('phoneNumber').addEventListener('input', function (e) {
+            // Remove all non-digit and non-plus characters
+            let phoneNumber = e.target.value.replace(/[^\d+]/g, '');
+
+            // Ensure the input starts with a '+' for country code
+            if (!phoneNumber.startsWith('+')) {
+                phoneNumber = '+' + phoneNumber.replace(/\D/g, '');
+            }
+
+            // Limit the total length to 15 characters (including '+' and digits)
+            if (phoneNumber.length > 15) {
+                phoneNumber = phoneNumber.substring(0, 15);
+            }
+
+            // Update the input value
+            e.target.value = phoneNumber;
+        });
+    </script>
+</body>
+</html>
