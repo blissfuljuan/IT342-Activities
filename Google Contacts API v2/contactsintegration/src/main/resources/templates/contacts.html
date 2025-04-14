@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Google Contacts</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f1f3f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+            width: 600px;
+            text-align: center;
+        }
+
+        .welcome {
+            font-size: 20px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 20px;
+        }
+
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #d9d9d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #5f6368;
+            margin-right: 10px;
+        }
+
+        .contact-details {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .contact-name {
+            font-size: 20px;
+            font-weight: 500;
+            color: #202124;
+        }
+
+        .contact-email, .contact-phone {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 10px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(to right, #60aaff, #00398f);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(to right, #700000, #ff6262);
+            color: white;
+        }
+
+        .btn-add {
+            background: linear-gradient(to bottom, #51ff85, #00520e);
+            color: white;
+            margin-top: 15px;
+            display: inline-block;
+            padding: 8px 15px;
+            font-size: 26px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 25px;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .logout {
+            background: linear-gradient(to bottom, #b9b9b9, #303030);
+            position: fixed;
+            bottom: 35px;
+            right: 35px;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .logout:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 16px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: left;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-close {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="welcome" th:text="'Welcome, ' + ${username}"></div>
+        <h1>Your Google Contacts</h1>
+
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <ul class="contact-list" th:if="${contacts}">
+            <li class="contact-item" th:each="contact : ${contacts}">
+                <div class="contact-photo" th:text="${#strings.substring(contact.name, 0, 1)}"></div>
+                <div class="contact-details">
+                    <div class="contact-name" th:text="${contact.name}"></div>
+                    <div class="contact-email" th:each="email : ${contact.email}" th:text="${email}"></div>
+                    <div class="contact-phone" th:each="phone : ${contact.phone}" th:text="${phone}"></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-edit" 
+                            th:attr="data-resource=${contact.resourceName}, 
+                                     data-name=${contact.name}, 
+                                     data-emails=${#strings.listJoin(contact.email, ',')}, 
+                                     data-phones=${#strings.listJoin(contact.phone, ',')}" 
+                            onclick="openEditModal(this)">Edit</button>
+                    <form th:action="@{/contacts/delete}" method="post" style="display:inline;" onsubmit="return showDeleteConfirmation(event, this)">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                        <button type="submit" class="btn btn-delete">Delete</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+
+        <p th:if="${contacts == null or #lists.isEmpty(contacts)}">No contacts found.</p>
+
+        <button class="btn-add" onclick="openAddModal()">+</button>
+
+        <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="return showLogoutConfirmation(event, this)">
+            <button type="submit" class="logout">Logout</button>
+        </form>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">My Google Contacts says</div>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-buttons">
+                <button id="confirmLogoutBtn" class="btn btn-delete">Yes</button>
+                <button type="button" class="btn modal-close" onclick="closeLogoutModal()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Add Contact</div>
+            <form id="contactForm" th:action="@{${formAction}}" method="post">
+                <input type="hidden" id="resourceName" name="resourceName">
+                <label>Name:</label>
+                <input type="text" id="contactName" name="name" required>
+                <label>Email Addresses:</label>
+                <div id="emailAddressesContainer">
+                    <input type="email" name="email" class="email-input" required>
+                </div>
+                <button type="button" class="btn btn-add" onclick="addEmailField()">+</button>
+                <label>Phone Numbers:</label>
+                <div id="phoneNumbersContainer">
+                    <input type="text" name="phone" class="phone-input" required>
+                </div>
+                <button type="button" class="btn btn-add" onclick="addPhoneField()">+</button>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn">Save</button>
+                    <button type="button" class="btn modal-close" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">My Google Contacts says</div>
+            <p>Are you sure you want to delete this contact?</p>
+            <div class="modal-buttons">
+                <button id="confirmDeleteBtn" class="btn btn-delete">Yes</button>
+                <button type="button" class="btn modal-close" onclick="closeDeleteModal()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deleteFormToSubmit = null;
+        let logoutFormToSubmit = null;
+
+        function showDeleteConfirmation(event, form) {
+            event.preventDefault();
+            deleteFormToSubmit = form;
+            document.getElementById("deleteConfirmModal").style.display = "block";
+        }
+
+        function closeDeleteModal() {
+            document.getElementById("deleteConfirmModal").style.display = "none";
+            deleteFormToSubmit = null;
+        }
+
+        document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
+            if (deleteFormToSubmit) {
+                deleteFormToSubmit.submit();
+            }
+        });
+
+        function showLogoutConfirmation(event, form) {
+            event.preventDefault();
+            logoutFormToSubmit = form;
+            document.getElementById("logoutConfirmModal").style.display = "block";
+        }
+
+        function closeLogoutModal() {
+            document.getElementById("logoutConfirmModal").style.display = "none";
+            logoutFormToSubmit = null;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
+            if (confirmLogoutBtn) {
+                confirmLogoutBtn.addEventListener("click", function() {
+                    if (logoutFormToSubmit) {
+                        logoutFormToSubmit.submit();
+                    }
+                });
+            } else {
+                console.error("Confirm Logout Button not found!");
+            }
+        });
+
+        function addEmailField() {
+            const container = document.getElementById("emailAddressesContainer");
+            const newInput = document.createElement("input");
+            newInput.type = "email";
+            newInput.name = "email";
+            newInput.className = "email-input";
+            container.appendChild(newInput);
+        }
+
+        function addPhoneField() {
+            const container = document.getElementById("phoneNumbersContainer");
+            const newInput = document.createElement("input");
+            newInput.type = "text";
+            newInput.name = "phone";
+            newInput.className = "phone-input";
+            container.appendChild(newInput);
+        }
+
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Add Contact";
+            document.getElementById("contactForm").action = "/contacts/add";
+            document.getElementById("contactName").value = "";
+            
+            // Reset email fields
+            const emailContainer = document.getElementById("emailAddressesContainer");
+            emailContainer.innerHTML = '<input type="email" name="email" class="email-input" required>';
+            
+            // Reset phone fields
+            const phoneContainer = document.getElementById("phoneNumbersContainer");
+            phoneContainer.innerHTML = '<input type="text" name="phone" class="phone-input" required>';
+            
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function openEditModal(button) {
+            document.getElementById("modalTitle").innerText = "Edit Contact";
+            document.getElementById("contactForm").action = "/contacts/edit";
+            document.getElementById("resourceName").value = button.getAttribute("data-resource");
+            document.getElementById("contactName").value = button.getAttribute("data-name");
+
+            // Populate emails
+            const emails = button.getAttribute("data-emails").split(",");
+            const emailContainer = document.getElementById("emailAddressesContainer");
+            emailContainer.innerHTML = "";
+            emails.forEach(email => {
+                if (email.trim() !== "No email") {
+                    const input = document.createElement("input");
+                    input.type = "email";
+                    input.name = "email";
+                    input.className = "email-input";
+                    input.value = email.trim();
+                    emailContainer.appendChild(input);
+                }
+            });
+            if (emailContainer.children.length === 0) {
+                addEmailField();
+            }
+
+            // Populate phones
+            const phones = button.getAttribute("data-phones").split(",");
+            const phoneContainer = document.getElementById("phoneNumbersContainer");
+            phoneContainer.innerHTML = "";
+            phones.forEach(phone => {
+                if (phone.trim() !== "No phone") {
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.name = "phone";
+                    input.className = "phone-input";
+                    input.value = phone.trim();
+                    phoneContainer.appendChild(input);
+                }
+            });
+            if (phoneContainer.children.length === 0) {
+                addPhoneField();
+            }
+
+            document.getElementById("contactModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("contactModal").style.display = "none";
+        }
+    </script>
+</body>
+</html>
