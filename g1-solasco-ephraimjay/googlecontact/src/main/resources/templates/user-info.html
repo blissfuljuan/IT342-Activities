@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profile - Google Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(-45deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .contact-card {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: float 6s infinite;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 0;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            top: 10px;
+        }
+
+        .contact-card::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            top: 40px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .content-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.15);
+            backdrop-filter: blur(12px);
+            margin: 2rem auto;
+            max-width: 800px;
+            z-index: 1;
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #202124;
+        }
+
+        .profile-email {
+            color: #5f6368;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #202124;
+        }
+
+        .stat-label {
+            color: #5f6368;
+            font-size: 0.875rem;
+        }
+
+        .profile-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #1a73e8;
+            border-color: #1a73e8;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+            border-color: #1557b0;
+        }
+
+        .btn-outline-primary {
+            color: #1a73e8;
+            border-color: #1a73e8;
+        }
+
+        .btn-outline-primary:hover {
+            background: #1a73e8;
+            border-color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div id="background-animation"></div>
+    <div class="content-container">
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container">
+                <a class="navbar-brand" href="/contacts">My Contacts</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contacts">Contacts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/user-info">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="profile-card">
+            <img th:src="${pictureUrl}" alt="Profile Picture" class="profile-image">
+            <h1 class="profile-name" th:text="${name}">User Name</h1>
+            <p class="profile-email" th:text="${email}">user@example.com</p>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value" th:text="${totalContacts}">0</div>
+                    <div class="stat-label">Contacts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" th:text="${emailContacts}">0</div>
+                    <div class="stat-label">With Email</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" th:text="${phoneContacts}">0</div>
+                    <div class="stat-label">With Phone</div>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <a href="/contacts" class="btn btn-primary action-btn">
+                    <i class="bi bi-person-lines-fill me-2"></i>
+                    View Contacts
+                </a>
+                <a href="/logout" class="btn btn-outline-primary action-btn">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function createContactCards() {
+            const container = document.body;
+            const numCards = 8;
+            
+            for (let i = 0; i < numCards; i++) {
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                
+                // Random position
+                card.style.left = Math.random() * 100 + 'vw';
+                card.style.top = Math.random() * 100 + 'vh';
+                
+                // Random animation delay
+                card.style.animationDelay = (Math.random() * 2) + 's';
+                
+                container.appendChild(card);
+            }
+        }
+
+        window.addEventListener('load', createContactCards);
+    </script>
+</body>
+</html>
