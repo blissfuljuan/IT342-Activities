@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts API</title>
+    <link rel="icon" type="image/png" th:href="@{/contact.png}">
+    <style>
+        body {
+            background-color: #0f0e17;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #0f0e17;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        a {
+            color: #bb86fc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: #ff8906;
+            color: #fffffe;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 15px;
+            letter-spacing: 2px;
+            font-weight: 1000;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+        h2 {
+            font-size: 30px;
+        }
+        p {
+            color: #a7a9be;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <h1>Google Contacts API</h1>
+    </div>
+    <div class="login-button">
+        <a th:href="@{/login}"><button>Login</button></a>
+    </div>
+</header>
+<div class="container">
+    <h2>Welcome to the Website!</h2>
+    <p>This is the landing page of Google Contants API.</p>
+</div>
+</body>
+</html>
