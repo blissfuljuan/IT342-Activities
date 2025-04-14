@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Secured Page</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      color: #bb86fc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #1e1e1e;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    button {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #333;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #333;
+    }
+
+    a {
+      color: #bb86fc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="container">
+    <h1>Home Page</h1>
+  </div>
+  <div class="contacts-button">
+    <a th:href="@{/contacts/getContacts}"><button>Contacts</button></a>
+  </div>
+</header>
+<div class="container">
+  <h2>This is a secure page!</h2>
+</div>
+</body>
+</html>
