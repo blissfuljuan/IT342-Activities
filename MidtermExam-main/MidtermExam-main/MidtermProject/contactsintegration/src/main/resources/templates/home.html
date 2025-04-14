@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts App</title>
+    <style>
+        * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     }
+
+     body {
+         min-height: 100vh;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         background: linear-gradient(135deg, #8e44ad, #3498db);
+         overflow: hidden;
+         position: relative;
+     }
+
+     .container {
+         background: rgba(255, 255, 255, 0.15);
+         backdrop-filter: blur(12px);
+         padding: 40px;
+         border-radius: 16px;
+         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+         width: 100%;
+         max-width: 400px;
+         text-align: center;
+         position: relative;
+         z-index: 1;
+         border: 1px solid rgba(255, 255, 255, 0.2);
+     }
+
+     h1 {
+         color: #fff;
+         margin-bottom: 15px;
+         font-size: 28px;
+         font-weight: 600;
+     }
+
+     p {
+         color: rgba(255, 255, 255, 0.8);
+         margin-bottom: 30px;
+         font-size: 16px;
+         line-height: 1.5;
+     }
+
+     .btn-google {
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         padding: 12px 24px;
+         font-size: 16px;
+         color: white;
+         background: #4285f4;
+         border: none;
+         border-radius: 12px;
+         text-decoration: none;
+         transition: background 0.3s ease, transform 0.2s ease;
+         cursor: pointer;
+         box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+     }
+
+     .btn-google:hover {
+         background: #357abd;
+         transform: translateY(-3px);
+     }
+
+     .btn-google:active {
+         transform: translateY(0);
+     }
+
+     .google-icon {
+         margin-right: 10px;
+         font-size: 20px;
+     }
+
+     @keyframes floating {
+         0% { transform: translateY(0); }
+         50% { transform: translateY(-10px); }
+         100% { transform: translateY(0); }
+     }
+
+     .floating-elements {
+         position: absolute;
+         width: 100%;
+         height: 100%;
+         top: 0;
+         left: 0;
+         z-index: 0;
+     }
+
+     .floating-elements span {
+         position: absolute;
+         width: 80px;
+         height: 80px;
+         background: rgba(255, 255, 255, 0.1);
+         border-radius: 50%;
+         animation: floating 5s infinite ease-in-out;
+     }
+
+     .floating-elements span:nth-child(1) {
+         top: 10%; left: 15%; animation-duration: 6s;
+     }
+     .floating-elements span:nth-child(2) {
+         top: 50%; left: 70%; animation-duration: 8s;
+     }
+     .floating-elements span:nth-child(3) {
+         bottom: 20%; left: 40%; animation-duration: 7s;
+     }
+    </style>
+    <!-- Add Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1>Sign in to go to Google Contacts</h1>
+    <p>Sign in with Google to access</p>
+
+    <a href="/oauth2/authorization/google" class="btn-google">
+        <span class="material-icons google-icon">account_circle</span>
+        Sign in with Google
+    </a>
+</div>
+</body>
+</html>
