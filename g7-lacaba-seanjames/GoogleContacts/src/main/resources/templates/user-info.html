@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Profile - Netflix Contacts</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --netflix-red: #E50914;
+      --netflix-black: #141414;
+      --netflix-dark-gray: #181818;
+      --netflix-gray: #303030;
+      --netflix-light-gray: #6D6D6D;
+      --netflix-white: #FFFFFF;
+    }
+
+    body {
+      background-color: var(--netflix-black);
+      color: var(--netflix-white);
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .navbar {
+      background-color: var(--netflix-black) !important;
+      padding: 0.5rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .navbar-brand {
+      color: var(--netflix-red) !important;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .nav-link {
+      color: var(--netflix-white) !important;
+      margin: 0 10px;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: var(--netflix-red) !important;
+    }
+
+    .nav-link.active {
+      font-weight: bold;
+      color: var(--netflix-white) !important;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 30px;
+      background-color: var(--netflix-dark-gray);
+      border-radius: 4px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      border-left: 4px solid var(--netflix-red);
+      padding-left: 15px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .user-info {
+      padding: 25px;
+      background-color: var(--netflix-gray);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 4px;
+      margin-right: 25px;
+      object-fit: cover;
+      border: 2px solid var(--netflix-red);
+    }
+
+    .user-details h3 {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .user-details p {
+      color: #ccc;
+      margin-bottom: 5px;
+    }
+
+    .btn {
+      background-color: var(--netflix-red);
+      color: var(--netflix-white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: all 0.3s;
+      margin-right: 15px;
+    }
+
+    .btn:hover {
+      background-color: #f40612;
+      transform: scale(1.05);
+      color: var(--netflix-white);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--netflix-white);
+    }
+
+    .btn-outline:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">NETCONTACTS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/contacts">Contacts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/user-info">Profile</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">
+            <i class="bi bi-box-arrow-right"></i> Sign Out
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Your Profile</h1>
+
+  <div class="user-info">
+    <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+    <img th:unless="${pictureUrl}" src="/api/placeholder/100/100" class="profile-image" alt="Profile picture">
+    <div class="user-details">
+      <h3>Hello, <span th:text="${name}">User</span></h3>
+      <p><i class="bi bi-envelope"></i> <span th:text="${email}">email@example.com</span></p>
+      <p><i class="bi bi-clock"></i> Member since 2023</p>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <a href="/contacts" class="btn">
+      <i class="bi bi-people-fill"></i> My Contacts
+    </a>
+    <a href="/logout" class="btn btn-outline">
+      <i class="bi bi-box-arrow-right"></i> Sign Out
+    </a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
