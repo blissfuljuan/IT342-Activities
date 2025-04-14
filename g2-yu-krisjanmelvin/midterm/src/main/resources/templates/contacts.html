@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Google Contacts Manager</h1>
+
+    <!-- Add Contact Toggle Button -->
+    <button id="toggle-form-btn" class="button add-btn">Add Contact</button>
+
+    <!-- Add Contact Form -->
+    <div id="form-container" class="form-container">
+        <h2>Add New Contact</h2>
+        <form th:action="@{/contacts/add}" th:object="${newContact}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="text" th:field="*{firstName}" placeholder="First Name" required>
+            <span th:errors="*{firstName}" class="error"></span>
+            <input type="text" th:field="*{lastName}" placeholder="Last Name">
+            <input type="text" th:field="*{emails[0]}" placeholder="Email (optional)">
+            <input type="tel" th:field="*{phoneNumbers[0]}" placeholder="Phone (11 digits, optional)"
+                   pattern="[0-9]{11}" maxlength="11" title="Phone number must be exactly 11 digits">
+            <span th:errors="*{phoneNumbers[0]}" class="error"></span>
+            <button type="submit">Add Contact</button>
+        </form>
+    </div>
+
+    <!-- Contact List -->
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Emails</th>
+            <th>Phones</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact.firstName} + ' ' + ${contact.lastName} ?: 'No Name'"></td>
+            <td>
+                <ul th:if="${contact.emails != null and !contact.emails.isEmpty()}">
+                    <li th:each="email : ${contact.emails}" th:text="${email}"></li>
+                </ul>
+                <span th:if="${contact.emails == null or contact.emails.isEmpty()}">No Emails</span>
+            </td>
+            <td>
+                <ul th:if="${contact.phoneNumbers != null and !contact.phoneNumbers.isEmpty()}">
+                    <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone}"></li>
+                </ul>
+                <span th:if="${contact.phoneNumbers == null or contact.phoneNumbers.isEmpty()}">No Phones</span>
+            </td>
+            <td>
+                <a th:href="@{/contacts/edit/{id}(id=${contact.resourceName.replace('/', '_')})}" class="button edit-btn">Edit</a>
+                <a th:href="@{/contacts/delete/{id}(id=${contact.resourceName.replace('/', '_')})}" class="button delete-btn">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/logout">Logout</a>
+</div>
+
+<!-- Inline JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Script loaded');
+        const toggleBtn = document.getElementById('toggle-form-btn');
+        const formContainer = document.getElementById('form-container');
+        if (toggleBtn && formContainer) {
+            toggleBtn.addEventListener('click', () => {
+                console.log('Button clicked');
+                formContainer.classList.toggle('active');
+                toggleBtn.textContent = formContainer.classList.contains('active') ? 'Cancel' : 'Add Contact';
+            });
+        } else {
+            console.error('Toggle button or form container not found');
+        }
+    });
+</script>
+</body>
+</html>

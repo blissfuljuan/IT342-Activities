@@ -1,0 +1,279 @@
+/* General Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fa;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Headings */
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+h2 {
+    color: #34495e;
+    font-size: 1.6em;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background: #fff;
+}
+
+th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background-color: #3498db;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+td {
+    color: #5f6a6a;
+}
+
+tr:hover {
+    background-color: #f1f5f8;
+    transition: background-color 0.3s ease;
+}
+
+/* Buttons */
+.button {
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.95em;
+    margin-right: 10px;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.add-btn {
+    background-color: #3498db;
+    margin-bottom: 20px;
+}
+
+.add-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.edit-btn {
+    background-color: #2ecc71;
+}
+
+.edit-btn:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* Form Container */
+.form-container {
+    background-color: #fafafa;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.form-container.active {
+    max-height: 400px; /* Increased to accommodate more fields */
+    opacity: 1;
+}
+
+.form-container input {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 12px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-container input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    outline: none;
+}
+
+.form-container button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.form-container button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* Logout Link */
+a[href="/logout"] {
+    display: inline-block;
+    color: #e74c3c;
+    text-decoration: none;
+    font-size: 1em;
+    padding: 10px 18px;
+    border-radius: 6px;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+a[href="/logout"]:hover {
+    background-color: #c0392b;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .form-container {
+        padding: 15px;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 12px;
+    }
+
+    .button {
+        padding: 8px 14px;
+        font-size: 0.9em;
+    }
+
+    .error {
+        color: #e74c3c;
+        font-size: 0.9em;
+        display: block;
+        margin-top: 5px;
+    }
+
+    /* Add to your existing styles.css */
+    table td ul {
+        margin: 0;
+        padding-left: 20px; /* Adjust indentation as needed */
+        list-style-type: disc; /* Ensures bullet points */
+    }
+
+    table td ul li {
+        margin: 5px 0; /* Spacing between items */
+        color: #5f6a6a; /* Match table text color */
+    }
+
+    table td span {
+        color: #7f8c8d; /* Match 'No Emails'/'No Phones' to original style */
+    }
+    /* Add to your existing styles.css */
+
+    /* Container for dynamic fields */
+    #emails-container, #phones-container {
+        margin-bottom: 15px;
+    }
+
+    /* Styling for each field row */
+    .email-field, .phone-field {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .email-field input, .phone-field input {
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+
+    /* Remove button */
+    .remove-btn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .remove-btn:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    /* Add field button */
+    .add-field-btn {
+        background-color: #2ecc71;
+        margin-top: 5px;
+    }
+
+    .add-field-btn:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+    }
+
+    /* Section headings */
+    #emails-container h3, #phones-container h3 {
+        color: #34495e;
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+}
