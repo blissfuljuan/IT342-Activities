@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Contacts Manager</title>
+    <style>
+        body {
+         font-family: Arial, sans-serif;
+         background-color: #fce4ec;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         margin: 0;
+         padding: 20px;
+     }
+
+     .card {
+         background: #fff;
+         padding: 20px;
+         border-radius: 10px;
+         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+         text-align: center;
+         width: 300px;
+         margin-bottom: 20px;
+         border: 2px solid #f8bbd0;
+     }
+
+     .card img {
+         border-radius: 50%;
+         width: 80px;
+         height: 80px;
+         margin-bottom: 10px;
+         border: 3px solid #ce93d8;
+     }
+
+     .card h2 {
+         margin: 0;
+         font-size: 20px;
+         color: #880e4f;
+     }
+
+     .card p {
+         margin: 5px 0;
+         color: #ad1457;
+         font-size: 14px;
+     }
+
+     .container {
+         width: 100%;
+         max-width: 900px;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         gap: 20px;
+     }
+
+     .contacts-list {
+         width: 100%;
+         background: white;
+         padding: 20px;
+         border-radius: 10px;
+         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+         border: 2px solid #ba68c8;
+     }
+
+     .contacts-table {
+         width: 100%;
+         border-collapse: collapse;
+         text-align: left;
+         border: 1px solid #ba68c8;
+     }
+
+     .contacts-table th, .contacts-table td {
+         border: 1px solid #f8bbd0;
+         padding: 10px;
+     }
+
+     .contacts-table th {
+         background-color: #f8bbd0;
+         color: #6a1b9a;
+         text-align: center;
+     }
+
+     .action-buttons {
+         display: flex;
+         gap: 10px;
+     }
+
+     .btn {
+         padding: 6px 12px;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+         font-size: 14px;
+     }
+
+     .btn-edit {
+         background-color: #ba68c8;
+         color: white;
+     }
+
+     .btn-delete {
+         background-color: #f06292;
+         color: white;
+     }
+
+     .btn-logout {
+         background-color: #f06292;
+         color: white;
+         border: none;
+         padding: 6px 12px;
+         border-radius: 4px;
+         cursor: pointer;
+         font-size: 14px;
+     }
+
+     .btn-logout:hover {
+         background-color: #e91e63;
+     }
+
+     .form-section {
+         width: 100%;
+         background: white;
+         padding: 20px;
+         border-radius: 10px;
+         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+         border: 2px solid #ba68c8;
+     }
+
+     .form-group {
+         margin-bottom: 15px;
+     }
+
+     .form-group label {
+         display: block;
+         margin-bottom: 5px;
+         font-weight: bold;
+         color: #6a1b9a;
+     }
+
+     .form-group input {
+         width: 100%;
+         padding: 8px;
+         border: 1px solid #ddd;
+         border-radius: 4px;
+         box-sizing: border-box;
+         background-color: #fce4ec;
+         color: #6a1b9a;
+     }
+
+     .btn-submit {
+         background-color: #ab47bc;
+         color: white;
+     }
+
+     .message {
+         padding: 10px;
+         border-radius: 4px;
+         margin-bottom: 10px;
+     }
+
+     .success {
+         background-color: #fce4ec;
+         color: #6a1b9a;
+         border: 1px solid #ba68c8;
+     }
+
+     .error {
+         background-color: #f8bbd0;
+         color: #880e4f;
+         border: 1px solid #e91e63;
+     }
+
+    </style>
+</head>
+<body>
+
+<!-- User Profile Card -->
+<div class="card">
+    <img th:src="${picture}" alt="User Picture">
+    <h2 th:text="${name}"></h2>
+    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+</div>
+
+<form action="/logout" method="post" style="position: absolute; top: 20px; right: 20px;">
+    <button type="submit" class="btn btn-logout">Logout</button>
+</form>
+
+<div class="container">
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="message success" th:text="${successMessage}"></div>
+    <div th:if="${error}" class="message error" th:text="${error}"></div>
+
+    <!-- Add Contact Form -->
+    <div class="form-section">
+        <h3 id="formTitle">Add New Contact</h3>
+        <form id="contactForm" method="post">
+            <input type="hidden" id="resourceName" name="resourceName">
+            <input type="hidden" id="formAction" value="add">
+
+            <div class="form-group">
+                <label for="givenName">Name:</label>
+                <input type="text" id="givenName" name="givenName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="text" id="phoneNumber" name="phoneNumber">
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-submit" id="submitBtn">Add Contact</button>
+                <button type="button" class="btn" id="cancelBtn" style="display:none;">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Google Contacts List -->
+    <div class="container">
+        <h3>Google Contacts</h3>
+
+
+        <table class="contacts-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id = "contacts-table">
+            <tr th:each="contact : ${contacts}" class="contact-item">
+                <td class="contact-info" th:text="${contact.names != null && !contact.names.empty ? contact.names[0].displayName : 'N/A'}"></td>
+                <td class="contact-info" th:text="${contact.emailAddresses != null && !contact.emailAddresses.empty ? contact.emailAddresses[0].value : 'N/A'}"></td>
+                <td class="contact-info" th:text="${contact.phoneNumbers != null && !contact.phoneNumbers.empty ? contact.phoneNumbers[0].value : 'N/A'}"></td>
+                <td>
+                        <span th:attr="data-resource-name=${contact.resourceName},
+                                      data-given-name=${contact.names != null && !contact.names.empty ? contact.names[0].givenName : ''},
+                                      data-email=${contact.emailAddresses != null && !contact.emailAddresses.empty ? contact.emailAddresses[0].value : ''},
+                                      data-phone=${contact.phoneNumbers != null && !contact.phoneNumbers.empty ? contact.phoneNumbers[0].value : ''}"
+                              class="contact-data"></span>
+                    <button class="btn btn-edit edit-btn">Edit</button>
+                    <button class="btn btn-delete delete-btn">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${contacts == null || contacts.empty}">
+        <p>No contacts found. Add some contacts to get started!</p>
+    </div>
+</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const contactForm = document.getElementById('contactForm');
+    const contactTableBody = document.querySelector('tbody');
+
+    // Handle form submission
+    contactForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formAction = document.getElementById('formAction').value;
+        const givenName = document.getElementById('givenName').value;
+        const email = document.getElementById('email').value || 'N/A';
+        const phoneNumber = document.getElementById('phoneNumber').value || 'N/A';
+
+        const contactData = {
+            names: [{ givenName: givenName }],
+            emailAddresses: [{ value: email }],
+            phoneNumbers: phoneNumber ? [{ value: phoneNumber }] : []
+        };
+
+        if (formAction === 'add') {
+            fetch("http://localhost:8080/api/contacts", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            })
+            .then(response => response.json())
+            .then(newContact => {
+                alert('Contact added successfully!');
+                addContactToTable(newContact);
+                contactForm.reset();
+            })
+            .catch(error => {
+                alert('Error adding contact: ' + error.message);
+            });
+        } else if (formAction === 'update') {
+            const resourceName = document.getElementById('resourceName').value;
+            contactData.resourceName = resourceName;
+            contactData.etag = "*";
+
+            fetch(`/api/contacts?resourceName=${encodeURIComponent(resourceName)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            })
+            .then(response => response.json())
+            .then(updatedContact => {
+                alert('Contact updated successfully!');
+                updateContactInTable(updatedContact);
+                contactForm.reset();
+            })
+            .catch(error => {
+                alert('Error updating contact: ' + error.message);
+            });
+        }
+    });
+
+   document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.btn-search').addEventListener('click', filterContacts);
+});
+
+
+    // Event delegation for dynamically added delete buttons
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('delete-btn')) {
+            const contactItem = event.target.closest('.contact-item');
+            const resourceName = contactItem.querySelector('.contact-data').dataset.resourceName;
+
+            if (confirm('Are you sure you want to delete this contact?')) {
+                fetch(`/api/contacts/${resourceName}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Contact deleted successfully!');
+                        contactItem.remove(); // Remove row without refreshing
+                    } else {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                })
+                .catch(error => {
+                    alert('Error deleting contact: ' + error.message);
+                });
+            }
+        }
+    });
+
+    // Function to dynamically add a contact to the table
+    function addContactToTable(contact) {
+        const newRow = document.createElement('tr');
+        newRow.classList.add('contact-item');
+
+        newRow.innerHTML = `
+            <td class="contact-info">${contact.names[0].givenName || 'N/A'}</td>
+            <td class="contact-info">${contact.emailAddresses[0]?.value || 'N/A'}</td>
+            <td class="contact-info">${contact.phoneNumbers[0]?.value || 'N/A'}</td>
+            <td>
+                <span data-resource-name="${contact.resourceName}"
+                      class="contact-data"></span>
+                <button class="btn btn-edit edit-btn">Edit</button>
+                <button class="btn btn-delete delete-btn">Delete</button>
+            </td>
+        `;
+
+        contactTableBody.prepend(newRow);
+    }
+
+    // Function to update a contact in the table
+    function updateContactInTable(contact) {
+        const rows = document.querySelectorAll('.contact-item');
+        rows.forEach(row => {
+            const resourceName = row.querySelector('.contact-data').dataset.resourceName;
+            if (resourceName === contact.resourceName) {
+                row.querySelector('.contact-info:nth-child(1)').textContent = contact.names[0].givenName || 'N/A';
+                row.querySelector('.contact-info:nth-child(2)').textContent = contact.emailAddresses[0]?.value || 'N/A';
+                row.querySelector('.contact-info:nth-child(3)').textContent = contact.phoneNumbers[0]?.value || 'N/A';
+            }
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('edit-btn')) {
+        const contactItem = event.target.closest('.contact-item');
+        const resourceName = contactItem.querySelector('.contact-data').dataset.resourceName;
+        const givenName = contactItem.querySelector('.contact-info:nth-child(1)').textContent;
+        const email = contactItem.querySelector('.contact-info:nth-child(2)').textContent;
+        const phoneNumber = contactItem.querySelector('.contact-info:nth-child(3)').textContent;
+
+        // Populate form fields with existing data for editing
+        document.getElementById('formTitle').textContent = 'Edit Contact';
+        document.getElementById('submitBtn').textContent = 'Update Contact';
+        document.getElementById('formAction').value = 'update';
+        document.getElementById('resourceName').value = resourceName;
+        document.getElementById('givenName').value = givenName;
+        document.getElementById('email').value = email !== 'N/A' ? email : '';
+        document.getElementById('phoneNumber').value = phoneNumber !== 'N/A' ? phoneNumber : '';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+    }
+});
+
+    // Reset form function
+    function resetForm() {
+        document.getElementById('formTitle').textContent = 'Add New Contact';
+        document.getElementById('submitBtn').textContent = 'Add Contact';
+        document.getElementById('formAction').value = 'add';
+        document.getElementById('resourceName').value = '';
+        document.getElementById('givenName').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    document.getElementById('cancelBtn').addEventListener('click', resetForm);
+});
+
+</script>
+
+</body>
+</html>

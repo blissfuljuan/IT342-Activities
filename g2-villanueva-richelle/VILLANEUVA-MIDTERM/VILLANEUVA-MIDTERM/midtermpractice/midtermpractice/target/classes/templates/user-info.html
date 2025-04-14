@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fce4ec;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: #f8bbd0;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        h1 {
+            color: #f06292;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px rgba(156, 39, 176, 0.2);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #ba68c8;
+            color: white;
+        }
+        td {
+            background: #f3e5f5;
+        }
+        .btn {
+            background-color: #f06292;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            width: 50%;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>User Information</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${userAttributes}">
+            <td th:text="${entry.key}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button onclick="window.location.href='/contacts'" class="btn">Contacts</button>
+
+</body>
+</html>
