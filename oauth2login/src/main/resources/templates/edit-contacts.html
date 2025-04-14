@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Contact</title>
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            margin: 30px;
+            background: #eef2f3;
+        }
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.15);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .edit-btn {
+            background: #ffca28;
+            color: #333;
+        }
+        .back-btn {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Edit Contact</h2>
+
+<div class="container">
+    <form th:action="@{/contacts/update/{resourceName}(resourceName=${resourceName})}" method="post">
+        <label>First Name:</label>
+        <input type="text" th:name="givenName" th:value="${givenName}" required>
+        <label>Last Name:</label>
+        <input type="text" th:name="familyName" th:value="${familyName}" required>
+        <label>Email:</label>
+        <input type="email" th:name="email" th:value="${email}" required>
+        <label>Phone:</label>
+        <input type="text" th:name="phoneNumber" th:value="${phoneNumber}" required>
+        <button type="submit" class="button edit-btn">Update Contact</button>
+    </form>
+    <br>
+    <button class="button back-btn" onclick="window.location.href='/contacts'">Back to Contacts</button>
+</div>
+
+</body>
+</html>
