@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="emailField" class="row mb-2 email-field">
+        <div class="col-md-6">
+            <input type="email" class="form-control" th:name="'emailAddresses[' + ${emailIndex} + '].value'" th:id="'emailAddresses' + ${emailIndex} + '.value'" placeholder="Email address">
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" th:name="'emailAddresses[' + ${emailIndex} + '].type'" th:id="'emailAddresses' + ${emailIndex} + '.type'">
+                <option value="">-- Select Type --</option>
+                <option value="HOME">Home</option>
+                <option value="WORK">Work</option>
+                <option value="OTHER">Other</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-outline-danger remove-field">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
