@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-OAuth2LoginApplication<OAuth2Login>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "biacolo.com.example.OAuth2Login.OAuth2LoginApplication",
+            "projectName": "OAuth2Login",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
