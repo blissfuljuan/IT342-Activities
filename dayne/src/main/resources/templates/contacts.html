@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <link rel="stylesheet" href="/css/contacts.css">
+</head>
+<body>
+<div class="contacts-container">
+    <div class="nav-buttons" style="text-align: left;">
+        <a href="/googleuser" class="nav-btn">Back to Profile</a>
+    </div>
+    <h2>Contacts</h2>
+
+    <div id="addContactModal" class="modal">
+        <div class="modal-content add-contact-modal">
+            <h3>Add New Contact</h3>
+            <form id="addContactForm" class="add-contact-form">
+                <div class="form-group">
+                    <label for="newContactName">Name *</label>
+                    <input type="text" id="newContactName" required placeholder="Enter name">
+                </div>
+                <div class="form-group">
+                    <label for="newContactPhone">Phone Number *</label>
+                    <input type="tel" id="newContactPhone" required placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label for="newContactEmail">Email</label>
+                    <input type="email" id="newContactEmail" placeholder="Enter email">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-save">Save Contact</button>
+                    <button type="button" class="btn btn-cancel" id="cancelAddContact">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="add-contact-section">
+        <button id="showAddContactForm" class="btn btn-add">Add New Contact</button>
+    </div>
+
+    <div th:if="${contactsMap == null or contactsMap.isEmpty()}" class="empty-contacts">
+        <p>No contacts found with phone numbers.</p>
+    </div>
+
+    <div th:if="${contactsMap != null and not contactsMap.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="contactsList">
+            <tr th:each="contact, contactStat : ${contactsMap}">
+                <td th:text="${contact.value.name}">Contact Name</td>
+                <td th:text="${contact.value.phoneNumber}">Phone Number</td>
+                <td th:text="${contact.value.email != null ? contact.value.email : 'No email provided'}">Email</td>
+                <td>
+                    <button class="btn btn-edit edit-contact-btn"
+                            th:data-resource-id="${contact.key}"
+                            th:data-name="${contact.value.name}"
+                            th:data-phone="${contact.value.phoneNumber}"
+                            th:data-email="${contact.value.email}"
+                            th:data-index="${contactStat.index}">Edit</button>
+                    <button class="btn btn-delete delete-contact-btn"
+                            th:data-resource-id="${contact.key}"
+                            th:data-name="${contact.value.name}">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <p id="deleteMessage">Are you sure you want to delete this contact?</p>
+        <div class="modal-buttons">
+            <button id="confirmDeleteBtn" class="btn btn-delete">Delete</button>
+            <button id="cancelDeleteBtn" class="btn btn-cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentContactId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.edit-contact-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceId = this.getAttribute('data-resource-id');
+                const name = this.getAttribute('data-name');
+                const phone = this.getAttribute('data-phone');
+                const email = this.getAttribute('data-email');
+                const index = parseInt(this.getAttribute('data-index'));
+                editContact(resourceId, name, phone, email, index);
+            });
+        });
+
+        document.querySelectorAll('.delete-contact-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceId = this.getAttribute('data-resource-id');
+                const name = this.getAttribute('data-name');
+                confirmDelete(resourceId, name);
+            });
+        });
+
+        document.querySelectorAll('.save-contact-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceId = this.getAttribute('data-resource-id');
+                const index = parseInt(this.getAttribute('data-index'));
+                saveContact(resourceId, index);
+            });
+        });
+
+        document.querySelectorAll('.cancel-edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                cancelEdit(index);
+            });
+        });
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', cancelDelete);
+    });
+
+    function editContact(contactId, name, phone, email, index) {
+        const contactRow = document.querySelectorAll('#contactsList tr')[index];
+        const editFormHtml = `
+      <td colspan="4">
+        <div class="edit-form">
+          <input type="text" id="edit-name-${index}" value="${name}" placeholder="Name" />
+          <input type="text" id="edit-phone-${index}" value="${phone}" placeholder="Phone" />
+          <input type="email" id="edit-email-${index}" value="${email}" placeholder="Email" />
+          <div class="contact-actions">
+            <button type="button" class="btn btn-save save-contact-btn" data-resource-id="${contactId}" data-index="${index}">Save</button>
+            <button type="button" class="btn btn-cancel cancel-edit-btn" data-index="${index}">Cancel</button>
+          </div>
+        </div>
+      </td>
+    `;
+        contactRow.innerHTML = editFormHtml;
+        attachEditFormEventListeners(index);
+    }
+
+    function attachEditFormEventListeners(index) {
+        document.querySelector(`.save-contact-btn[data-index="${index}"]`).addEventListener('click', function() {
+            const resourceId = this.getAttribute('data-resource-id');
+            saveContact(resourceId, index);
+        });
+
+        document.querySelector(`.cancel-edit-btn[data-index="${index}"]`).addEventListener('click', function() {
+            cancelEdit(index);
+        });
+    }
+
+    function cancelEdit(index) {
+        location.reload(); // Simple way to revert changes by reloading the page
+    }
+
+    function saveContact(contactId, index) {
+        const name = document.getElementById('edit-name-' + index).value.trim();
+        const phone = document.getElementById('edit-phone-' + index).value.trim();
+        const emailElement = document.getElementById('edit-email-' + index);
+        const email = emailElement ? emailElement.value.trim() : '';
+
+        if (!name || !phone) {
+            showToast('Name and phone number are required', 'error');
+            return;
+        }
+
+        const cleanId = contactId.replace('people/', '');
+
+        const contactData = {
+            name: name,
+            phoneNumber: phone,
+            email: email
+        };
+
+        fetch(`/api/contacts/${encodeURIComponent(cleanId)}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(contactData)
+        })
+            .then(async response => {
+                const text = await response.text();
+                if (!response.ok) {
+                    throw new Error(text || `HTTP error! status: ${response.status}`);
+                }
+                return JSON.parse(text);
+            })
+            .then(() => {
+                showToast('Contact updated successfully!', 'success');
+                location.reload(); // Reload the page to show updated data
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to update contact: ' + error.message, 'error');
+            });
+    }
+
+    function confirmDelete(contactId, name) {
+        currentContactId = contactId;
+        document.getElementById('deleteMessage').textContent = `Are you sure you want to delete "${name}"?`;
+        document.getElementById('confirmDeleteBtn').onclick = function() {
+            deleteContact(contactId);
+        };
+        document.getElementById('deleteModal').style.display = 'block';
+    }
+
+    function cancelDelete() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    function deleteContact(contactId) {
+        const id = contactId.includes('/') ? contactId.split('/').pop() : contactId;
+
+        fetch(`/api/contacts/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (response.status >= 200 && response.status < 300) {
+                    showToast('Contact deleted successfully!', 'success');
+                    location.reload(); // Reload the page to show updated data
+                } else {
+                    throw new Error(`Failed to delete contact. Status: ${response.status}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to delete contact: ' + error.message, 'error');
+            });
+    }
+
+    document.getElementById('showAddContactForm').addEventListener('click', function() {
+        document.getElementById('addContactModal').style.display = 'block';
+    });
+
+    document.getElementById('cancelAddContact').addEventListener('click', function() {
+        document.getElementById('addContactModal').style.display = 'none';
+        document.getElementById('addContactForm').reset();
+    });
+
+    document.getElementById('addContactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('newContactName').value.trim();
+        const phone = document.getElementById('newContactPhone').value.trim();
+        const email = document.getElementById('newContactEmail').value.trim();
+
+        if (!name || !phone) {
+            showToast('Name and phone number are required', 'error');
+            return;
+        }
+
+        const contactData = {
+            name: name,
+            phoneNumber: phone,
+            email: email
+        };
+
+        fetch('/api/contacts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(contactData)
+        })
+            .then(async response => {
+                const text = await response.text();
+                if (!response.ok) {
+                    throw new Error(text || `HTTP error! status: ${response.status}`);
+                }
+                return JSON.parse(text);
+            })
+            .then(() => {
+                showToast('Contact added successfully!', 'success');
+                location.reload(); // Reload the page to show updated data
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to add contact: ' + error.message, 'error');
+            });
+    });
+
+    function showToast(message, type = 'info') {
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '1';
+        }, 100);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+</script>
+</body>
+</html>
