@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contacts Manager</title>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        /* Set Bootstrap table background variable */
+        :root {
+            --bs-table-bg: #795C34;
+        }
+        /* Global Poppins Font and Ash White Background */
+        body {
+            background-color: #FAFAFA; /* Ash white */
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Bold labels */
+        .form-label {
+            font-weight: bold;
+        }
+        /* Page Header */
+        .page-header {
+            background-color: #3F301D;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        /* Content Wrapper */
+        .content-wrapper {
+            margin: 30px auto;
+            max-width: 1200px;
+            padding: 0 15px;
+        }
+        /* Card for Table */
+        .card {
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        /* Button Container */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        /* Table Container */
+        .table-container {
+            overflow-x: auto;
+        }
+        /* Override .table-dark Header */
+        .table-dark {
+            background-color: var(--bs-table-bg) !important;
+        }
+        /* Modal Adjustments */
+        .modal-dialog {
+            max-width: 600px;
+        }
+        /* Custom Brown Buttons for "Add New Contact" and "Logout" */
+        .btn-brown-success {
+            background-color: #CD853F !important; /* Peru */
+            border-color: #CD853F !important;
+            color: #fff;
+        }
+        .btn-brown-success:hover {
+            background-color: #C87C3E !important;
+            border-color: #C87C3E !important;
+        }
+        .btn-brown-danger {
+            background-color: #8B4513 !important; /* SaddleBrown */
+            border-color: #8B4513 !important;
+            color: #fff;
+        }
+        .btn-brown-danger:hover {
+            background-color: #7A3E12 !important;
+            border-color: #7A3E12 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1>Contacts Manager</h1>
+</div>
+
+<div class="content-wrapper">
+    <!-- Button Container -->
+    <div class="btn-container">
+        <button type="button" class="btn btn-brown-success" data-bs-toggle="modal" data-bs-target="#addContactModal">
+            Add New Contact
+        </button>
+        <a href="/userinfo" class="btn btn-brown-danger">User-info</a>
+        <a href="/logout" class="btn btn-brown-danger">Logout</a>
+
+    </div>
+
+    <!-- Contacts Table Card -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Your Contacts</h5>
+            <div class="table-responsive table-container">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="contact : ${contacts}" th:if="${contact.names != null and contact.names.size() > 0}">
+                        <td th:text="${contact.names[0].displayName}"></td>
+                        <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></td>
+                        <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Number'}"></td>
+                        <td>
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">Edit</button>
+                            <form action="/api/contacts/delete" method="POST" class="d-inline">
+                                <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Contact Modal -->
+<div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addContactModalLabel">Add New Contact</h5>
+                <!-- Modal buttons here use standard bootstrap colors -->
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+            <div class="modal-body">
+                <form action="/api/contacts/create" method="POST">
+                    <div class="mb-3">
+                        <label for="givenName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="givenName" name="givenName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="familyName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="familyName" name="familyName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Standard Bootstrap colors for modal actions -->
+                        <button type="submit" class="btn btn-success">Save Contact</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Contact Modals -->
+<div th:each="contact : ${contacts}">
+    <div class="modal fade" th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}" tabindex="-1" aria-labelledby="editContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100">Edit Contact</h5>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/api/contacts/update}" method="POST">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                        <div class="mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="givenName" th:value="${contact.names[0].givenName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="familyName" th:value="${contact.names[0].familyName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" th:value="${contact.emailAddresses[0].value}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phoneNumber" th:value="${contact.phoneNumbers[0].value}">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
