@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts Integration</title>
+    <style>
+        body {
+            background: url('/images/bg2.jpg?v=1') no-repeat center center fixed;
+            background-size: cover;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #333;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            margin-top: 5px;
+            color: rgb(237, 228, 228);
+        }
+        p {
+            color: rgb(136, 136, 240);
+        }
+        .btn {
+            background: linear-gradient(to bottom, #d2cece, #646161);
+            color: rgb(32, 29, 204);
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Google Contacts Integration!</h1>
+        <p>Click below to proceed with Google.</p>
+        <a href="/oauth2/authorization/google?redirect_uri=/contacts" class="btn">Click Here</a>
+    </div>
+</body>
+</html>
