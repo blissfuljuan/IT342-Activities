@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Info</title>
+</head>
+<body>
+<h1>Welcome, <span th:text="${fullName}"></span>!</h1>
+<p><strong>First Name:</strong> <span th:text="${firstName}"></span></p>
+
+<p><strong>Last Name:</strong> <span th:text="${lastName}"></span></p>
+<p><strong>Email:</strong> <span th:text="${email}"></span></p>
+
+<div style="margin-top:20px;">
+    <a th:href="@{/contacts}">
+        <button type="button">Contacts</button>
+    </a>
+
+    <a th:href="@{/logout}">
+        <button type="button">Logout</button>
+    </a>
+</div>
+</body>
+</html>
