@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #e0f2fe;
+            --text-color: #1e293b;
+            --error-color: #ef4444;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin: auto;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout {
+            background-color: var(--error-color);
+            color: white;
+        }
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-add {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .btn-add:hover {
+            background-color: #2563eb;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            box-shadow: var(--box-shadow);
+            background: white;
+        }
+        
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--accent-color);
+        }
+        
+        tr:hover {
+            background-color: #bfdbfe;
+        }
+        
+        .actions a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .actions a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="button-container">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+        <button class="btn btn-add" onclick="window.location.href='/contacts/add'">+ Add Contact</button>
+    </div>
+
+    <h2>Google Contacts</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="contact : ${contacts}">
+                <td th:text="${contact.name ?: 'Unknown'}"></td>
+                <td th:text="${contact.emails != null ? contact.emails[0] : 'No Email'}"></td>
+                <td th:text="${contact.phoneNumbers != null ? contact.phoneNumbers[0] : 'No Phone'}"></td>
+                <td class="actions" th:if="${contact.resourceName}">
+                    <a th:href="@{/contacts/edit(id=${#uris.escapeQueryParam(contact.resourceName)})}">Edit</a> |
+                    <a th:href="@{/contacts/delete(id=${contact.resourceName})}" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

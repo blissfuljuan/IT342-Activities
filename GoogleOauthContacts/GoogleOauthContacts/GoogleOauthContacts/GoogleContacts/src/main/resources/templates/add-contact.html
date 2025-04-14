@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #e0f2fe;
+            --text-color:  #222;
+            --error-color: #d62828;
+            --border-radius: 6px;
+            --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(76, 149, 108, 0.2);
+        }
+        
+        .field-container {
+            margin-bottom: 20px;
+        }
+        
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .field-row input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .btn {
+			padding: 10px 15px;
+			border: none;
+			border-radius: var(--border-radius);
+			cursor: pointer;
+			font-size: 16px;
+			transition: background 0.3s;
+        }
+        
+        .btn-primary {
+			background-color: var(--primary-color);
+			color: white;
+        }
+        
+        .btn-primary:hover {
+           background-color: #162c6a;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-danger {
+            background-color: var(--error-color);
+            color: white;
+            margin-left: 10px;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b52222;
+        }
+        
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-add:before {
+            content: "+";
+            margin-right: 5px;
+        }
+        
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn-back:before {
+            content: "←";
+            margin-right: 5px;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+    </style>
+    <script>
+        function addField(containerId, inputName) {
+            const container = document.getElementById(containerId);
+            const fieldRow = document.createElement("div");
+            fieldRow.className = "field-row";
+            
+            const input = document.createElement("input");
+            input.type = inputName === "emails" ? "email" : "tel";
+            input.name = inputName;
+            input.required = true;
+            
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.className = "btn btn-danger";
+            removeBtn.innerText = "Remove";
+            removeBtn.onclick = function() {
+                container.removeChild(fieldRow);
+            };
+            
+            fieldRow.appendChild(input);
+            fieldRow.appendChild(removeBtn);
+            container.appendChild(fieldRow);
+        }
+        
+        function removeField(element) {
+            const fieldRow = element.parentNode;
+            const container = fieldRow.parentNode;
+            container.removeChild(fieldRow);
+        }
+    </script>
+</head>
+<body>
+    <h2>Add Contact</h2>
+    <form th:action="@{/contacts/add}" th:object="${contact}" method="post">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" th:field="*{name}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Emails:</label>
+            <div id="email-container" class="field-container">
+                <div class="field-row">
+                    <input type="email" name="emails" required>
+                    <button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-add" onclick="addField('email-container', 'emails')">Add Email</button>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Numbers:</label>
+            <div id="phone-container" class="field-container">
+                <div class="field-row">
+                    <input type="tel" name="phoneNumbers" required>
+                    <button type="button" class="btn btn-danger" onclick="removeField(this)">Remove</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-add" onclick="addField('phone-container', 'phoneNumbers')">Add Phone Number</button>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-back" onclick="window.location.href='/contacts'">Back to Contacts</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</body>
+</html>
