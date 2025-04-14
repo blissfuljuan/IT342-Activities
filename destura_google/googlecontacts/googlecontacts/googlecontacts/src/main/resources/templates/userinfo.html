@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Information</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .user-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<h2>Google User Information</h2>
+<table>
+    <tr>
+        <th>Profile Picture</th>
+        <td>
+            <img th:if="${picture}" th:src="${picture}" class="user-picture" alt="Profile Picture"/>
+        </td>
+    </tr>
+    <tr>
+        <th>Name</th>
+        <td th:text="${name}">-</td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td th:text="${email}">-</td>
+    </tr>
+</table>
+
+<h2>Google Contacts</h2>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+    </tr>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names != null and contact.names[0] != null ? contact.names[0].displayName : 'No Name'}">No Name</td>
+        <td th:text="${contact.emailAddresses != null and contact.emailAddresses[0] != null ? contact.emailAddresses[0].value : 'No Email'}">No Email</td>
+        <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers[0] != null ? contact.phoneNumbers[0].value : 'No Phone'}">No Phone</td>
+    </tr>
+</table>
+
+</body>
+</html>
