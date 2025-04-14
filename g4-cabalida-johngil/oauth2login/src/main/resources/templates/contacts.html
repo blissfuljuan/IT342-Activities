@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+</head>
+<body>
+<h1>Contacts List</h1>
+<a th:href="@{/new-contact}"><button>Add New</button></a>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Phone Number</th>
+        <th>Email</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names[0].displayName} ?: 'No Name'"></td>
+        <td>
+            <ul th:each="phone : ${contact.phoneNumbers}">
+                <li th:text="${phone.value}"></li>
+            </ul>
+        </td>
+        <td>
+            <ul th:each="email : ${contact.emailAddresses}">
+                <li th:text="${email.value}"></li>
+            </ul>
+        </td>
+        <td>
+            <form th:action="@{/edit-contact}" method="get" style="display:inline;">
+                <input type="hidden" name="id" th:value="${contact.resourceName}">
+                <button type="submit">Edit</button>
+            </form>
+
+            <form th:action="@{/delete-contact}" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${contact.resourceName}">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
