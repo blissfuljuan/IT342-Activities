@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title>User Info - Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+
+        body {
+            background: linear-gradient(135deg, #1b2735, #090a0f);
+            color: #e0e0e0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 60px auto;
+            padding: 25px;
+            background: #222831;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #00adb5;
+            margin-bottom: 15px;
+        }
+
+        .user-details h3 {
+            margin: 5px 0;
+            font-size: 22px;
+            color: #00adb5;
+        }
+
+        .user-details p {
+            margin: 5px 0;
+            font-size: 15px;
+            color: #aaaaaa;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: 0.3s;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #00adb5;
+            color: #222831;
+        }
+
+        .btn-primary:hover {
+            background: #0096a1;
+        }
+
+        .btn-secondary {
+            background: #393e46;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #50575f;
+        }
+
+        .navbar {
+            background: #222831;
+        }
+
+        .navbar .nav-link {
+            color: #e0e0e0;
+            transition: 0.3s;
+        }
+
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active {
+            color: #00adb5;
+        }
+
+    </style>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/contacts">Contacts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/user-info">Profile</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>User Profile</h2>
+
+    <div class="user-info">
+        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+        <div class="user-details">
+            <h3>Welcome, <span th:text="${name}">User</span>!</h3>
+            <p>Email: <span th:text="${email}">email@example.com</span></p>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="/contacts" class="btn btn-primary">View Contacts</a>
+        <a href="/logout" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+</head>
+<body>
+<h2>Your Google Contacts</h2>
+<ul>
+    <li th:each="contact : ${contacts['connections']}">
+        <span th:text="${contact.names[0].displayName}"></span> -
+        <span th:if="${contact.emailAddresses}" th:text="${contact.emailAddresses[0].value}"></span>
+    </li>
+</ul>
+<a href="/logout">Logout</a>
+</body>
+</html>
