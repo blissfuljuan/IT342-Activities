@@ -1,0 +1,250 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+h1 {
+    color: #222;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    font-size: 14px;
+    border-radius: 8px;
+    color: #fff;
+    background-color: #007bff;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.add-btn {
+    background-color: #28a745;
+}
+
+.add-btn:hover {
+    background-color: #218838;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 20px;
+    text-align: left;
+    font-size: 16px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #f2f2f2;
+}
+
+td ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+td ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+td ul li:last-child {
+    border-bottom: none;
+}
+
+.contact-list {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.contact-list li {
+    padding: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+td button {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
+td button:first-child {
+    margin-right: 10px;
+    background-color: #ffc107;
+}
+
+td button:first-child:hover {
+    background-color: #e0a800;
+}
+
+td button:last-child {
+    margin-right: 10px;
+    background-color: #dc3545; /* Delete */
+}
+
+td button:last-child:hover {
+    background-color: #c82333;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    width: 600px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.popup h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    border-bottom: 2px solid rgb(0, 123, 255);
+    padding-bottom: 10px;
+}
+
+.popup label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.popup input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.input-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 calc(50% - 10px);
+    max-width: 100%;
+}
+
+.input-row input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.input-row .icon-btn {
+    background-color: #28a745;
+    color: white;
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.input-row .icon-btn:hover {
+    background-color: #218838;
+}
+
+.input-row .icon-btn.minus {
+    background-color: #dc3545;
+}
+
+.input-row .icon-btn.minus:hover {
+    background-color: #c82333;
+}
+
+.icon-btn {
+    margin-left: auto;
+}
+
+.input-container .input-row:not(:last-child) .icon-btn.plus {
+    display: none; 
+}
+
+

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <link rel="stylesheet" th:href="@{/css/contacts.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/contacts.js}" defer></script>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+    <h1>Google Contacts</h1>
+
+    <a href="/user-info">Back</a>
+    
+    <button onclick="showAddPopup()">Add Contact</button>
+
+    <br>
+    <table border="2">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Emails</th>
+                <th>Phones</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="contact : ${contacts}">
+                <td th:text="${contact.name}">Name</td>
+                <td>
+                    <ul class="contact-list">
+                        <li th:each="email : ${#strings.arraySplit(contact.email, ', ')}" th:text="${email}">Email</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul class="contact-list">
+                        <li th:each="phone : ${#strings.arraySplit(contact.phone, ', ')}" th:text="${phone}">Phone</li>
+                    </ul>
+                </td>
+                <td>
+                    <button th:attr="onclick='showEditPopup(\'' + ${contact.resourceName} + '\', \'' + ${contact.name} + '\', \'' + ${contact.email} + '\', \'' + ${contact.phone} + '\')'">Edit</button>
+                    <button th:attr="onclick='deleteContact(\'' + ${contact.resourceName} + '\')'">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${error}" th:text="${error}"></p>
+
+    <div id="overlay"></div>
+
+    <div id="addPopup" class="popup fade-in">
+        <h2>Add Contact</h2>
+        <form id="addForm">
+            <label>First Name: <input type="text" id="addFirstName" required></label>
+            <label>Last Name: <input type="text" id="addLastName" required></label>
+    
+            <div class="input-group">
+                <label>Emails:</label>
+                <div id="addEmails" class="input-container">
+                    <div class="input-row">
+                        <input type="email" name="addEmail" required>
+                        <button type="button" class="icon-btn plus" onclick="addField('addEmails', 'email')">+</button>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="input-group">
+                <label>Phones:</label>
+                <div id="addPhones" class="input-container">
+                    <div class="input-row">
+                        <input type="text" name="addPhone" required>
+                        <button type="button" class="icon-btn plus" onclick="addField('addPhones', 'phone')">+</button>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="popup-buttons">
+                <button type="submit" class="add-btn">Add</button>
+                <button type="button" class="cancel-btn" onclick="closeAddPopup()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    
+
+    <div id="editPopup" class="popup fade-in">
+        <h2>Edit Contact</h2>
+        <form id="editForm">
+            <input type="hidden" id="editResourceName">
+            <label>First Name: <input type="text" id="editFirstName" required></label>
+            <label>Last Name: <input type="text" id="editLastName" required></label>
+    
+            <div class="input-group">
+                <label>Emails:</label>
+                <div id="editEmails" class="input-container">
+                    <div class="input-row">
+                        <input type="email" name="editEmail" required>
+                        <button type="button" class="icon-btn plus" onclick="addField('editEmails', 'email')">+</button>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="input-group">
+                <label>Phones:</label>
+                <div id="editPhones" class="input-container">
+                    <div class="input-row">
+                        <input type="text" name="editPhone" required>
+                        <button type="button" class="icon-btn plus" onclick="addField('editPhones', 'phone')">+</button>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="popup-buttons">
+                <button type="submit" class="add-btn">Save</button>
+                <button type="button" class="cancel-btn" onclick="closeEditPopup()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

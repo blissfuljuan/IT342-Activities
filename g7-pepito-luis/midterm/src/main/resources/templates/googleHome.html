@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Profile</title>
+</head>
+<body>
+<h1>My Profile</h1>
+
+<div th:if="${name}">
+    <p>Display Name: <span th:text="${name}"></span></p>
+    <p>Email: <span th:text="${email}"></span></p>
+    <br/>
+    <a href="/logout">Logout</a>
+</div>
+
+</body>
+</html>
