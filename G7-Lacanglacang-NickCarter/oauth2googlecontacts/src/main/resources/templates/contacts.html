@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Google Contacts</title>
+    <link rel="icon" href="/google.ico" type="image/png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://fonts.cdnfonts.com/css/product-sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background-color: #fff;
+            font-family: 'Product Sans', sans-serif;
+            color: #202124;
+        }
+
+        .header-title {
+            font-size: 36px;
+            font-weight: 500;
+            color: #1a73e8;
+            padding: 20px 0;
+        }
+
+        .google-logo {
+            display: inline-flex;
+            /* Helps keep letter spacing consistent */
+            font-weight: bold;
+            font-size: 36px;
+        }
+
+        .google-logo span {
+            display: inline-block;
+            letter-spacing: 1px;
+            /* Adjust this for a tighter fit */
+
+            /* Adjust this for a tighter fit */
+        }
+
+        .g-blue {
+            color: #4285F4;
+        }
+
+        /* Blue */
+        .o-red {
+            color: #DB4437;
+        }
+
+        /* Red */
+        .o-yellow {
+            color: #F4B400;
+        }
+
+        /* Yellow */
+        .l-green {
+            color: #0F9D58;
+        }
+
+        /* Green */
+        .e-red {
+            color: #DB4437;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary {
+            background-color: #1a73e8 !important;
+            border: none !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #185abc !important;
+        }
+
+        .btn-secondary {
+            border: 3px solid #0cb127;
+            color: #0cb127 !important;
+            background-color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            border: 3px solid #ffffff;
+            color: #ffffff !important;
+            background-color: #0cb127 !important;
+        }
+
+        .btn-close {
+            border: 3px solid rgb(0, 0, 0);
+            border-radius: 8px;
+            color: rgb(0, 0, 0);
+        }
+
+        .btn-add-contact {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-add-contact:hover {
+            background-color: #185abc;
+        }
+
+        .btn-edit-contact {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 1px solid #c78c06;
+        }
+
+        .btn-delete-contact {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 1px solid red;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            width: 300px;
+            height: 48px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            font-size: 14px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 30px;
+            padding-bottom: 10px;
+            align-items: center;
+        }
+
+        .right-section {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            gap: 10px;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 14px;
+
+            align-items: center;
+            justify-content: center;
+        }
+
+        td {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+        }
+
+        .rounded-circle {
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        /* Table Header Styling */
+        #contactsTable thead th {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        .btn-success {
+            white-space: nowrap;
+        }
+
+
+        /* Contact Info Styling */
+        .contact-info {
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Action Buttons */
+        .action-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="top-bar">
+            <h1 class="google-logo">
+                <span class="g-blue">G</span>
+                <span class="o-red">o</span>
+                <span class="o-yellow">o</span>
+                <span class="g-blue">g</span>
+                <span class="l-green">l</span>
+                <span class="e-red">e</span>
+                <span class="g-blue">&nbsp;Contacts</span>
+            </h1>
+            <div class="right-section">
+                <button type="button" class="btn-add-contact" data-bs-toggle="modal"
+                    data-bs-target="#addContactModal">+</button>
+                <input type="text" id="searchBar" class="search-bar" placeholder="Search contacts..."
+                    onkeyup="searchContacts()">
+
+            </div>
+        </div>
+
+
+
+        <!-- Add Contact Modal -->
+        <div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <!-- Add Contact Form -->
+                        <form action="/api/contacts/create" method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="givenName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="givenName" name="givenName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="familyName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="familyName" name="familyName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email">
+                            </div>
+                            <div id="phoneNumbersContainer">
+                                <div class="mb-3 phone-number-group">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phoneNumbers[]" required>
+                                </div>
+                            </div>
+
+                            <!-- Add More Phone Number Button -->
+                            <button type="button" class="btn btn-secondary" onclick="addPhoneNumber()">+ Add
+                                More</button>
+
+
+                            <div class="modal-footer" style="justify-content: center;">
+                                <button type="submit" class="btn btn-primary">Save Contact</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Table -->
+        <table class="table table-bordered table-hover" id="contactsTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Email Address</th>
+                    <th>Contact Number</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="contact : ${contacts}">
+                    <td>
+                        <img th:src="${contact.photos != null and contact.photos.size() > 0 ? contact.photos[0].url : '/default-profile.png'}"
+                            width="40" height="40" class="rounded-circle">
+                    </td>
+                    <td th:text="${contact.names[0].displayName}"></td>
+                    <td
+                        th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}">
+                    </td>
+                    <td>
+                        <ul class="list-unstyled"
+                            th:if="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0}">
+                            <li th:each="phone : ${contact.phoneNumbers}" th:text="${phone.value}"></li>
+                        </ul>
+                        <span th:if="${contact.phoneNumbers == null or contact.phoneNumbers.size() == 0}">No
+                            Number</span>
+                    </td>
+
+
+                    <td style="gap: 10px;">
+                        <button class="btn btn-edit-contact btn-sm" data-bs-toggle="modal"
+                            th:attr="data-bs-target='#editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                            <i class="fas fa-pen" style="color: #c78c06;"></i>
+                        </button>
+                        <form action="/api/contacts/delete" method="POST" class="d-inline"
+                            onsubmit="return confirmDelete()">
+                            <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                            <button class="btn btn-delete-contact btn-sm">
+                                <i class="fas fa-trash" style="color: red;"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <!-- Edit Contact Modal for Each Contact -->
+                <tr th:each="contact : ${contacts}">
+                    <div class="modal fade"
+                        th:id="'editContactModal-' + ${#strings.replace(contact.resourceName, '/', '_')}" tabindex="-1"
+                        aria-labelledby="editContactModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <!-- Edit Contact Form -->
+                                    <form th:action="@{/api/contacts/update}" method="POST"
+                                        onsubmit="return debugEditForm(this)">
+
+                                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}">
+                                        <div class="mb-3">
+                                            <label for="editGivenName" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="editGivenName" name="givenName"
+                                                th:value="${contact.names[0].givenName}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="editFamilyName" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="editFamilyName"
+                                                name="familyName" th:value="${contact.names[0].familyName}" required>
+                                        </div>
+                                        <div id="editEmailsContainer"
+                                            th:id="'editEmailsContainer-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                                            <label class="form-label">Emails</label>
+
+                                            <div th:each="i : ${#numbers.sequence(0, 3)}">
+                                                <input type="email" class="form-control email-input mb-2"
+                                                    name="emails[]"
+                                                    th:value="${contact.emailAddresses != null and i < contact.emailAddresses.size() ? contact.emailAddresses[i].value : ''}"
+                                                    placeholder="Enter email address" th:id="'emailInput-' + ${i}"
+                                                    th:style="${contact.emailAddresses == null or i >= contact.emailAddresses.size() ? 'display: none;' : ''}">
+                                            </div>
+                                        </div>
+                                        <!-- Add More Button -->
+                                        <button type="button" class="btn btn-secondary mt-2"
+                                            onclick="showNextEmailField(this)">Add More</button>
+
+
+                                        <div id="editPhoneNumbersContainer"
+                                            th:id="'editPhoneNumbersContainer-' + ${#strings.replace(contact.resourceName, '/', '_')}">
+                                            <label class="form-label">Phone Numbers</label>
+
+                                            <div th:each="i : ${#numbers.sequence(0, 3)}">
+                                                <input type="tel" class="form-control phone-input mb-2"
+                                                    name="phoneNumbers[]"
+                                                    th:value="${contact.phoneNumbers != null and i < contact.phoneNumbers.size() ? contact.phoneNumbers[i].value : ''}"
+                                                    placeholder="Enter phone number" th:id="'phoneInput-' + ${i}"
+                                                    th:style="${contact.phoneNumbers == null or i >= contact.phoneNumbers.size() ? 'display: none;' : ''}">
+                                            </div>
+                                        </div>
+                                        <!-- Add More Button -->
+                                        <button type="button" class="btn btn-secondary mt-2"
+                                            onclick="showNextPhoneNumberField(this)">Add More</button>
+
+                                        <div class="modal-footer" style="justify-content: center;">
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let originalTableData = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const table = document.getElementById('contactsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].getElementsByTagName('td').length) {
+                    originalTableData.push(rows[i].cloneNode(true));
+                }
+            }
+        });
+
+        function confirmDelete() {
+            return confirm("Are you sure you want to delete this contact?");
+        }
+
+        function showNextPhoneNumberField(button) {
+            let container = button.previousElementSibling; // Get the phone number container
+            let inputs = container.querySelectorAll('.phone-input'); // Get all phone input fields
+
+            for (let input of inputs) {
+                if (input.style.display === 'none') {
+                    input.style.display = 'block'; // Show the hidden field
+                    return; // Stop after showing one field
+                }
+            }
+
+            // Hide the button when max 3 inputs are shown
+            button.style.display = 'none';
+        }
+
+        function showNextEmailField(button) {
+            let container = button.previousElementSibling;
+            let inputs = container.getElementsByClassName("email-input");
+
+            for (let i = 0; i < inputs.length; i++) {
+                if (inputs[i].style.display === "none") {
+                    inputs[i].style.display = "block";
+                    return;
+                }
+            }
+
+            button.style.display = 'none';
+        }
+
+
+        function searchContacts() {
+            const input = document.getElementById('searchBar');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('contactsTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                if (!tr[i].getElementsByTagName('td').length) continue;
+
+                const tdName = tr[i].getElementsByTagName('td')[0];
+                const tdEmail = tr[i].getElementsByTagName('td')[1];
+                const tdPhone = tr[i].getElementsByTagName('td')[2];
+
+                if (tdName || tdEmail || tdPhone) {
+                    const txtName = tdName.textContent || tdName.innerText;
+                    const txtEmail = tdEmail.textContent || tdEmail.innerText;
+                    const txtPhone = tdPhone.textContent || tdPhone.innerText;
+
+                    if (
+                        txtName.toUpperCase().indexOf(filter) > -1 ||
+                        txtEmail.toUpperCase().indexOf(filter) > -1 ||
+                        txtPhone.toUpperCase().indexOf(filter) > -1
+                    ) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function addPhoneNumber(containerId) {
+            let container;
+            if (containerId) {
+                // This is for the edit modal
+                container = document.getElementById(`phoneNumbersContainer-${containerId}`);
+            } else {
+                // This is for the create modal
+                container = document.getElementById("phoneNumbersContainer");
+            }
+
+            if (container) {
+                let div = document.createElement("div");
+                div.classList.add("mb-3", "phone-number-group");
+
+                let label = document.createElement("label");
+                label.classList.add("form-label");
+                label.innerText = "Phone Number";
+
+                let input = document.createElement("input");
+                input.type = "tel";
+                input.classList.add("form-control");
+                input.name = "phoneNumbers[]";  // This ensures it's recognized as part of the array
+                input.required = true;
+
+                // Append the label and input to the new div
+                div.appendChild(label);
+                div.appendChild(input);
+
+                // Append the new phone number div to the container
+                container.appendChild(div);
+            }
+        }
+
+        function removePhoneNumber(button) {
+            button.parentElement.remove();
+        }
+
+        function debugEditForm(form) {
+            const formData = new FormData(form);
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+            return true;
+        }
+
+
+    </script>
+</body>
+
+</html>
