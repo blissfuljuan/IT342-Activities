@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background: #f1f1f1;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+        }
+        input {
+            padding: 8px;
+            width: 80%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .update-btn {
+            background: #28a745;
+            color: white;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        .add-btn {
+            background: #007bff;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Google Contacts</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="contact : ${contacts}">
+                <td th:if="${contact.names}" th:text="${contact.names[0].displayName}"></td>
+                <td th:if="${contact.emailAddresses}" th:text="${contact.emailAddresses[0].value}"></td>
+                <td th:if="${contact.phoneNumbers}" th:text="${contact.phoneNumbers[0].value}"></td>
+                <td>
+                    <form action="/contacts/delete" method="post">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
+                    <form action="/contacts/update" method="post">
+                        <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+                        <input type="text" name="name" placeholder="New Name" required />
+                        <input type="email" name="email" placeholder="New Email" />
+                        <input type="text" name="phone" placeholder="New Phone" />
+                        <button type="submit" class="update-btn">Update</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Add New Contact</h2>
+    <form action="/add" method="post">
+        <button type="submit" class="add-btn">Add Contact</button>
+        <input type="text" name="name" placeholder="Full Name" required />
+        <input type="email" name="email" placeholder="Email Address" />
+        <input type="text" name="phone" placeholder="Phone Number" />
+    </form>
+</body>
+</html>
