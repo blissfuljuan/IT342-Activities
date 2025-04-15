@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome to Contact Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 90%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .user-info {
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .logout-button {
+            padding: 0.5rem 1.5rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .logout-button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            margin: 2rem 0;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        p {
+            color: #718096;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .contact-banner {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .contact-banner:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .contact-banner h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .contact-banner p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            color: #3498db;
+            background: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .contact-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #764ba2;
+        }
+
+        .feature-title {
+            color: #2d3748;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            color: #718096;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-banner {
+                padding: 1.5rem;
+            }
+
+            .contact-banner h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                text-align: center;
+            }
+
+            .contact-banner h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="user-info">
+                <div class="user-name" th:if="${#authentication != null and #authentication.principal != null}" 
+                     th:text="${#authentication.principal.attributes != null ? #authentication.principal.attributes.name : 'User'}">
+                    User
+                </div>
+                <div class="user-name" th:unless="${#authentication != null and #authentication.principal != null}">
+                    Guest
+                </div>
+            </div>
+            <a href="/logout" class="logout-button">Logout</a>
+        </div>
+
+        <div class="main-content">
+            <h1>Welcome to Contact Manager</h1>
+            <p>Your personal contact management solution</p>
+
+            <a href="/contacts/contacts-ui" class="contact-banner">
+                <h2>Manage Your Contacts</h2>
+                <p>Access, add, update, and organize your Google Contacts all in one place</p>
+                <span class="contact-button">Open Contacts</span>
+            </a>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3 class="feature-title">Multiple Contacts</h3>
+                    <p class="feature-description">Add and manage multiple contacts with ease</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Contact Details</h3>
+                    <p class="feature-description">Store emails, phone numbers, and birthdays</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Easy Updates</h3>
+                    <p class="feature-description">Update contact information with just a few clicks</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Contact Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .split-container {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            width: 1000px;
+            max-width: 95%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .left-side {
+            flex: 1;
+            padding: 60px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="%23FFFFFF20" d="M40,120 L160,120 L100,40 Z"/></svg>') center/cover;
+            opacity: 0.1;
+        }
+
+        .brand {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-logo {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .brand h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .brand p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .features-list {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            font-size: 1rem;
+        }
+
+        .feature-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .right-side {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 50px;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .google-btn {
+            background: #4285f4;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .github-btn {
+            background: #24292e;
+            box-shadow: 0 4px 15px rgba(36, 41, 46, 0.3);
+        }
+
+        .social-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-button i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+
+            .left-side, .right-side {
+                padding: 40px;
+            }
+
+            .brand h1 {
+                font-size: 2rem;
+            }
+
+            .brand p {
+                font-size: 1rem;
+            }
+
+            .login-header h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-side, .right-side {
+                padding: 30px;
+            }
+
+            .brand-logo {
+                font-size: 3rem;
+            }
+
+            .brand h1 {
+                font-size: 1.8rem;
+            }
+
+            .social-button {
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="split-container">
+        <div class="left-side">
+            <div class="brand">
+                <div class="brand-logo">📱</div>
+                <h1>Contact Manager</h1>
+                <p>Your all-in-one solution for managing contacts efficiently and securely.</p>
+            </div>
+            <div class="features-list">
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Seamless Google Contacts Integration</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Multiple Contact Management</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Easy Updates & Organization</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Secure & Private</span>
+                </div>
+            </div>
+        </div>
+        <div class="right-side">
+            <div class="login-header">
+                <h2>Welcome Back!</h2>
+                <p>Sign in to access your contacts</p>
+            </div>
+            <div class="social-buttons">
+                <a href="/oauth2/authorization/google" class="social-button google-btn">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </a>
+                <a href="/oauth2/authorization/github" class="social-button github-btn">
+                    <i class="fab fa-github"></i>
+                    Continue with GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
