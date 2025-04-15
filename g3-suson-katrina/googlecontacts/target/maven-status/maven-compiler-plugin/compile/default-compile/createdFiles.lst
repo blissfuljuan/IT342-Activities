@@ -1,0 +1,7 @@
+com\suson\googlecontactsintegration\controller\UserController.class
+com\suson\googlecontactsintegration\controller\GooglePeopleService.class
+com\suson\googlecontactsintegration\config\SecurityConfig.class
+com\suson\googlecontactsintegration\controller\WebController.class
+com\suson\googlecontactsintegration\service\GooglePeopleService.class
+com\suson\googlecontactsintegration\controller\ContactsController.class
+com\suson\googlecontactsintegration\GooglecontactsintegrationApplication.class
