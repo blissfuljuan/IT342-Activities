@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts Manager</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        h2 {
+            color: #1a73e8;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .contacts-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .contact-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .contact-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .contact-info {
+            flex-grow: 1;
+        }
+        .contact-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #1a73e8;
+        }
+        .contact-phone {
+            color: #5f6368;
+        }
+        .contact-email {
+            color: #5f6368;
+            font-size: 14px;
+        }
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .edit-form {
+            display: none;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        .edit-form input {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .edit-form input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .btn-edit {
+            background-color: #1a73e8;
+            color: white;
+        }
+        .btn-edit:hover {
+            background-color: #1557b0;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #218838;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 320px;
+            text-align: center;
+        }
+        .modal-buttons {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .nav-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: #1557b0;
+        }
+        .empty-contacts {
+            text-align: center;
+            padding: 40px;
+            color: #5f6368;
+        }
+        .add-contact-section {
+            margin-bottom: 24px;
+            text-align: right;
+        }
+        .btn-add {
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+        .btn-add:hover {
+            background-color: #1557b0;
+        }
+        .add-contact-modal {
+            width: 400px !important;
+            padding: 30px !important;
+        }
+        .add-contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: #202124;
+        }
+        .form-group input {
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="nav-buttons">
+    <a href="/googleuser" class="nav-btn">Back to Profile</a>
+</div>
+
+<div class="contacts-container">
+    <h2>Google Contacts Manager</h2>
+
+    <div id="addContactModal" class="modal">
+        <div class="modal-content add-contact-modal">
+            <h3>Add New Contact</h3>
+            <form id="addContactForm" class="add-contact-form">
+                <div class="form-group">
+                    <label for="newContactName">Name *</label>
+                    <input type="text" id="newContactName" required placeholder="Enter name">
+                </div>
+                <div class="form-group">
+                    <label for="newContactPhone">Phone Number *</label>
+                    <input type="tel" id="newContactPhone" required placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label for="newContactEmail">Email</label>
+                    <input type="email" id="newContactEmail" placeholder="Enter email">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-save">Save Contact</button>
+                    <button type="button" class="btn btn-cancel" id="cancelAddContact">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="add-contact-section">
+        <button id="showAddContactForm" class="btn btn-add">Add New Contact</button>
+    </div>
+
+    <div th:if="${contactsMap == null or contactsMap.isEmpty()}" class="empty-contacts">
+        <p>No contacts found with phone numbers.</p>
+    </div>
+
+    <div th:if="${contactsMap != null and not contactsMap.isEmpty()}">
+        <div id="contactsList">
+            <div th:each="contact, contactStat : ${contactsMap}" class="contact-card">
+                <div class="contact-info">
+                    <div class="contact-name" th:text="${contact.value.name}">Contact Name</div>
+                    <div class="contact-phone" th:text="${contact.value.phoneNumber}">Phone Number</div>
+                    <div th:if="${contact.value.email != null and contact.value.email != ''}" class="contact-email" th:text="${contact.value.email}">Email</div>
+                </div>
+                <div class="contact-actions">
+                    <button class="btn btn-edit edit-contact-btn"
+                            th:data-resource-id="${contact.key}"
+                            th:data-name="${contact.value.name}"
+                            th:data-phone="${contact.value.phoneNumber}"
+                            th:data-index="${contactStat.index}">Edit</button>
+                    <button class="btn btn-delete delete-contact-btn"
+                            th:data-resource-id="${contact.key}"
+                            th:data-name="${contact.value.name}">Delete</button>
+                </div>
+                <div class="edit-form" th:id="'edit-form-' + ${contactStat.index}">
+                    <input type="text" th:id="'edit-name-' + ${contactStat.index}" th:value="${contact.value.name}" placeholder="Name" />
+                    <input type="text" th:id="'edit-phone-' + ${contactStat.index}" th:value="${contact.value.phoneNumber}" placeholder="Phone" />
+                    <input type="email" th:id="'edit-email-' + ${contactStat.index}" th:value="${contact.value.email}" placeholder="Email" />
+                    <div class="contact-actions">
+                        <button type="button" class="btn btn-save save-contact-btn"
+                                th:data-resource-id="${contact.key}"
+                                th:data-index="${contactStat.index}">Save</button>
+                        <button type="button" class="btn btn-cancel cancel-edit-btn"
+                                th:data-index="${contactStat.index}">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <p id="deleteMessage">Are you sure you want to delete this contact?</p>
+        <div class="modal-buttons">
+            <button id="confirmDeleteBtn" class="btn btn-delete">Delete</button>
+            <button id="cancelDeleteBtn" class="btn btn-cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentContactId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.edit-contact-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceId = this.getAttribute('data-resource-id');
+                const name = this.getAttribute('data-name');
+                const phone = this.getAttribute('data-phone');
+                const index = parseInt(this.getAttribute('data-index'));
+                editContact(resourceId, name, phone, index);
+            });
+        });
+
+        document.querySelectorAll('.delete-contact-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceId = this.getAttribute('data-resource-id');
+                const name = this.getAttribute('data-name');
+                confirmDelete(resourceId, name);
+            });
+        });
+
+        document.querySelectorAll('.save-contact-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceId = this.getAttribute('data-resource-id');
+                const index = parseInt(this.getAttribute('data-index'));
+                saveContact(resourceId, index);
+            });
+        });
+
+        document.querySelectorAll('.cancel-edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                cancelEdit(index);
+            });
+        });
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', cancelDelete);
+    });
+
+    function editContact(contactId, name, phone, index) {
+        const contactCards = document.querySelectorAll('.contact-card');
+        const card = contactCards[index];
+        const editForm = card.querySelector('.edit-form');
+
+        document.getElementById('edit-name-' + index).value = name || '';
+        document.getElementById('edit-phone-' + index).value = phone || '';
+
+        const emailInput = document.getElementById('edit-email-' + index);
+        const emailDisplay = card.querySelector('.contact-email');
+        if (emailInput && emailDisplay) {
+            emailInput.value = emailDisplay.textContent || '';
+        }
+
+        editForm.style.display = 'block';
+    }
+
+
+    function cancelEdit(index) {
+        const contactCards = document.querySelectorAll('.contact-card');
+        const card = contactCards[index];
+
+
+        card.querySelector('.edit-form').style.display = 'none';
+    }
+
+
+    function saveContact(contactId, index) {
+        const name = document.getElementById('edit-name-' + index).value.trim();
+        const phone = document.getElementById('edit-phone-' + index).value.trim();
+        const emailElement = document.getElementById('edit-email-' + index);
+        const email = emailElement ? emailElement.value.trim() : '';
+
+        if (!name || !phone) {
+            showToast('Name and phone number are required', 'error');
+            return;
+        }
+
+
+        const cleanId = contactId.replace('people/', '');
+
+        const contactData = {
+            name: name,
+            phoneNumber: phone,
+            email: email
+        };
+
+        console.log('Sending update request with data:', contactData);
+
+        fetch(`/api/contacts/${encodeURIComponent(cleanId)}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(contactData)
+        })
+            .then(async response => {
+                const text = await response.text();
+                console.log('Response:', text);
+
+                if (!response.ok) {
+                    throw new Error(text || `HTTP error! status: ${response.status}`);
+                }
+
+                try {
+                    return text ? JSON.parse(text) : {};
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                    throw new Error('Invalid JSON response');
+                }
+            })
+            .then(data => {
+                const card = document.querySelectorAll('.contact-card')[index];
+
+
+                card.querySelector('.contact-name').textContent = name;
+                card.querySelector('.contact-phone').textContent = phone;
+
+
+                let emailDisplay = card.querySelector('.contact-email');
+                if (email) {
+                    if (!emailDisplay) {
+                        emailDisplay = document.createElement('div');
+                        emailDisplay.className = 'contact-email';
+                        card.querySelector('.contact-info').appendChild(emailDisplay);
+                    }
+                    emailDisplay.textContent = email;
+                    emailDisplay.style.display = '';
+                } else if (emailDisplay) {
+                    emailDisplay.style.display = 'none';
+                }
+
+                setTimeout(() => {
+                    fetch('/api/contacts', {
+                        headers: {
+                            'Cache-Control': 'no-cache',
+                            'Pragma': 'no-cache'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(contacts => {
+                            const card = document.querySelectorAll('.contact-card')[index];
+                            const contactData = contacts[data.resourceId];
+                            if (contactData) {
+                                card.querySelector('.contact-name').textContent = contactData.name;
+                                card.querySelector('.contact-phone').textContent = contactData.phoneNumber;
+                                if (contactData.email) {
+                                    let emailElement = card.querySelector('.contact-email');
+                                    if (!emailElement) {
+                                        emailElement = document.createElement('div');
+                                        emailElement.className = 'contact-email';
+                                        card.querySelector('.contact-info').appendChild(emailElement);
+                                    }
+                                    emailElement.textContent = contactData.email;
+                                }
+                            }
+                        })
+                        .catch(error => console.error('Error refreshing contact data:', error));
+                }, 1000);
+
+                cancelEdit(index);
+                showToast('Contact updated successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to update contact: ' + error.message, 'error');
+            });
+    }
+
+    function showToast(message, type = 'info') {
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    function confirmDelete(contactId, name) {
+        console.log('Confirming delete for:', contactId, name);
+        currentContactId = contactId;
+        document.getElementById('deleteMessage').textContent = `Are you sure you want to delete "${name}"?`;
+        document.getElementById('confirmDeleteBtn').onclick = function() {
+            deleteContact(contactId);
+        };
+        document.getElementById('deleteModal').style.display = 'block';
+    }
+
+
+    function cancelDelete() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+
+    function deleteContact(contactId) {
+        const id = contactId.includes('/') ? contactId.split('/').pop() : contactId;
+        console.log('Attempting to delete contact:', id);
+
+        fetch(`/api/contacts/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                console.log('Delete response status:', response.status);
+
+                if (response.status >= 200 && response.status < 300) {
+                    const contactCards = document.querySelectorAll('.contact-card');
+                    for (let i = 0; i < contactCards.length; i++) {
+                        const deleteBtn = contactCards[i].querySelector('.delete-contact-btn');
+                        if (deleteBtn.getAttribute('data-resource-id') === contactId) {
+                            const card = contactCards[i];
+                            card.style.transition = 'opacity 0.5s ease';
+                            card.style.opacity = '0';
+                            setTimeout(() => {
+                                card.remove();
+                                if (document.querySelectorAll('.contact-card').length === 0) {
+                                    const contactsList = document.getElementById('contactsList');
+                                    const emptyMessage = document.createElement('div');
+                                    emptyMessage.className = 'empty-contacts';
+                                    emptyMessage.innerHTML = '<p>No contacts found with phone numbers.</p>';
+                                    contactsList.parentNode.replaceChild(emptyMessage, contactsList);
+                                }
+                            }, 500);
+                            break;
+                        }
+                    }
+
+
+                    cancelDelete();
+
+
+                    const successMessage = document.createElement('div');
+                    successMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #4CAF50;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 4px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+                    successMessage.textContent = 'Contact deleted successfully!';
+                    document.body.appendChild(successMessage);
+
+
+                    setTimeout(() => {
+                        successMessage.style.opacity = '1';
+                        setTimeout(() => {
+                            successMessage.style.opacity = '0';
+                            setTimeout(() => {
+                                successMessage.remove();
+                            }, 300);
+                        }, 2000);
+                    }, 100);
+
+                } else {
+                    throw new Error(`Failed to delete contact. Status: ${response.status}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+
+                const errorMessage = document.createElement('div');
+                errorMessage.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f44336;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        `;
+                errorMessage.textContent = `Error: ${error.message}`;
+                document.body.appendChild(errorMessage);
+
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 3000);
+
+                cancelDelete();
+            });
+    }
+
+    document.getElementById('showAddContactForm').addEventListener('click', function() {
+        document.getElementById('addContactModal').style.display = 'block';
+    });
+
+    document.getElementById('cancelAddContact').addEventListener('click', function() {
+        document.getElementById('addContactModal').style.display = 'none';
+        document.getElementById('addContactForm').reset();
+    });
+
+    document.getElementById('addContactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('newContactName').value.trim();
+        const phone = document.getElementById('newContactPhone').value.trim();
+        const email = document.getElementById('newContactEmail').value.trim();
+
+        if (!name || !phone) {
+            showToast('Name and phone number are required', 'error');
+            return;
+        }
+
+        const contactData = {
+            name: name,
+            phoneNumber: phone,
+            email: email
+        };
+
+        fetch('/api/contacts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(contactData)
+        })
+            .then(async response => {
+                const text = await response.text();
+                if (!response.ok) {
+                    throw new Error(text || `HTTP error! status: ${response.status}`);
+                }
+                return JSON.parse(text);
+            })
+            .then(data => {
+
+                const contactsList = document.getElementById('contactsList');
+                const newCard = createContactCard(data, document.querySelectorAll('.contact-card').length);
+
+
+                contactsList.insertAdjacentHTML('afterbegin', newCard);
+
+
+                document.getElementById('addContactForm').reset();
+                document.getElementById('addContactModal').style.display = 'none';
+
+
+                showToast('Contact added successfully!', 'success');
+
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to add contact: ' + error.message, 'error');
+            });
+    });
+
+
+    function createContactCard(contact, index) {
+        return `
+        <div class="contact-card">
+            <div class="contact-info">
+                <div class="contact-name">${contact.name}</div>
+                <div class="contact-phone">${contact.phoneNumber}</div>
+                ${contact.email ? `<div class="contact-email">${contact.email}</div>` : ''}
+            </div>
+            <div class="contact-actions">
+                <button class="btn btn-edit"
+                        onclick="editContact('${contact.resourceId}', '${contact.name}', '${contact.phoneNumber}', ${index})">
+                    Edit
+                </button>
+                <button class="btn btn-delete"
+                        onclick="confirmDelete('${contact.resourceId}', '${contact.name}')">
+                    Delete
+                </button>
+            </div>
+        </div>
+    `;
+    }
+</script>
+</body>
+</html>
