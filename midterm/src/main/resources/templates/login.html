@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .google-btn {
+            background-color: #4285f4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .google-btn:hover {
+            background-color: #357abd;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Welcome to Contact Manager</h2>
+    <p>Please sign in with your Google account to continue</p>
+    <a href="/oauth2/authorization/google" class="google-btn">
+        Sign in with Google
+    </a>
+    <div th:if="${param.error}" class="error-message">
+        Authentication failed. Please try again.
+    </div>
+</div>
+</body>
+</html>
