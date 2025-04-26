@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Google Contacts Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .error-container {
+            max-width: 500px;
+            text-align: center;
+        }
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #dc3545;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <div class="card shadow-lg">
+        <div class="card-header">Oops! Something Went Wrong</div>
+        <div class="card-body p-4">
+            <div class="alert alert-danger" th:if="${error}">
+                <p th:text="${error}" class="mb-0">Error message will be displayed here</p>
+            </div>
+            <div class="alert alert-warning" th:unless="${error}">
+                <p>An unexpected error occurred. Please try again later or contact support.</p>
+            </div>
+            <a href="/login" class="btn btn-custom mt-3">Return to Login</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
