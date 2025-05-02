@@ -1,0 +1,4 @@
+com\pepito\midterm\MidtermApplication.class
+com\pepito\midterm\Config\SecurityConfig.class
+com\pepito\midterm\Controller\UserController.class
+com\pepito\midterm\Service\GoogleContactService.class
