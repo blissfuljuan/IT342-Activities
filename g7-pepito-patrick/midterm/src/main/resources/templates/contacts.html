@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Contacts</title>
+    <style>
+       body {
+           font-family: Arial, sans-serif;
+           background-color: #f8f9fa;
+           margin: 0;
+           padding: 0;
+       }
+       .container {
+           max-width: 800px;
+           margin: 30px auto;
+           padding: 20px;
+           background-color: #fff;
+           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+           border-radius: 8px;
+       }
+       header {
+           text-align: center;
+           margin-bottom: 20px;
+       }
+       header h1 {
+           color: #333;
+           margin: 0;
+       }
+       .nav-buttons {
+           margin-bottom: 20px;
+           text-align: center;
+       }
+       .nav-buttons a {
+           display: inline-block;
+           padding: 10px 15px;
+           margin: 5px;
+           text-decoration: none;
+           background-color: #007bff;
+           color: #fff;
+           border-radius: 4px;
+           transition: background-color 0.3s;
+       }
+       .nav-buttons a:hover {
+           background-color: #0056b3;
+       }
+       table {
+           width: 100%;
+           border-collapse: collapse;
+           margin-bottom: 20px;
+       }
+       table th, table td {
+           padding: 12px;
+           border: 1px solid #ddd;
+           text-align: left;
+       }
+       table th {
+           background-color: #007bff;
+           color: #fff;
+       }
+       .action-buttons a, .action-buttons form {
+           display: inline-block;
+           margin-right: 5px;
+       }
+       .action-buttons a, .action-buttons button {
+           padding: 5px 10px;
+           text-decoration: none;
+           color: #fff;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+       }
+       .update-btn {
+           background-color: #28a745;
+       }
+       .update-btn:hover {
+           background-color: #218838;
+       }
+       .delete-btn {
+           background-color: #dc3545;
+       }
+       .delete-btn:hover {
+           background-color: #c82333;
+       }
+       .error {
+           color: #dc3545;
+           font-weight: bold;
+           text-align: center;
+       }
+   </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Google Contacts</h1>
+    </header>
+    <div class="nav-buttons">
+        <a href="/user-info">Back</a>
+        <a href="/logout">Logout</a>
+        <a href="/contact/add">Add Contact</a>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact.name}">Name</td>
+            <td th:text="${contact.email}">Email</td>
+            <td th:text="${contact.phone}">Phone</td>
+            <td class="action-buttons">
+                <a th:href="@{'/contact/update/' + ${contact.resourceName}}" class="update-btn">Update</a>
+                <form th:action="@{'/contact/delete/' + ${contact.resourceName}}" method="post" onsubmit="return confirm('Are you sure you want to delete this contact?');">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p th:if="${error}" th:text="${error}" class="error"></p>
+</div>
+</body>
+</html>
