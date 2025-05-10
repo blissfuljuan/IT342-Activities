@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Contacts Integration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #007bff, #6610f2);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            position: relative;
+        }
+        .card-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .hero-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .btn-custom {
+            background: #ffcc00;
+            color: #000;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            background: #ffaa00;
+            transform: scale(1.05);
+        }
+        .floating-icons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .floating-icons img {
+            width: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="hero-section">
+            <div class="floating-icons">
+                <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="User Icon">
+                <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Contacts Icon">
+            </div>
+            <div class="card-container">
+                <h1>Google Contacts Integration</h1>
+                <p>Manage your Google Contacts easily and efficiently with a seamless experience.</p>
+                <a class="btn btn-custom btn-lg shadow" href="/contacts" role="button">Login with Google</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
