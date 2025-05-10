@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/googlecontact.iml" filepath="$PROJECT_DIR$/.idea/googlecontact.iml" />
+      <module fileurl="file://$PROJECT_DIR$/googlecontacts/googlecontacts/googlecontactintegration.iml" filepath="$PROJECT_DIR$/googlecontacts/googlecontacts/googlecontactintegration.iml" />
+    </modules>
+  </component>
+</project>
