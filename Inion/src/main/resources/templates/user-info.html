@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User ID - Google Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .container {
+            position: relative;
+            max-width: 400px;
+            padding: 30px;
+            border: 1px solid #d0d0d0;
+            border-radius: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        h1 {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .user-info {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 6px;
+            background-color: #fafafa;
+            border: 1px dashed #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            margin-right: 18px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .user-details {
+            flex-grow: 1;
+        }
+        .user-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .user-details p {
+            color: #555;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 0;
+            border-radius: 6px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .btn-contacts {
+            background-color: #1a1a1a;
+            color: white;
+            border: none;
+        }
+        .btn-contacts:hover {
+            background-color: #333;
+            color: white;
+        }
+        .btn-logout {
+            background-color: transparent;
+            color: #1a1a1a;
+            border: 1px solid #d0d0d0;
+        }
+        .btn-logout:hover {
+            background-color: #f0f0f0;
+        }
+        .btn i {
+            margin-right: 8px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>User Information</h1>
+    <div class="user-info">
+        <img th:if="${pictureUrl}" th:src="${pictureUrl}" class="profile-image" alt="Profile picture">
+        <div th:unless="${pictureUrl}" class="profile-image d-flex align-items-center justify-content-center bg-light">
+            <i class="bi bi-person" style="font-size: 30px; color: #aaa;"></i>
+        </div>
+        <div class="user-details">
+            <h3><span th:text="${name}">User</span></h3>
+            <p><i class="bi bi-envelope" style="opacity: 0.7;"></i> <span th:text="${email}">email@example.com</span></p>
+        </div>
+    </div>
+    <div class="nav-buttons">
+        <a href="/contacts" class="btn btn-contacts">
+            <i class="bi bi-person-lines-fill"></i> View My Contacts
+        </a>
+        <a href="/logout" class="btn btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+</div>
+</body>
+</html>
