@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1000px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .table {
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-body input {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .modal-body input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .success-message,
+        .error-message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+            margin-left: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            border: none;
+            margin-left: 10px;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .actions-column {
+            width: 200px;
+            text-align: center;
+        }
+
+        .modal-title {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Contacts</h1>
+
+    <div th:if="${success}" class="success-message" th:text="${success}"></div>
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <!-- Add Contact Button -->
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Add Contact</button>
+
+    <!-- Update the table header -->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col" class="actions-column">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact.firstName}"></td>
+            <td th:text="${contact.lastName}"></td>
+            <td th:text="${contact.email}"></td>
+            <td th:text="${contact.phoneNumber}"></td>
+            <td>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal"
+                        th:data-resource-name="${contact.resourceName}"
+                        th:data-first-name="${contact.firstName}"
+                        th:data-last-name="${contact.lastName}"
+                        th:data-email="${contact.email}"
+                        th:data-phone-number="${contact.phoneNumber}">Edit</button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                        th:data-resource-name="${contact.resourceName}">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Add New Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/contacts/add}" method="post">
+                <div class="modal-body">
+                    <input type="text" id="addFirstName" name="firstName" placeholder="First Name" required>
+                    <input type="text" id="addLastName" name="lastName" placeholder="Last Name" required>
+                    <input type="email" id="addEmail" name="email" placeholder="Email" required>
+                    <input type="tel" id="addPhoneNumber" name="phoneNumber" placeholder="Phone Number">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/contacts/update}" method="post">
+                <div class="modal-body">
+                    <input type="text" id="editFirstName" name="firstName" placeholder="First Name" required>
+                    <input type="text" id="editLastName" name="lastName" placeholder="Last Name" required>
+                    <input type="email" id="editEmail" name="email" placeholder="Email" required>
+                    <input type="tel" id="editPhoneNumber" name="phoneNumber" placeholder="Phone Number">
+                    <input type="hidden" id="editResourceName" name="resourceName">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this contact?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form th:action="@{/contacts/delete}" method="post">
+                    <input type="hidden" id="deleteResourceName" name="resourceName"/>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Edit Modal Handler
+        const editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', event => {
+            try {
+                const button = event.relatedTarget;
+
+                // Get all data attributes
+                const firstName = button.getAttribute('data-first-name');
+                const lastName = button.getAttribute('data-last-name');
+                const email = button.getAttribute('data-email');
+                const phoneNumber = button.getAttribute('data-phone-number');
+                const resourceName = button.getAttribute('data-resource-name');
+
+                // Validate required data
+                if (!resourceName) {
+                    console.error('Missing resource name');
+                    event.preventDefault();
+                    return;
+                }
+
+                // Set form values
+                document.getElementById('editFirstName').value = firstName || '';
+                document.getElementById('editLastName').value = lastName || '';
+                document.getElementById('editEmail').value = email || '';
+                document.getElementById('editPhoneNumber').value = phoneNumber || '';
+                document.getElementById('editResourceName').value = resourceName;
+
+            } catch (error) {
+                console.error('Error in edit modal handler:', error);
+                event.preventDefault();
+            }
+        });
+
+        // Delete Modal Handler
+        const deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', event => {
+            try {
+                const button = event.relatedTarget;
+                const resourceName = button.getAttribute('data-resource-name');
+
+                if (!resourceName) {
+                    console.error('Missing resource name for delete');
+                    event.preventDefault();
+                    return;
+                }
+
+                deleteModal.querySelector('#deleteResourceName').value = resourceName;
+
+            } catch (error) {
+                console.error('Error in delete modal handler:', error);
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+</body>
+</html>
