@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts Integration</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.15);
+            width: 350px;
+        }
+        h1 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #4285F4;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+        .btn:hover {
+            background-color: #357ae8;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Google Contacts Integration</h1>
+        <h5>By Ezekiel Gil T. Saludsod</h5>
+        <p>Sign in with Google to continue.</p>
+        <a href="/oauth2/authorization/google?redirect_uri=/contacts" class="btn">Continue with Google</a>
+    </div>
+</body>
+</html>
