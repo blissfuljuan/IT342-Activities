@@ -1,0 +1,160 @@
+body {
+    background-color: #15192f;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+.header-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+h2, h3 {
+    color: #ffffff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #2d3250;
+}
+
+th {
+    background-color: #2d3250;
+    color: #ffffff;
+}
+
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+a {
+    color: #64b5f6;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    background-color: #e53935;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 15px;
+}
+
+button:hover {
+    background-color: #c62828;
+}
+
+.button {
+    display: inline-block;
+    background-color: #4285f4;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+
+}
+
+.delete-button {
+    background-color: #e53935; /* Google red */
+    color: white;
+    
+}
+
+.button:hover {
+    background-color: #1976d2;
+    text-decoration: none;
+}
+
+.update-button {
+    background-color: #4285f4; /* Google blue */
+    color: white;
+}
+
+.update-button:hover {
+    background-color: #3367d6; /* Darker blue on hover */
+    text-decoration: none;
+}
+
+.contact-container {
+    align-items: center;
+    align-content: center;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 50%;
+    color: black;
+    border-radius: 20px;
+    font-size: 15px;
+}
+.h2-create{
+    color: black;
+}
+.create-contact{
+    background-color: #4285f4;
+    width: 100%;
+    margin: 20px 0 20px 0;
+    padding: 10px;
+}
+.create-contact:hover{
+    background-color: #1976d2;
+}
+.blue-text {
+    color: #4285f4; /* Google blue */
+}
+
+.white-text {
+    color: #000000; /* White */
+}
+
+.back-button:hover {
+    background-color: #c62828;
+}
+
+.back-button {
+    background-color: #4285f4;
+    color: white;
+    border-radius: 4px;
+    width: 20%;
+    padding: 5px;
+    margin: 20px;
+    font-size: small;
+    align-content: center;
+    display: flex;
+    text-decoration: none;
+}
+.contact-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+/* Styling input fields */
+.contact-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease-in-out;
+}
