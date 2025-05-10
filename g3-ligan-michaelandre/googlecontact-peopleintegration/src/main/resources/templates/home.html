@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+  <title>Home - Google Contacts Integration</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4285F4;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            color: #4285F4;
+            margin-bottom: 20px;
+        }
+        .contacts-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .contact-actions {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        button[disabled] {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        .debug-container {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow: auto;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .pagination span {
+            margin: 0 10px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+<header>
+  <h2>Google Contacts/People Integration</h2>
+  <div class="user-info">
+    <!--<span sec:authentication="name">Username</span>-->
+    <form th:action="@{/logout}" method="post">
+      <button class="logout-btn" type="submit">Logout</button>
+    </form>
+  </div>
+</header>
+<div class="container">
+  <!--<h1>My Google Contacts <span id="contacts-count" style="font-size: 0.6em; color: #666;"></span></h1>-->
+  <h1>My Google Contacts <span id="contacts-count" style="font-size: 0.6em; color: #666;"></span></h1>
+  <div class="contacts-container">
+    <div class="contact-actions">
+      <!--<button id="refreshBtn">Refresh Contacts</button>-->
+      <button id="newContactBtn">Add New Contact</button>
+      <!--<button id="debugBtn" style="background-color: #f44336;">Debug Contacts</button>-->
+    </div>
+
+    <div id="debug-container" style="display: none;" class="debug-container"></div>
+
+    <div id="contacts-table-container">
+      <p class="loading">Loading contacts...</p>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="pagination">
+      <button id="prevPageBtn" disabled>&laquo; Previous</button>
+      <span id="pageIndicator">Page 1</span>
+      <button id="nextPageBtn">Next &raquo;</button>
+    </div>
+  </div>
+
+</div>
+<div id="editContactModal" class="modal">
+  <div class="modal-content">
+    <h3>Edit Contact</h3>
+    <div id="editForm">
+      <input type="hidden" id="editContactId">
+      <div class="form-group">
+        <label for="editName">Name:</label>
+        <input type="text" id="editName">
+      </div>
+      <div class="form-group">
+        <label for="editEmail">Email:</label>
+        <input type="email" id="editEmail">
+      </div>
+      <div class="form-group">
+        <label for="editPhone">Phone:</label>
+        <input type="tel" id="editPhone">
+      </div>
+      <div class="button-group">
+        <button onclick="closeEditModal()" style="background-color: #f44336; margin-right: 10px;">Cancel</button>
+        <button onclick="saveContact()" style="background-color: #4CAF50;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="newContactModal" class="modal">
+  <div class="modal-content">
+    <h3>Add New Contact</h3>
+    <div id="newContactForm">
+      <div class="form-group">
+        <label for="newName">Name:</label>
+        <input type="text" id="newName">
+      </div>
+      <div class="form-group">
+        <label for="newEmail">Email:</label>
+        <input type="email" id="newEmail">
+      </div>
+      <div class="form-group">
+        <label for="newPhone">Phone:</label>
+        <input type="tel" id="newPhone">
+      </div>
+      <div class="button-group">
+        <button onclick="closeNewContactModal()" style="background-color: #f44336; margin-right: 10px;">Cancel</button>
+        <button onclick="createNewContact()" style="background-color: #4CAF50;">Create Contact</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Global variables for pagination
+let allContacts = [];
+let currentPage = 0;
+const contactsPerPage = 10;
+
+// Wait for the DOM to be fully loaded before attaching event handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to buttons
+    document.getElementById('newContactBtn').addEventListener('click', showNewContactForm);
+    document.getElementById('prevPageBtn').addEventListener('click', prevPage);
+    document.getElementById('nextPageBtn').addEventListener('click', nextPage);
+
+    // Load contacts when the page loads
+    loadContacts();
+});
+
+// Function to load contacts from the API
+function loadContacts() {
+    const tableContainer = document.getElementById('contacts-table-container');
+    tableContainer.innerHTML = '<p class="loading">Loading contacts...</p>';
+
+    fetch('/api/contacts')
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Error fetching contacts');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.length > 0) {
+                // Store all contacts and display first page
+                allContacts = data;
+                currentPage = 0;
+                displayCurrentPage();
+            } else {
+                tableContainer.innerHTML = '<p>No contacts found. You may need to add some contacts to your Google account first.</p>';
+                resetPagination();
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching contacts:', error);
+            tableContainer.innerHTML = `<p>Error loading contacts: ${error.message || 'Please try again later.'}</p>`;
+            resetPagination();
+        });
+}
+// Function to display the current page of contacts
+function displayCurrentPage() {
+    const start = currentPage * contactsPerPage;
+    const end = start + contactsPerPage;
+    const pageContacts = allContacts.slice(start, end);
+
+    // Update page indicator
+    document.getElementById('pageIndicator').textContent = `Page ${currentPage + 1} of ${Math.ceil(allContacts.length / contactsPerPage)}`;
+
+    // Enable/disable pagination buttons
+    document.getElementById('prevPageBtn').disabled = (currentPage === 0);
+    document.getElementById('nextPageBtn').disabled = (end >= allContacts.length);
+
+    // Display contacts for this page
+    displayContacts(pageContacts);
+
+    // Update total contacts count
+    const contactsCount = document.getElementById('contacts-count');
+    contactsCount.textContent = `(${allContacts.length} total, showing ${start+1}-${Math.min(end, allContacts.length)})`;
+}
+// Navigation functions
+function nextPage() {
+    if ((currentPage + 1) * contactsPerPage < allContacts.length) {
+        currentPage++;
+        displayCurrentPage();
+    }
+}
+function prevPage() {
+    if (currentPage > 0) {
+        currentPage--;
+        displayCurrentPage();
+    }
+}
+
+function resetPagination() {
+    document.getElementById('prevPageBtn').disabled = true;
+    document.getElementById('nextPageBtn').disabled = true;
+    document.getElementById('pageIndicator').textContent = 'Page 1';
+    document.getElementById('contacts-count').textContent = '';
+}
+
+// Function to display contacts in a table
+function displayContacts(contacts) {
+    const tableContainer = document.getElementById('contacts-table-container');
+
+    let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    contacts.forEach(contact => {
+        // Improved name extraction with fallback
+        let name = 'N/A';
+        if (contact.names && contact.names.length > 0) {
+            name = contact.names[0].displayName || contact.names[0].givenName || 'N/A';
+        }
+
+        // More thorough email extraction
+        let email = 'N/A';
+        if (contact.emailAddresses && contact.emailAddresses.length > 0) {
+            email = contact.emailAddresses[0].value || 'N/A';
+        }
+
+        // More thorough phone extraction
+        let phone = 'N/A';
+        if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+            phone = contact.phoneNumbers[0].value || contact.phoneNumbers[0].canonicalForm || 'N/A';
+        }
+        const resourceName = contact.resourceName;
+
+        tableHTML += `
+            <tr>
+                <td>${name}</td>
+                <td>${email}</td>
+                <td>${phone}</td>
+                <td>
+                    <button onclick="editContact('${resourceName}')">Edit</button>
+                    <button onclick="deleteContact('${resourceName}')">Delete</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+    tableContainer.innerHTML = tableHTML;
+}
+
+// Function to show new contact form
+function showNewContactForm() {
+    // Clear form fields
+    document.getElementById('newName').value = '';
+    document.getElementById('newEmail').value = '';
+    document.getElementById('newPhone').value = '';
+
+    // Show the modal
+    document.getElementById('newContactModal').style.display = 'block';
+}
+
+// Function to close new contact modal
+function closeNewContactModal() {
+    document.getElementById('newContactModal').style.display = 'none';
+}
+
+// Function to create a new contact
+function createNewContact() {
+    const name = document.getElementById('newName').value;
+    const email = document.getElementById('newEmail').value;
+    const phone = document.getElementById('newPhone').value;
+
+    if (!name || name.trim() === '') {
+        alert('Name is required');
+        return;
+    }
+
+    // Create contact object
+    const contact = {
+        names: [{
+            displayName: name,
+            givenName: name
+        }]
+    };
+
+    // Add email if provided
+    if (email && email.trim() !== '') {
+        contact.emailAddresses = [{
+            value: email,
+            type: 'home'
+        }];
+    }
+
+    // Add phone if provided
+    if (phone && phone.trim() !== '') {
+        contact.phoneNumbers = [{
+            value: phone,
+            type: 'mobile'
+        }];
+    }
+
+    // Send create request
+    fetch('/api/contacts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contact)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to create contact');
+        }
+        return response.json();
+    })
+    .then(data => {
+        closeNewContactModal();
+        loadContacts(); // Refresh contacts list
+        alert('Contact created successfully!');
+    })
+    .catch(error => {
+        console.error('Error creating contact:', error);
+        alert('Error creating contact. Please try again.');
+    });
+}
+// Function to edit contact
+function editContact(resourceName) {
+    // Fetch the contact details
+    fetch(`/api/contacts/get?resourceName=${encodeURIComponent(resourceName)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch contact details');
+            }
+            return response.json();
+        })
+        .then(contact => {
+            // Populate the edit form
+            document.getElementById('editContactId').value = resourceName;
+
+            // Set name if available
+            if (contact.names && contact.names.length > 0) {
+                document.getElementById('editName').value = contact.names[0].displayName || '';
+            } else {
+                document.getElementById('editName').value = '';
+            }
+
+            // Set email if available
+            if (contact.emailAddresses && contact.emailAddresses.length > 0) {
+                document.getElementById('editEmail').value = contact.emailAddresses[0].value || '';
+            } else {
+                document.getElementById('editEmail').value = '';
+            }
+
+            // Set phone if available
+            if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+                document.getElementById('editPhone').value = contact.phoneNumbers[0].value || '';
+            } else {
+                document.getElementById('editPhone').value = '';
+            }
+
+            // Show the modal
+            document.getElementById('editContactModal').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error fetching contact:', error);
+            alert('Error loading contact details. Please try again.');
+        });
+}
+
+// Function to close edit modal
+function closeEditModal() {
+    document.getElementById('editContactModal').style.display = 'none';
+}
+// Function to save edited contact
+function saveContact() {
+    const resourceName = document.getElementById('editContactId').value;
+    const name = document.getElementById('editName').value;
+    const email = document.getElementById('editEmail').value;
+    const phone = document.getElementById('editPhone').value;
+
+    if (!name || name.trim() === '') {
+        alert('Name is required');
+        return;
+    }
+
+    // Create contact object with updated details
+    const contact = {
+        names: [{
+            displayName: name,
+            givenName: name
+        }]
+    };
+
+    // Add email if provided
+    if (email && email.trim() !== '') {
+        contact.emailAddresses = [{
+            value: email,
+            type: 'home'
+        }];
+    }
+
+    // Add phone if provided
+    if (phone && phone.trim() !== '') {
+        contact.phoneNumbers = [{
+            value: phone,
+            type: 'mobile'
+        }];
+    }
+
+    // Get CSRF token
+    const csrfToken = getCsrfToken();
+    console.log("Using CSRF token:", csrfToken);
+    console.log("Contact data to update:", contact);
+
+    // Make sure resourceName is properly formatted when sending to server
+    let formattedResourceName = resourceName;
+    if (!resourceName.startsWith('people/')) {
+        formattedResourceName = 'people/' + resourceName;
+    }
+
+    console.log("Using resourceName:", formattedResourceName);
+
+    // Send update request
+    fetch(`/api/contacts/update?resourceName=${encodeURIComponent(formattedResourceName)}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify(contact)
+    })
+    .then(response => {
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+            return response.json().then(data => {
+                console.error("Error response:", data);
+                throw new Error(data.message || 'Failed to update contact');
+            });        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Update success:", data);
+        closeEditModal();
+        loadContacts(); // Refresh contacts list
+        alert('Contact updated successfully!');
+    })
+    .catch(error => {
+        console.error('Error updating contact:', error);
+        alert('Error updating contact: ' + error.message);
+    });
+}
+// Function to delete a contact
+function deleteContact(resourceName) {
+    if (confirm('Are you sure you want to delete this contact?')) {
+        // Get CSRF token
+        const csrfToken = getCsrfToken();
+        console.log("Using CSRF token:", csrfToken);
+
+        fetch(`/api/contacts/delete?resourceName=${encodeURIComponent(resourceName)}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error("Error response:", text);
+                    throw new Error('Failed to delete contact');
+                });
+            }
+            loadContacts(); // Refresh contacts list
+            alert('Contact deleted successfully!');
+        })
+        .catch(error => {
+            console.error('Error deleting contact:', error);
+            alert('Error deleting contact. Please try again.');
+        });
+    }
+}
+// Function to create a new contact
+function createNewContact() {
+    const name = document.getElementById('newName').value;
+    const email = document.getElementById('newEmail').value;
+    const phone = document.getElementById('newPhone').value;
+
+    if (!name || name.trim() === '') {
+        alert('Name is required');
+        return;
+    }
+
+    // Create contact object
+    const contact = {
+        names: [{
+            displayName: name,
+            givenName: name
+        }]
+    };
+
+    // Add email if provided
+    if (email && email.trim() !== '') {
+        contact.emailAddresses = [{
+            value: email,
+            type: 'home'
+        }];
+    }
+
+    // Add phone if provided
+    if (phone && phone.trim() !== '') {
+        contact.phoneNumbers = [{
+            value: phone,
+            type: 'mobile'
+        }];
+    }
+
+    // Get CSRF token from cookie
+    const csrfToken = getCsrfToken();
+    console.log("Using CSRF token:", csrfToken);
+
+    // Send create request
+    fetch('/api/contacts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify(contact)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to create contact');
+        }
+        return response.json();
+    })
+    .then(data => {
+        closeNewContactModal();
+        loadContacts(); // Refresh contacts list
+        alert('Contact created successfully!');
+    })
+    .catch(error => {
+        console.error('Error creating contact:', error);
+        alert('Error creating contact. Please try again.');
+    });
+}
+
+// Helper function to get CSRF token from cookies
+function getCsrfToken() {
+    const name = "XSRF-TOKEN=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(';');
+
+    for (let i = 0; i < cookieArray.length; i++) {
+        let cookie = cookieArray[i].trim();
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length, cookie.length);
+        }
+    }
+    console.warn("CSRF token not found in cookies");
+    return "";
+}
+</script>
