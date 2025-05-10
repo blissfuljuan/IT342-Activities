@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        a {
+            color: #bb86fc;
+            text-decoration: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #1e1e1e;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        form {
+            background: #1e1e1e;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form div {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+        }
+
+        form input[type="submit"],
+        form button {
+            background: #333;
+            color: #fff;
+            border: 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        form button {
+            margin-top: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <h1>Google Contacts API</h1>
+    </div>
+</header>
+<div class="container">
+    <h2>
+        Login
+    </h2>
+    <form th:action="@{/login}" method="post">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"/>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"/>
+        </div>
+        <div>
+            <input type="submit" value="Login"/>
+        </div>
+    </form>
+    <div>
+        <a th:href="@{/oauth2/authorization/google}"><button>Login with Google</button></a>
+        <a th:href="@{/oauth2/authorization/github}"><button>Login with GitHub</button></a>
+    </div>
+</div>
+</body>
+</html>
