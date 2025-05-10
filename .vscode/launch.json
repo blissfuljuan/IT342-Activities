@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-OAuth2LoginApplication<OAuth2demo>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "duterte.com.example.OAuth2demo.OAuth2LoginApplication",
+            "projectName": "OAuth2demo",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GooglecontactsApplication<googlecontacts>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.duterte.googlecontacts.GooglecontactsApplication",
+            "projectName": "googlecontacts",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
