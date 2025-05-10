@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Google Contacts</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 20px;
+    }
+    .container {
+        width: 60%;
+        margin: 50px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: left;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+    th {
+        background-color: #0073e6;
+        color: white;
+    }
+    .error {
+        color: red;
+        text-align: center;
+        font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Google Contacts</h1>
+
+  <!-- Error Message -->
+  <div th:if="${error}" class="error">
+    <p th:text="${error}"></p>
+  </div>
+
+  <table th:if="${contacts}">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+      <td th:text="${contact.name}"></td>
+      <td th:text="${contact.email}"></td>
+      <td th:text="${contact.phone}"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p th:if="${contacts == null}" class="error">No contacts found.</p>
+</div>
+</body>
+</html>
