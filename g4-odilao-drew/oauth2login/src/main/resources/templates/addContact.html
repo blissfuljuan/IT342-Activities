@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Contact - Google Contacts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    :root {
+        --primary-color: #4285F4;
+        --secondary-color: #fbbc05;
+        --text-color: #333;
+        --light-gray: #f8f9fa;
+        --border-color: #e0e0e0;
+    }
+
+    body {
+        font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+        color: var(--text-color);
+        background-color: #f5f5f5;
+    }
+
+    .navbar {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: white !important;
+        padding: 12px 0;
+    }
+
+    .navbar-brand {
+        font-weight: 500;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-brand i {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: #555;
+        position: relative;
+        padding: 8px 16px;
+    }
+
+    .nav-link.active {
+        color: var(--primary-color);
+    }
+
+    .nav-link.active:after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .container-card {
+        max-width: 800px;
+        margin: 40px auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background-color: var(--primary-color) !important;
+        color: white;
+        padding: 20px 30px;
+        border: none;
+    }
+
+    .card-header h2 {
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-header h2 i {
+        margin-right: 10px;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+        position: relative;
+    }
+
+    .form-group i {
+        position: absolute;
+        left: 12px;
+        top: 42px;
+        color: #5f6368;
+    }
+
+    .form-group .form-control {
+        padding-left: 40px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-weight: 500;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: #3367d6;
+        border-color: #3367d6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+    }
+
+    .btn-secondary {
+        background-color: #f1f3f4;
+        border-color: #f1f3f4;
+        color: #5f6368;
+    }
+
+    .btn-secondary:hover {
+        background-color: #e8eaed;
+        border-color: #e8eaed;
+        color: #202124;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert {
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 24px;
+        border: none;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="/">
+      <i class="bi bi-person-circle"></i>
+      Google Contacts
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/contacts">Contacts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/user-info">Profile</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-card">
+  <div class="card-header">
+    <h2><i class="bi bi-person-plus-fill"></i> Add New Contact</h2>
+  </div>
+  <div class="card-body">
+    <div th:if="${error}" class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <span th:text="${error}">Error message</span>
+    </div>
+
+    <form action="/contact/add" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <div class="form-group mb-3">
+        <label for="displayName" class="form-label">Full Name</label>
+        <i class="bi bi-person-fill"></i>
+        <input type="text" class="form-control" id="displayName" name="displayName" placeholder="Enter contact name" required>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <i class="bi bi-envelope-fill"></i>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="phoneNumber" class="form-label">Phone Number</label>
+        <i class="bi bi-telephone-fill"></i>
+        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="notes" class="form-label">Notes</label>
+        <i class="bi bi-sticky-fill"></i>
+        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any additional information"></textarea>
+      </div>
+
+      <div class="actions">
+        <a href="/contacts" class="btn btn-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-save me-1"></i> Save Contact
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
