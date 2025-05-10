@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Royal Contacts - Google Contacts Integration</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        :root {
+            --royal-purple: #4a0080;
+            --royal-purple-dark: #370060;
+            --royal-purple-light: #6920a5;
+            --royal-lavender: #c7a4e5;
+            --royal-gold: #e7bd45;
+            --royal-cream: #f7f3e8;
+            --royal-black: #1a0033;
+            --royal-success: #448853;
+            --royal-danger: #a23645;
+        }
+        
+        body {
+            background-color: #f2edf8;
+            font-family: 'Raleway', sans-serif;
+            color: #333;
+            background-image: linear-gradient(135deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%),
+                              linear-gradient(225deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%),
+                              linear-gradient(315deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%),
+                              linear-gradient(45deg, rgba(201, 178, 228, 0.1) 25%, transparent 25%);
+            background-size: 25px 25px;
+        }
+        
+        h1, h2, h3, h4, h5, .card-title, .navbar-brand {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(to right, var(--royal-purple), var(--royal-purple-light));
+            border-bottom: 3px solid var(--royal-gold);
+            padding: 0.75rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .navbar-brand i {
+            color: var(--royal-gold);
+            font-size: 1.75rem;
+        }
+        
+        .royal-crown {
+            display: inline-block;
+            margin-right: 5px;
+            color: var(--royal-gold);
+        }
+        
+        .navbar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+            padding: 8px 16px;
+            position: relative;
+        }
+        
+        .navbar .nav-link::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -3px;
+            left: 50%;
+            background-color: var(--royal-gold);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .navbar .nav-link:hover::after, 
+        .navbar .nav-link.active::after {
+            width: 80%;
+        }
+        
+        .navbar .nav-link:hover, 
+        .navbar .nav-link.active {
+            color: white;
+        }
+        
+        .navbar .nav-link.logout {
+            color: white;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        
+        .navbar .nav-link.logout:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: var(--royal-gold);
+        }
+        
+        .navbar .nav-link.logout::after {
+            display: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            padding: 30px 20px;
+        }
+        
+        .page-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--royal-purple);
+        }
+        
+        .page-title::after {
+            content: "";
+            display: block;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(to right, var(--royal-gold), transparent);
+            margin-top: 8px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background-color: white;
+            position: relative;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--royal-purple), var(--royal-purple-light));
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            margin-bottom: 0;
+            color: var(--royal-purple);
+            font-weight: 700;
+            font-size: 1.75rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        
+        .btn-royal {
+            background-color: var(--royal-purple);
+            border-color: var(--royal-purple);
+            color: white;
+        }
+        
+        .btn-royal:hover {
+            background-color: var(--royal-purple-dark);
+            border-color: var(--royal-purple-dark);
+            color: white;
+            box-shadow: 0 4px 8px rgba(74, 0, 128, 0.3);
+        }
+        
+        .btn-gold {
+            background-color: var(--royal-gold);
+            border-color: var(--royal-gold);
+            color: var(--royal-black);
+        }
+        
+        .btn-gold:hover {
+            background-color: #d3aa3a;
+            border-color: #d3aa3a;
+            color: var(--royal-black);
+            box-shadow: 0 4px 8px rgba(231, 189, 69, 0.3);
+        }
+        
+        .btn-danger {
+            background-color: var(--royal-danger);
+            border-color: var(--royal-danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #8c2d3a;
+            border-color: #8c2d3a;
+            box-shadow: 0 4px 8px rgba(162, 54, 69, 0.3);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .add-contact-btn {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .add-contact-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+        
+        .add-contact-btn:hover::before {
+            left: 0;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            background-color: #f5f0fa;
+            color: var(--royal-purple-dark);
+            font-weight: 600;
+            border-bottom: 2px solid rgba(74, 0, 128, 0.1);
+            padding: 1.2rem 1.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .table td {
+            padding: 1.2rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+        
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(201, 178, 228, 0.1);
+        }
+        
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .avatar-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border: 2px solid white;
+        }
+        
+        .avatar-circle::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            bottom: -2px;
+            left: -2px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Avatar color classes - royal purple palette */
+        .avatar-a { background: linear-gradient(135deg, #6920a5, #4a0080); }
+        .avatar-b { background: linear-gradient(135deg, #7030a5, #5a1090); }
+        .avatar-c { background: linear-gradient(135deg, #7540a5, #6a20a0); }
+        .avatar-d { background: linear-gradient(135deg, #6530b5, #5a20a0); }
+        .avatar-e { background: linear-gradient(135deg, #5520a5, #4a1090); }
+        .avatar-f { background: linear-gradient(135deg, #4510a5, #3a0080); }
+        .avatar-g { background: linear-gradient(135deg, #5520b5, #4a10a0); }
+        .avatar-h { background: linear-gradient(135deg, #6a30c5, #5a20b0); }
+        .avatar-i { background: linear-gradient(135deg, #7a40d5, #6a30c0); }
+        .avatar-j { background: linear-gradient(135deg, #8a50e5, #7a40d0); }
+        .avatar-k { background: linear-gradient(135deg, #7a40c5, #6a30b0); }
+        .avatar-l { background: linear-gradient(135deg, #6a30b5, #5a20a0); }
+        .avatar-m { background: linear-gradient(135deg, #5a20a5, #4a1090); }
+        .avatar-n { background: linear-gradient(135deg, #4a10a5, #3a0090); }
+        .avatar-o { background: linear-gradient(135deg, #5a20b5, #4a10a0); }
+        .avatar-p { background: linear-gradient(135deg, #6a30c5, #5a20b0); }
+        .avatar-q { background: linear-gradient(135deg, #7a40d5, #6a30c0); }
+        .avatar-r { background: linear-gradient(135deg, #8a50e5, #7a40d0); }
+        .avatar-s { background: linear-gradient(135deg, #7a40c5, #6a30b0); }
+        .avatar-t { background: linear-gradient(135deg, #6a30b5, #5a20a0); }
+        .avatar-u { background: linear-gradient(135deg, #5a20a5, #4a1090); }
+        .avatar-v { background: linear-gradient(135deg, #4a10a5, #3a0090); }
+        .avatar-w { background: linear-gradient(135deg, #5a20b5, #4a10a0); }
+        .avatar-x { background: linear-gradient(135deg, #6a30c5, #5a20b0); }
+        .avatar-y { background: linear-gradient(135deg, #7a40d5, #6a30c0); }
+        .avatar-z { background: linear-gradient(135deg, #8a50e5, #7a40d0); }
+        .avatar-default { background: linear-gradient(135deg, #594d6d, #3a3045); }
+        
+        .contact-name {
+            font-weight: 600;
+            color: var(--royal-purple-dark);
+            transition: all 0.2s ease;
+        }
+        
+        tr:hover .contact-name {
+            color: var(--royal-purple);
+        }
+        
+        .text-muted {
+            color: #8a8a8a !important;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn i {
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        .action-btn.edit-btn {
+            background-color: #f8f0ff;
+            border: 1px solid #e5d1fa;
+            color: var(--royal-purple);
+        }
+        
+        .action-btn.edit-btn:hover {
+            background-color: var(--royal-purple);
+            border-color: var(--royal-purple);
+            color: white;
+        }
+        
+        .action-btn.delete-btn {
+            background-color: #fff0f0;
+            border: 1px solid #fad1d1;
+            color: var(--royal-danger);
+        }
+        
+        .action-btn.delete-btn:hover {
+            background-color: var(--royal-danger);
+            border-color: var(--royal-danger);
+            color: white;
+        }
+        
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #f5f0fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: var(--royal-purple);
+            font-size: 2.5rem;
+        }
+        
+        .empty-state h3 {
+            color: var(--royal-purple);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/contacts">
+                <i class="bi bi-gem"></i>
+                 Contacts
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/contacts">
+                            <i class="bi bi-journals"></i> Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user-info">
+                            <i class="bi bi-person-badge"></i> Profile
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link logout" href="/logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1 class="page-title">Contacts</h1>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="bi bi-book me-2"></i>
+                    My Contacts
+                </h2>
+                <a href="/contact/add-form" class="btn btn-gold add-contact-btn">
+                    <i class="bi bi-plus-circle"></i> Add New Contact
+                </a>
+            </div>
+            
+            <div class="card-body">
+                <div class="empty-state" th:if="${contacts == null || contacts.isEmpty()}">
+                    <div class="empty-icon">
+                        <i class="bi bi-journal"></i>
+                    </div>
+                    <h3>Your Directory Awaits</h3>
+                    <p>Your royal contacts directory is empty. Begin building your network by adding your first contact.</p>
+                    <a href="/contact/add-form" class="btn btn-royal">
+                        <i class="bi bi-plus-circle"></i> Add First Contact
+                    </a>
+                </div>
+
+                <div class="table-container" th:unless="${contacts == null || contacts.isEmpty()}">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col"><i class="bi bi-person me-2"></i>Name</th>
+                            <th scope="col"><i class="bi bi-envelope me-2"></i>Email</th>
+                            <th scope="col"><i class="bi bi-telephone me-2"></i>Phone</th>
+                            <th scope="col" class="text-end"><i class="bi bi-gear me-2"></i>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="contact : ${contacts}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div th:class="${'avatar-circle avatar-' + (#strings.toLowerCase(#strings.substring(contact.names[0].displayName, 0, 1)))}">
+                                        <span th:text="${#strings.substring(contact.names[0].displayName, 0, 1)}">A</span>
+                                    </div>
+                                    <div class="ms-3">
+                                        <div class="contact-name" th:text="${contact.names[0].displayName}">Name</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div th:if="${not #lists.isEmpty(contact.emailAddresses)}">
+                                    <div th:each="email, emailStat : ${contact.emailAddresses}" th:unless="${emailStat.index > 2}">
+                                        <span th:text="${email.value}">Email</span>
+                                        <small th:if="${email.type}" class="text-muted ms-1" th:text="'(' + ${email.type} + ')'"></small>
+                                        <br th:if="${!emailStat.last && emailStat.index < 2}"/>
+                                    </div>
+                                    <small th:if="${contact.emailAddresses.size() > 3}" class="text-muted">
+                                        +<span th:text="${contact.emailAddresses.size() - 3}"></span> more
+                                    </small>
+                                </div>
+                                <span th:unless="${not #lists.isEmpty(contact.emailAddresses)}" class="text-muted">No email</span>
+                            </td>
+                            <td>
+                                <div th:if="${not #lists.isEmpty(contact.phoneNumbers)}">
+                                    <div th:each="phone, phoneStat : ${contact.phoneNumbers}" th:unless="${phoneStat.index > 2}">
+                                        <span th:text="${phone.value}">Phone</span>
+                                        <small th:if="${phone.type}" class="text-muted ms-1" th:text="'(' + ${phone.type} + ')'"></small>
+                                        <br th:if="${!phoneStat.last && phoneStat.index < 2}"/>
+                                    </div>
+                                    <small th:if="${contact.phoneNumbers.size() > 3}" class="text-muted">
+                                        +<span th:text="${contact.phoneNumbers.size() - 3}"></span> more
+                                    </small>
+                                </div>
+                                <span th:unless="${not #lists.isEmpty(contact.phoneNumbers)}" class="text-muted">No phone</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end">
+                                    <a th:href="@{'/contacts/edit/' + ${contact.resourceName}}" class="btn action-btn edit-btn" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{'/contacts/delete/' + ${contact.resourceName}}"
+                                       class="btn action-btn delete-btn"
+                                       onclick="return confirm('Are you sure you want to delete this contact?')" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+</body>
+</html>
