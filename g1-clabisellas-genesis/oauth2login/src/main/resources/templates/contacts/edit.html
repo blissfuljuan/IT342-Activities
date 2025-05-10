@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Contact - Google Contacts Integration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Google Contacts Integration</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contacts">Back to Contacts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Edit Contact</h2>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{'/contacts/' + ${resourceName}}" method="post">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" 
+                                           th:value="${utils.getFirstName(contact)}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" 
+                                           th:value="${utils.getLastName(contact)}">
+                                </div>
+                            </div>
+                            
+                            <div id="emailFields">
+                                <label class="form-label">Email Addresses</label>
+                                <div th:each="email, iterStat : ${utils.getEmails(contact)}" class="mb-3 input-group">
+                                    <input type="email" class="form-control" name="emails" th:value="${email}" required>
+                                    <button type="button" class="btn btn-danger" th:if="${iterStat.index > 0}" onclick="removeField(this)">-</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary mb-3" onclick="addEmailField()">+ Add Email</button>
+                            
+                            <div id="phoneFields">
+                                <label class="form-label">Phone Numbers</label>
+                                <div th:each="phone, iterStat : ${utils.getPhoneNumbers(contact)}" class="mb-3 input-group">
+                                    <input type="tel" class="form-control" name="phoneNumbers" th:value="${phone}" required>
+                                    <button type="button" class="btn btn-danger" th:if="${iterStat.index > 0}" onclick="removeField(this)">-</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary mb-3" onclick="addPhoneField()">+ Add Phone</button>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/contacts" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Update Contact</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addEmailField() {
+            let emailFields = document.getElementById('emailFields');
+            let newField = document.createElement('div');
+            newField.classList.add('mb-3', 'input-group');
+            newField.innerHTML = `<input type="email" class="form-control" name="emails" required>
+                                  <button type="button" class="btn btn-danger" onclick="removeField(this)">-</button>`;
+            emailFields.appendChild(newField);
+        }
+
+        function addPhoneField() {
+            let phoneFields = document.getElementById('phoneFields');
+            let newField = document.createElement('div');
+            newField.classList.add('mb-3', 'input-group');
+            newField.innerHTML = `<input type="tel" class="form-control" name="phoneNumbers" required>
+                                  <button type="button" class="btn btn-danger" onclick="removeField(this)">-</button>`;
+            phoneFields.appendChild(newField);
+        }
+
+        function removeField(button) {
+            button.parentElement.remove();
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
