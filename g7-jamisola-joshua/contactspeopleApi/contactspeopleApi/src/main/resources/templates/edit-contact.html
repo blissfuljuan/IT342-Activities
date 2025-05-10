@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Contact</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Edit Contact</h2>
+    <form action="/update-contact" method="post">
+        <input type="hidden" name="resourceName" th:value="${contact.resourceName}" />
+
+        <label>First Name:</label>
+        <input type="text" name="givenName" th:value="${contact.names != null and #lists.size(contact.names) > 0 ? contact.names[0].givenName : ''}" />
+
+        <label>Last Name:</label>
+        <input type="text" name="familyName" th:value="${contact.names != null and #lists.size(contact.names) > 0 ? contact.names[0].familyName : ''}" />
+
+        <label>Email:</label>
+        <input type="email" name="email" th:value="${contact.emailAddresses != null and #lists.size(contact.emailAddresses) > 0 ? contact.emailAddresses[0].value : ''}" />
+
+        <label>Phone:</label>
+        <input type="text" name="phone" th:value="${contact.phoneNumbers != null and #lists.size(contact.phoneNumbers) > 0 ? contact.phoneNumbers[0].value : ''}" />
+
+        <button type="submit">Update Contact</button>
+    </form>
+
+    <a href="/contacts">Back to Contacts</a>
+</div>
+
+</body>
+</html>
