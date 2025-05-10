@@ -1,0 +1,77 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body - Plain white background */
+body {
+    background: white;
+    color: black;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Basic layout */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+/* Remove card styles */
+.card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    background: white;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 10px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+    background: gray;
+    color: white;
+}
+
+.btn:hover {
+    background: darkgray;
+}
+
+/* Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.table th {
+    background: lightgray;
+}
+
+/* Remove any floating images */
+img {
+    display: none;
+}

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Contact - Google Contacts Integration</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        :root {
+            --bg-gradient-light: linear-gradient(-45deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            --bg-gradient-dark: linear-gradient(-45deg, #1a73e8, #188038, #c47f00, #d93025);
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --hover-bg: #f8f9fa;
+            --table-header-bg: #f8f9fa;
+            --overlay-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #212529;
+            --bg-secondary: #343a40;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --border-color: #495057;
+            --hover-bg: #343a40;
+            --table-header-bg: #343a40;
+            --overlay-bg: rgba(33, 37, 41, 0.9);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: lightblue !important;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] body {
+            background: var(--bg-gradient-dark);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .contact-card {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: float 6s infinite;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 0;
+        }
+
+        [data-theme="dark"] .contact-card {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            top: 10px;
+        }
+
+        [data-theme="dark"] .contact-card::before {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-card::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            top: 40px;
+        }
+
+        [data-theme="dark"] .contact-card::after {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .content-container {
+            position: relative;
+            background: var(--overlay-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.15);
+            backdrop-filter: blur(12px);
+            margin: 2rem auto;
+            max-width: 800px;
+            z-index: 1;
+            border: 1px solid var(--border-color);
+        }
+
+        :root {
+            /* Base colors */
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 221.2 83.2% 53.3%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96.1%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96.1%;
+            --accent-foreground: 222.2 47.4% 11.2%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+            --radius: 0.75rem;
+        }
+
+        .dark {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 217.2 91.2% 59.8%;
+            --primary-foreground: 222.2 47.4% 11.2%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 224.3 76.3% 48%;
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .navbar {
+            background: hsl(var(--background));
+            border-bottom: 1px solid hsl(var(--border));
+            padding: 1rem 0;
+        }
+
+        .nav-link {
+            color: hsl(var(--foreground));
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+            border-radius: calc(var(--radius) - 0.5rem);
+        }
+
+        .nav-link:hover {
+            color: hsl(var(--primary));
+            background: hsl(var(--accent));
+        }
+
+        .form-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            margin: 0;
+        }
+
+        .form-description {
+            color: hsl(var(--muted-foreground));
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: hsl(var(--foreground));
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: hsl(var(--background));
+            border: 1px solid hsl(var(--input));
+            border-radius: var(--radius);
+            color: hsl(var(--foreground));
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+
+        .form-control::placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+            margin-top: 0.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon {
+            font-size: 1.25rem;
+        }
+
+        .error-message {
+            color: hsl(var(--destructive));
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .contact-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: block;
+            border: 2px solid hsl(var(--border));
+            padding: 2px;
+        }
+
+        .multi-field {
+            position: relative;
+            padding: 1rem;
+            background: hsl(var(--accent));
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+
+        .multi-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .multi-field-actions {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-add-field {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: hsl(var(--primary));
+            background: transparent;
+            border: 1px dashed hsl(var(--primary));
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-field:hover {
+            background: hsl(var(--primary) / 0.1);
+        }
+
+        .btn-remove-field {
+            padding: 0.25rem;
+            font-size: 1rem;
+            color: hsl(var(--muted-foreground));
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-remove-field:hover {
+            color: hsl(var(--destructive));
+        }
+
+        .field-type-select {
+            width: auto;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+            }
+            body {
+                color-scheme: dark;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-animation"></div>
+    <div class="content-container">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="/contacts">My Contacts</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contacts">Contacts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/user-info">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container py-4">
+            <div class="form-card">
+                <div class="form-header">
+                    <h1 class="form-title">Edit Contact</h1>
+                    <p class="form-description">Update contact information below</p>
+                </div>
+
+                <!-- Error Message Display -->
+                <div th:if="${error}" class="alert alert-danger mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span th:text="${error}">Error message</span>
+                </div>
+
+                <!-- Contact Not Found Message -->
+                <div th:if="${contact == null}" class="text-center py-4">
+                    <i class="bi bi-person-x fs-1 text-muted mb-3 d-block"></i>
+                    <h3 class="mb-3">Contact not found or could not be loaded.</h3>
+                    <p class="text-muted mb-4">The contact you're trying to edit might have been deleted or is not accessible.</p>
+                    <a href="/contacts" class="btn btn-primary">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Return to Contacts
+                    </a>
+                </div>
+
+                <!-- Edit Form -->
+                <form th:if="${contact != null}" 
+                      th:action="@{'/contacts/edit/people/' + ${#strings.replace(contact.resourceName, 'people/', '')}}"
+                      method="post" 
+                      id="editContactForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    
+                    <div class="form-group mb-4">
+                        <label for="displayName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="displayName" name="displayName" 
+                               th:value="${contact.names != null and not #lists.isEmpty(contact.names) ? contact.names[0].displayName : ''}" 
+                               required>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">Email Addresses</label>
+                        <div id="emailFields">
+                            <div th:if="${contact.emailAddresses != null and not #lists.isEmpty(contact.emailAddresses)}" 
+                                 th:each="email, stat : ${contact.emailAddresses}" class="multi-field">
+                                <div class="input-group mb-3">
+                                    <input type="email" class="form-control" name="emails" 
+                                           th:value="${email.value}" placeholder="Enter email address">
+                                    <select class="form-select" name="emailTypes" style="max-width: 120px;">
+                                        <option value="home" th:selected="${email.type == 'home'}">Home</option>
+                                        <option value="work" th:selected="${email.type == 'work'}">Work</option>
+                                        <option value="other" th:selected="${email.type == 'other'}">Other</option>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeField(this)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEmailField()">
+                            <i class="bi bi-plus"></i> Add Email
+                        </button>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">Phone Numbers</label>
+                        <div id="phoneFields">
+                            <div th:if="${contact.phoneNumbers != null and not #lists.isEmpty(contact.phoneNumbers)}" 
+                                 th:each="phone, stat : ${contact.phoneNumbers}" class="multi-field">
+                                <div class="input-group mb-3">
+                                    <input type="tel" class="form-control" name="phones" 
+                                           th:value="${phone.value}" placeholder="Enter phone number">
+                                    <select class="form-select" name="phoneTypes" style="max-width: 120px;">
+                                        <option value="mobile" th:selected="${phone.type == 'mobile'}">Mobile</option>
+                                        <option value="home" th:selected="${phone.type == 'home'}">Home</option>
+                                        <option value="work" th:selected="${phone.type == 'work'}">Work</option>
+                                        <option value="other" th:selected="${phone.type == 'other'}">Other</option>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeField(this)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addPhoneField()">
+                            <i class="bi bi-plus"></i> Add Phone
+                        </button>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/contacts" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/theme.js}"></script>
+    <script>
+        function createEmailField() {
+            return `
+                <div class="multi-field">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" name="emails" placeholder="Enter email address">
+                        <select class="form-select" name="emailTypes" style="max-width: 120px;">
+                            <option value="home">Home</option>
+                            <option value="work">Work</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeField(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createPhoneField() {
+            return `
+                <div class="multi-field">
+                    <div class="input-group mb-3">
+                        <input type="tel" class="form-control" name="phones" placeholder="Enter phone number">
+                        <select class="form-select" name="phoneTypes" style="max-width: 120px;">
+                            <option value="mobile">Mobile</option>
+                            <option value="home">Home</option>
+                            <option value="work">Work</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeField(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addEmailField() {
+            document.getElementById('emailFields').insertAdjacentHTML('beforeend', createEmailField());
+        }
+
+        function addPhoneField() {
+            document.getElementById('phoneFields').insertAdjacentHTML('beforeend', createPhoneField());
+        }
+
+        function removeField(button) {
+            button.closest('.multi-field').remove();
+        }
+
+        // Add initial fields if none exist
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailFields = document.getElementById('emailFields');
+            const phoneFields = document.getElementById('phoneFields');
+
+            if (emailFields.children.length === 0) {
+                addEmailField();
+            }
+            if (phoneFields.children.length === 0) {
+                addPhoneField();
+            }
+        });
+    </script>
+    <script>
+        function createContactCards() {
+            const container = document.body;
+            const numCards = 8;
+            
+            for (let i = 0; i < numCards; i++) {
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                
+                // Random position
+                card.style.left = Math.random() * 100 + 'vw';
+                card.style.top = Math.random() * 100 + 'vh';
+                
+                // Random animation delay
+                card.style.animationDelay = (Math.random() * 2) + 's';
+                
+                container.appendChild(card);
+            }
+        }
+
+        window.addEventListener('load', createContactCards);
+    </script>
+</body>
+</html>
