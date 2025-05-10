@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <script>
+        async function deleteContact(resourceName) {
+            if (!confirm("Are you sure you want to delete this contact?")) return;
+
+            try {
+                const response = await fetch(`/deleteContact?resourceName=${resourceName}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert("Contact deleted successfully");
+                    location.reload(); // Refresh the page to reflect changes
+                } else {
+                    alert("Failed to delete contact");
+                }
+            } catch (error) {
+                console.error("Error deleting contact:", error);
+                alert("Error deleting contact");
+            }
+        }
+
+        function openEditModal(resourceName, name, email, phone) {
+            document.getElementById('edit-resourceName').value = resourceName;
+            document.getElementById('edit-givenName').value = name || '';
+            document.getElementById('edit-email').value = email || '';
+            document.getElementById('edit-mobile').value = phone || '';
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        async function updateContact(event) {
+            event.preventDefault();
+            
+            const resourceName = document.getElementById('edit-resourceName').value;
+            const givenName = document.getElementById('edit-givenName').value;
+            const email = document.getElementById('edit-email').value;
+            const mobile = document.getElementById('edit-mobile').value;
+        
+            const params = new URLSearchParams({
+                resourceName: resourceName,
+                givenName: givenName || "",
+                email: email || "",
+                mobile: mobile || ""
+            });
+        
+            try {
+                const response = await fetch(`/updateContact?${params.toString()}`, {
+                    method: "PUT"
+                });
+        
+                if (response.ok) {
+                    alert("Contact updated successfully");
+                    location.reload(); // Refresh page to see updates
+                } else {
+                    const errorMsg = await response.text();
+                    alert("Failed to update contact: " + errorMsg);
+                }
+            } catch (error) {
+                console.error("Error updating contact:", error);
+                alert("Error updating contact");
+            }
+        }
+        
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+<h1>Google Contacts</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names != null and contact.names[0] != null ? contact.names[0].displayName : 'No Name'}"></td>
+        <td th:text="${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : 'No Email'}"></td>
+        <td th:text="${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : 'No Phone'}"></td>
+        <td>
+            <button th:attr="onclick='openEditModal(\'' + ${contact.resourceName} + '\', \'' + 
+                (${contact.names != null and contact.names.size() > 0 ? contact.names[0].displayName : 'No Name'}) + '\', \'' +
+                (${contact.emailAddresses != null and contact.emailAddresses.size() > 0 ? contact.emailAddresses[0].value : ''}) + '\', \'' +
+                (${contact.phoneNumbers != null and contact.phoneNumbers.size() > 0 ? contact.phoneNumbers[0].value : ''}) + '\')'">
+                Edit
+            </button>
+            <button th:attr="onclick='deleteContact(\'' + ${contact.resourceName} + '\')'">Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Create Contact Form -->
+<form action="/createContact" method="post">
+    <input type="text" name="givenName" placeholder="First Name" required>
+    <input type="text" name="familyName" placeholder="Last Name" required>
+    <input type="text" name="email" placeholder="Email" required>
+    <input type="text" name="mobile" placeholder="Phone No." required>
+    <button type="submit">Add Contact</button>
+</form>
+
+<!-- Edit Contact Modal -->
+<div id="editModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 20px; border: 1px solid black;">
+    <h2>Edit Contact</h2>
+    <form id="editContactForm" onsubmit="updateContact(event)">
+        <input type="hidden" id="edit-resourceName">
+        <label>First Name:</label>
+        <input type="text" id="edit-givenName" required><br>
+        <label>Email:</label>
+        <input type="text" id="edit-email"><br>
+        <label>Phone:</label>
+        <input type="text" id="edit-mobile"><br>
+        <button type="submit">Update</button>
+        <button type="button" onclick="closeEditModal()">Cancel</button>
+    </form>
+</div>
+
+</body>
+</html>
