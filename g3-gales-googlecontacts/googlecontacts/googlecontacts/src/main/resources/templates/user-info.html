@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: gray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            border: black 1px solid;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            align-self: flex-start;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: royalblue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: darkblue;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>User Information</h2>
+
+    <!-- Profile Picture -->
+    <div class="profile-pic">
+        <img th:src="${user.picture}" alt="Profile Picture">
+    </div>
+
+    <!-- User Information -->
+    <div class="info">
+        <label>Name:</label>
+        <input type="text" th:value="${user.name}" readonly>
+
+        <label>Email:</label>
+        <input type="text" th:value="${user.email}" readonly>
+
+        <label>Phone Number:</label>
+        <input type="text" th:value="${user.phone}" readonly>
+
+        <!-- Google Contacts Button -->
+        <a href="/google-contacts">
+            <button class="btn">Go to Google Contacts</button>
+        </a>
+    </div>
+</div>
+</body>
+</html>

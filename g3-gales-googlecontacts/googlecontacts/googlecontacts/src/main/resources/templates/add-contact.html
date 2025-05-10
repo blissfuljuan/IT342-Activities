@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Contact</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 8px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-submit {
+            background-color: royalblue;
+            color: white;
+            border: none;
+            margin-right: 5px;
+        }
+
+        .btn-back {
+            background-color: gray;
+            color: white;
+            border: none;
+            margin-left: 5px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Add New Contact</h2>
+
+    <form action="/add-contact" method="post">
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="phone" placeholder="Phone Number" required>
+
+        <div class="button-container">
+            <button type="submit" class="btn btn-submit">Add Contact</button>
+            <a href="/google-contacts" class="btn btn-back">Back</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

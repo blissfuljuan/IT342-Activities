@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Edit Contact</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-save {
+      background-color: cornflowerblue;
+      color: white;
+    }
+
+    .btn-cancel {
+      background-color: gray;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
+  <script>
+    async function updateContact(event) {
+      event.preventDefault();
+
+      const resourceName = document.getElementById("resourceName").value;
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      const requestData = { resourceName };
+
+      if (firstName || lastName) {
+        requestData.firstName = firstName || "";
+        requestData.lastName = lastName || "";
+      }
+      if (email) {
+        requestData.email = email;
+      }
+      if (phone) {
+        requestData.phone = phone;
+      }
+
+      try {
+        let response = await fetch("/edit-contact", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+          alert("Contact updated successfully!");
+          window.location.href = "/google-contacts";
+        } else {
+          let errorMessage = await response.text();
+          alert("Failed to update contact: " + errorMessage);
+        }
+      } catch (error) {
+        console.error("Error updating contact:", error);
+        alert("Failed to update contact.");
+      }
+    }
+  </script>
+</head>
+<body>
+<div class="container">
+  <h1>Edit Contact</h1>
+
+  <form onsubmit="updateContact(event)">
+    <input type="hidden" id="resourceName" name="resourceName" th:value="${resourceName}" />
+
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" name="firstName"
+           th:value="${contact.names != null and contact.names[0] != null and contact.names[0].givenName != null} ? ${contact.names[0].givenName} : ''" />
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastName"
+           th:value="${contact.names != null and contact.names[0] != null and contact.names[0].familyName != null} ? ${contact.names[0].familyName} : ''" />
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email"
+           th:value="${contact.emailAddresses != null and contact.emailAddresses[0] != null and contact.emailAddresses[0].value != null} ? ${contact.emailAddresses[0].value} : ''" />
+
+    <label for="phone">Phone:</label>
+    <input type="text" id="phone" name="phone"
+           th:value="${contact.phoneNumbers != null and contact.phoneNumbers[0] != null and contact.phoneNumbers[0].value != null} ? ${contact.phoneNumbers[0].value} : ''" />
+
+    <div class="button-container">
+      <button type="submit" class="btn btn-save">Save Changes</button>
+      <a href="/google-contacts" class="btn btn-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>

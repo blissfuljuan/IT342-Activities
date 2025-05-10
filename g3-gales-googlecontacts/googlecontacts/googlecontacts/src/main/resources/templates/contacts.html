@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Contacts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid black;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: black;
+            color: white;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid black;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Google Contacts</h1>
+        <a href="/add-contact">
+            <button class="btn btn-add" style="background-color:royalblue; color:white; border:none; height: 40px; font-weight: bold">Add Contact</button>
+        </a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact['names'] != null ? contact['names'][0]['displayName'] : 'N/A'}"></td>
+            <td th:text="${contact['emailAddresses'] != null ? contact['emailAddresses'][0]['value'] : 'N/A'}"></td>
+            <td th:text="${contact['phoneNumbers'] != null ? contact['phoneNumbers'][0]['value'] : 'N/A'}"></td>
+            <td>
+                <div class="actions">
+                    <a th:href="@{/edit-contact(resourceName=${contact['resourceName']})}">
+                        <button class="btn" style="background-color: dimgrey; color: white">Edit</button>
+                    </a>
+                    <form th:action="@{/delete-contact}" method="post" style="display:inline;">
+                        <input type="hidden" name="resourceName" th:value="${contact['resourceName']}" />
+                        <button type="submit" class="btn" style="background-color: crimson; color: white">Delete</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
