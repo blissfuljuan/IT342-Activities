@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Contacts</title>
+    <style>
+    body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #3c4043;
+            margin-bottom: 20px;
+        }
+
+        button {
+
+            color: black;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #185abc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+         .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Google Contacts</h1>
+<button id="createContactBtn"> Create </button>
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create New Contact</h2>
+        <form id="contactForm" th:action="@{/newContact}" method="post">
+            <label for="givenName">Given Name:</label><br>
+            <input type="text" id="givenName" name="givenName"><br>
+            <label for="familyName">Family Name:</label><br>
+            <input type="text" id="familyName" name="familyName"><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email"><br>
+            <label for="phoneNumber">Phone Number:</label><br>
+            <input type="tel" id="phoneNumber" name="phoneNumber"><br><br>
+            <button type="submit">Create Contact</button>
+        </form>
+    </div>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contact : ${contacts}">
+        <td th:text="${contact.names[0].displayName}"></td>
+        <td th:text="${contact.emailAddresses[0].value}"></td>
+        <td th:text="${contact.phoneNumbers[0].value}"></td>
+        <td>
+            <button th:data-resource-name="${contact.resourceName}"
+                    th:data-given-name="${contact.names[0].givenName}"
+                    th:data-family-name="${contact.names[0].familyName}"
+                    th:data-email="${contact.emailAddresses[0].value}"
+                    th:data-phone="${contact.phoneNumbers[0].value}"
+                    onclick="openUpdateModal(this)">
+                Edit
+            </button>
+
+            <div id="updateModal" class="modal">
+                <div class="modal-content">
+                    <span class="close update-close">x</span>
+                    <h2>Update Contact</h2>
+                    <form id="updateForm" th:action="@{/updateContact}" method="post">
+                        <input type="hidden" id="updateResourceName" name="resourceName">
+                        <label for="updateGivenName">Given Name:</label><br>
+                        <input type="text" id="updateGivenName" name="givenName"><br>
+                        <label for="updateFamilyName">Family Name:</label><br>
+                        <input type="text" id="updateFamilyName" name="familyName"><br>
+                        <label for="updateEmail">Email:</label><br>
+                        <input type="email" id="updateEmail" name="email"><br>
+                        <label for="updatePhoneNumber">Phone Number:</label><br>
+                        <input type="tel" id="updatePhoneNumber" name="phoneNumber"><br><br>
+                        <button type="submit">Update Contact</button>
+                    </form>
+                </div>
+            </div>
+
+            <form th:action="@{/deleteContact}" method="post" style="display:inline;">
+                <input type="hidden" name="resourceName" th:value="${contact.getResourceName()}">
+                <button type="submit">Delete</button>
+            </form></td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+
+        var modal = document.getElementById("contactModal");
+        var btn = document.getElementById("createContactBtn");
+        var span = document.getElementsByClassName("close")[0];
+        var updateModal = document.getElementById("updateModal");
+        var updateSpan = document.getElementsByClassName("update-close")[0];
+
+        function openUpdateModal(button) {
+            var resourceName = button.getAttribute("data-resource-name");
+            var givenName = button.getAttribute("data-given-name");
+            var familyName = button.getAttribute("data-family-name");
+            var email = button.getAttribute("data-email");
+            var phone = button.getAttribute("data-phone");
+
+
+
+            console.log("updateModal"+resourceName, givenName, familyName, email, phone);
+            if (updateModal) {
+
+                document.getElementById("updateResourceName").value = resourceName;
+                document.getElementById("updateGivenName").value = givenName;
+                document.getElementById("updateFamilyName").value = familyName;
+                document.getElementById("updateEmail").value = email;
+                document.getElementById("updatePhoneNumber").value = phone;
+
+
+                updateModal.style.display = "block";
+            } else {
+                console.error("Modal not found! Check the ID: updateModal" + resourceName);
+            }
+        }
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+    </script>
+
+</body>
+</html>
